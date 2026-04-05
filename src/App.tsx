@@ -9,6 +9,7 @@ import ProductPage from "./pages/ProductPage.tsx";
 import CartPage from "./pages/CartPage.tsx";
 import FavoritesPage from "./pages/FavoritesPage.tsx";
 import ProfilePage from "./pages/ProfilePage.tsx";
+import OrdersPage from "./pages/OrdersPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
