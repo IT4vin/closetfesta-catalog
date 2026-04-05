@@ -1,25 +1,23 @@
 import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, ShoppingBag, Heart, Minus, Plus, ShoppingCart } from "lucide-react";
-import { products, colorMap, type Product } from "@/data/products";
+import { products, colorMap } from "@/data/products";
 
-interface ProductDetailScreenProps {
-  productId: number;
-  onBack: () => void;
-}
-
-const ProductDetailScreen = ({ productId, onBack }: ProductDetailScreenProps) => {
-  const product = products.find((p) => p.id === productId) || products[0];
+const ProductDetailScreen = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const product = products.find((p) => p.id === Number(id)) || products[0];
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
   const [selectedSize, setSelectedSize] = useState("M");
   const [qty, setQty] = useState(1);
   const [fav, setFav] = useState(false);
 
   return (
-    <div className="relative flex flex-col h-full bg-background overflow-hidden">
-      <div className="flex-1 overflow-y-auto pb-28">
+    <div className="relative flex flex-col min-h-screen bg-background">
+      <div className="flex-1 pb-28">
         {/* Top Bar */}
         <div className="flex items-center justify-between px-5 pt-5 pb-3">
-          <button onClick={onBack} className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center shadow-card">
+          <button onClick={() => navigate("/")} className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center shadow-card">
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
           <h1 className="font-display text-lg font-semibold text-foreground">Detalhes</h1>
@@ -117,8 +115,8 @@ const ProductDetailScreen = ({ productId, onBack }: ProductDetailScreenProps) =>
       </div>
 
       {/* Bottom CTA */}
-      <div className="absolute bottom-0 left-0 right-0 bg-background/95 backdrop-blur-md border-t border-border px-5 py-4">
-        <div className="flex items-center justify-between">
+      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-md border-t border-border px-5 py-4 z-50">
+        <div className="flex items-center justify-between max-w-lg mx-auto">
           <div>
             <p className="font-body text-xs text-muted-foreground">Preço total</p>
             <p className="font-display text-2xl font-bold text-foreground">

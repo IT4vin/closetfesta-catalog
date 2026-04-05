@@ -1,15 +1,13 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Menu, ShoppingBag, Search, SlidersHorizontal, Heart, Home, Grid3X3, User, ArrowRight } from "lucide-react";
 import { products, colorMap } from "@/data/products";
 import bannerPromo from "@/assets/banner-promo.jpg";
 
-interface HomeScreenProps {
-  onSelectProduct: (id: number) => void;
-}
-
 const categories = Object.entries(colorMap);
 
-const HomeScreen = ({ onSelectProduct }: HomeScreenProps) => {
+const HomeScreen = () => {
+  const navigate = useNavigate();
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
 
   const toggleFav = (id: number) => {
@@ -21,9 +19,8 @@ const HomeScreen = ({ onSelectProduct }: HomeScreenProps) => {
   };
 
   return (
-    <div className="relative flex flex-col h-full bg-background overflow-hidden">
-      {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto pb-24">
+    <div className="relative flex flex-col min-h-screen bg-background">
+      <div className="flex-1 pb-24">
         {/* Top Bar */}
         <div className="flex items-center justify-between px-5 pt-5 pb-3">
           <button className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center shadow-card">
@@ -72,14 +69,8 @@ const HomeScreen = ({ onSelectProduct }: HomeScreenProps) => {
           </div>
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {categories.map(([name, color]) => (
-              <div
-                key={name}
-                className="flex items-center gap-2 bg-secondary rounded-xl px-4 py-2.5 shadow-card shrink-0 cursor-pointer transition-transform hover:scale-105"
-              >
-                <span
-                  className="w-4 h-4 rounded-full shrink-0 border border-border"
-                  style={{ backgroundColor: color }}
-                />
+              <div key={name} className="flex items-center gap-2 bg-secondary rounded-xl px-4 py-2.5 shadow-card shrink-0 cursor-pointer transition-transform hover:scale-105">
+                <span className="w-4 h-4 rounded-full shrink-0 border border-border" style={{ backgroundColor: color }} />
                 <span className="text-sm font-body font-medium text-foreground whitespace-nowrap">{name}</span>
               </div>
             ))}
@@ -93,12 +84,11 @@ const HomeScreen = ({ onSelectProduct }: HomeScreenProps) => {
             <button className="text-primary text-sm font-semibold font-body">Ver todos</button>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            {products.slice(0, 4).map((p, i) => (
+            {products.map((p, i) => (
               <div
                 key={p.id}
                 className="bg-secondary rounded-2xl overflow-hidden shadow-card cursor-pointer transition-all hover:shadow-elevated hover:-translate-y-1"
-                style={{ animationDelay: `${i * 100}ms` }}
-                onClick={() => onSelectProduct(p.id)}
+                onClick={() => navigate(`/produto/${p.id}`)}
               >
                 <div className="relative aspect-[3/4] overflow-hidden">
                   <img src={p.image} alt={p.name} className="w-full h-full object-cover" loading="lazy" />
@@ -123,9 +113,9 @@ const HomeScreen = ({ onSelectProduct }: HomeScreenProps) => {
       </div>
 
       {/* Bottom Nav */}
-      <div className="absolute bottom-0 left-0 right-0 bg-background/95 backdrop-blur-md border-t border-border px-6 py-3">
-        <div className="flex items-center justify-around">
-          <button className="flex flex-col items-center gap-1">
+      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-md border-t border-border px-6 py-3 z-50">
+        <div className="flex items-center justify-around max-w-lg mx-auto">
+          <button onClick={() => navigate("/")} className="flex flex-col items-center gap-1">
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-button">
               <Home className="w-5 h-5 text-primary-foreground" />
             </div>
