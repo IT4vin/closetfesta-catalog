@@ -85,7 +85,7 @@ export const products: Product[] = [
     price: 1590,
     image: dressSerenity,
     category: "Madrinha",
-    colors: ["Azul Serenity", "Lavanda", "Rose Blush"],
+    colors: ["Azul Serenity", "Lavanda", "Rosa Blush"],
     sizes: ["P", "M", "G", "GG"],
     description: "Vestido longo em chiffon azul serenity com costas elegantes. Leveza e sofisticação para cerimônias ao ar livre.",
   },
