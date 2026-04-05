@@ -113,22 +113,22 @@ const HomeScreen = () => {
       </div>
 
       {/* Bottom Nav */}
-      <div className="fixed bottom-0 left-0 right-0 px-5 pb-5 pt-2 z-50">
-        <div className="flex items-center justify-around max-w-md mx-auto bg-background rounded-[2rem] px-4 py-3 shadow-[0_8px_40px_-8px_rgba(0,0,0,0.15),0_2px_12px_-2px_rgba(0,0,0,0.08)]">
-          <button onClick={() => navigate("/")} className="flex items-center gap-2 bg-primary/10 rounded-full pl-3 pr-5 py-2.5">
-            <div className="w-11 h-11 rounded-full bg-primary flex items-center justify-center shadow-button">
-              <Home className="w-5 h-5 text-primary-foreground" />
+      <div className="fixed bottom-0 left-0 right-0 px-6 pb-4 pt-1 z-50">
+        <div className="flex items-center justify-around max-w-sm mx-auto bg-background rounded-full px-3 py-2 shadow-[0_6px_32px_-6px_rgba(0,0,0,0.13),0_2px_8px_-2px_rgba(0,0,0,0.06)]">
+          <button onClick={() => navigate("/")} className="flex items-center gap-1.5 bg-primary/10 rounded-full pl-2 pr-4 py-1.5">
+            <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center shadow-button">
+              <Home className="w-4 h-4 text-primary-foreground" />
             </div>
-            <span className="text-sm font-body font-bold text-primary">Home</span>
+            <span className="text-xs font-body font-bold text-primary">Home</span>
           </button>
-          <button className="w-11 h-11 flex items-center justify-center">
-            <ShoppingBag className="w-6 h-6 text-foreground/60" />
+          <button className="w-9 h-9 flex items-center justify-center">
+            <ShoppingBag className="w-5 h-5 text-foreground/60" />
           </button>
-          <button className="w-11 h-11 flex items-center justify-center">
-            <Heart className="w-6 h-6 text-foreground/60" />
+          <button className="w-9 h-9 flex items-center justify-center">
+            <Heart className="w-5 h-5 text-foreground/60" />
           </button>
-          <button className="w-11 h-11 flex items-center justify-center">
-            <User className="w-6 h-6 text-foreground/60" />
+          <button className="w-9 h-9 flex items-center justify-center">
+            <User className="w-5 h-5 text-foreground/60" />
           </button>
         </div>
       </div>
