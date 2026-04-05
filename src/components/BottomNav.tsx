@@ -1,20 +1,43 @@
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, ShoppingBag, Heart, User } from "lucide-react";
+import { Home, ShoppingBag, Heart, User, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+const MARSALA = "#9C2F45";
+
+const TABS: readonly { path: string; label: string; Icon: LucideIcon }[] = [
+  { path: "/", label: "Home", Icon: Home },
+  { path: "/carrinho", label: "Carrinho", Icon: ShoppingBag },
+  { path: "/favoritos", label: "Favoritos", Icon: Heart },
+  { path: "/perfil", label: "Perfil", Icon: User },
+];
+
+function indexForPath(pathname: string): number {
+  return TABS.findIndex((t) => t.path === pathname);
+}
+
 /**
- * Barra inferior fixa — use dentro do painel que desliza com o drawer (Home)
- * ou na raiz da página. Com `position: fixed`, permanece na base da viewport
- * (ou do ancestral com transform, no caso do Home).
+ * Barra inferior fixa — pílula branca com indicador marsala deslizante e rótulo só no item ativo.
  */
 const BottomNav = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  const isHome = pathname === "/";
-  const isCart = pathname === "/carrinho";
-  const isFav = pathname === "/favoritos";
-  const isProfile = pathname === "/perfil";
+  const routeIndex = indexForPath(pathname);
+  /** Mantido em sincronia com a rota; preserva última aba em rotas fora das tabs (ex.: produto). */
+  const [activeTab, setActiveTab] = useState(() => (routeIndex >= 0 ? routeIndex : 0));
+
+  useEffect(() => {
+    if (routeIndex >= 0) setActiveTab(routeIndex);
+  }, [routeIndex]);
+
+  const showMarsalaPill = routeIndex >= 0;
+  const slideIndex = showMarsalaPill ? routeIndex : activeTab;
+
+  const handleNav = (index: number, path: string) => {
+    setActiveTab(index);
+    navigate(path);
+  };
 
   return (
     <nav
@@ -23,73 +46,63 @@ const BottomNav = () => {
     >
       <div
         className={cn(
-          "pointer-events-auto mx-auto flex max-w-sm items-center justify-around rounded-full bg-background px-3 py-2",
+          "pointer-events-auto mx-auto max-w-sm overflow-hidden rounded-full bg-background px-2 py-2",
           "shadow-[0_6px_32px_-6px_rgba(0,0,0,0.13),0_2px_8px_-2px_rgba(0,0,0,0.06)]",
         )}
       >
-        <button
-          type="button"
-          onClick={() => navigate("/")}
-          className={cn(
-            "flex items-center gap-1.5 rounded-full py-1.5 pl-2 pr-4 transition-colors",
-            isHome && "bg-primary/10",
-          )}
-        >
-          <div
-            className={cn(
-              "flex h-9 w-9 items-center justify-center rounded-full",
-              isHome
-                ? "bg-[#9C2F45] text-white shadow-button"
-                : "bg-transparent text-foreground/60",
-            )}
-          >
-            <Home className="h-4 w-4" />
+        <div className="relative flex items-stretch">
+          <div className="pointer-events-none absolute inset-x-0 inset-y-1.5">
+            <div
+              className={cn(
+                "h-full w-1/4 rounded-full shadow-button transition-[transform,opacity] duration-[280ms] ease-out motion-reduce:transition-none",
+                showMarsalaPill ? "opacity-100" : "opacity-0",
+              )}
+              style={{
+                backgroundColor: MARSALA,
+                transform: `translateX(${slideIndex * 100}%)`,
+                willChange: "transform",
+              }}
+              aria-hidden
+            />
           </div>
-          <span
-            className={cn(
-              "font-body text-xs font-bold",
-              isHome ? "text-[#9C2F45]" : "text-foreground/50",
-            )}
-          >
-            Home
-          </span>
-        </button>
 
-        <button
-          type="button"
-          onClick={() => navigate("/carrinho")}
-          className={cn(
-            "flex h-9 w-9 items-center justify-center rounded-full transition-colors",
-            isCart ? "bg-primary/10 text-primary" : "text-foreground/60",
-          )}
-          aria-current={isCart ? "page" : undefined}
-        >
-          <ShoppingBag className="h-5 w-5" />
-        </button>
-
-        <button
-          type="button"
-          onClick={() => navigate("/favoritos")}
-          className={cn(
-            "flex h-9 w-9 items-center justify-center rounded-full transition-colors",
-            isFav ? "bg-primary/10 text-primary" : "text-foreground/60",
-          )}
-          aria-current={isFav ? "page" : undefined}
-        >
-          <Heart className="h-5 w-5" />
-        </button>
-
-        <button
-          type="button"
-          onClick={() => navigate("/perfil")}
-          className={cn(
-            "flex h-9 w-9 items-center justify-center rounded-full transition-colors",
-            isProfile ? "bg-primary/10 text-primary" : "text-foreground/60",
-          )}
-          aria-current={isProfile ? "page" : undefined}
-        >
-          <User className="h-5 w-5" />
-        </button>
+          {TABS.map((tab, index) => {
+            const isActive = pathname === tab.path;
+            return (
+              <button
+                key={tab.path}
+                type="button"
+                onClick={() => handleNav(index, tab.path)}
+                aria-label={tab.label}
+                className={cn(
+                  "relative z-10 flex min-h-[52px] flex-1 flex-col items-center justify-center rounded-full px-1 py-1",
+                  "outline-none focus-visible:ring-2 focus-visible:ring-[#9C2F45]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                )}
+                aria-current={isActive ? "page" : undefined}
+              >
+                <tab.Icon
+                  className={cn(
+                    "h-5 w-5 shrink-0 transition-colors duration-[280ms] ease-out motion-reduce:transition-none",
+                    isActive ? "text-white" : "text-foreground/55",
+                  )}
+                  strokeWidth={isActive ? 2.25 : 2}
+                  aria-hidden
+                />
+                <span
+                  className={cn(
+                    "pointer-events-none w-full overflow-hidden text-center font-body text-[10px] font-medium leading-tight",
+                    "transition-[margin,max-height,opacity,transform] duration-[280ms] ease-out motion-reduce:transition-none",
+                    isActive
+                      ? "mt-1 max-h-5 translate-y-0 text-white opacity-100"
+                      : "mt-0 max-h-0 translate-y-1.5 text-white opacity-0",
+                  )}
+                >
+                  {tab.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </nav>
   );
