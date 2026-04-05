@@ -7,14 +7,14 @@ import BottomNav from "@/components/BottomNav";
 import ClosetSearchBar from "@/components/ClosetSearchBar";
 import HighlightedText from "@/components/HighlightedText";
 import { useSearch } from "@/contexts/SearchContext";
-import { filterProductsByQuery } from "@/lib/searchUtils";
 import { toast } from "sonner";
 import { buildFavoritesShareText } from "@/lib/favoritesShare";
 
 const FavoritesScreen = () => {
   const navigate = useNavigate();
   const { addItem } = useCart();
-  const { searchQuery, hasActiveSearch, clearSearch } = useSearch();
+  const { searchQuery, hasActiveSearch, clearSearch, filteredProducts, hasActiveCategoryFilter, clearAllFilters } =
+    useSearch();
   const [favIds, setFavIds] = useState<Set<number>>(new Set(products.slice(0, 4).map((p) => p.id)));
 
   const removeFav = (id: number) => {
@@ -28,9 +28,11 @@ const FavoritesScreen = () => {
 
   const favProducts = products.filter((p) => favIds.has(p.id));
 
+  const allowedIds = useMemo(() => new Set(filteredProducts.map((p) => p.id)), [filteredProducts]);
+
   const visibleFavorites = useMemo(
-    () => filterProductsByQuery(favProducts, searchQuery),
-    [favProducts, searchQuery],
+    () => favProducts.filter((p) => allowedIds.has(p.id)),
+    [favProducts, allowedIds],
   );
 
   const handleShare = async () => {
@@ -49,7 +51,6 @@ const FavoritesScreen = () => {
 
     try {
       if (typeof navigator.share === "function") {
-        // WhatsApp/Telegram em vários Androids usam só `url` e descartam `text` se ambos forem enviados.
         const payload: ShareData = { title: shareTitle, text: textoCompleto };
         const can =
           typeof navigator.canShare !== "function" ? true : navigator.canShare(payload);
@@ -73,7 +74,6 @@ const FavoritesScreen = () => {
 
   return (
     <div className="relative flex min-h-screen flex-col bg-[#F8F4F0] pb-24">
-      {/* Header */}
       <div className="flex items-center gap-2 px-5 pb-4 pt-5">
         <button
           type="button"
@@ -109,53 +109,64 @@ const FavoritesScreen = () => {
             Explore nossos vestidos e salve os que mais amou
           </p>
         </div>
-      ) : hasActiveSearch && visibleFavorites.length === 0 ? (
+      ) : visibleFavorites.length === 0 ? (
         <div className="mx-5 flex flex-col items-center justify-center rounded-2xl border border-[#E8DFD6] bg-white px-6 py-14 text-center shadow-[0_12px_40px_-16px_rgba(156,47,69,0.15)]">
           <p className="font-display text-base font-semibold text-foreground">
-            Nenhum vestido encontrado para esta busca
+            Nenhum vestido encontrado com os filtros atuais
           </p>
           <p className="mt-2 font-body text-sm text-muted-foreground">
-            Ajuste os termos ou limpe a busca para ver todos os favoritos.
+            Ajuste a busca ou as categorias na Home para ver seus favoritos.
           </p>
-          <button
-            type="button"
-            onClick={clearSearch}
-            className="mt-6 rounded-full bg-[#9C2F45] px-6 py-2.5 font-body text-sm font-semibold text-white shadow-[0_8px_24px_-6px_rgba(156,47,69,0.45)] transition-transform active:scale-[0.98]"
-          >
-            Limpar busca
-          </button>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            {hasActiveSearch && (
+              <button
+                type="button"
+                onClick={clearSearch}
+                className="rounded-full border-2 border-[#9C2F45]/40 px-5 py-2.5 font-body text-sm font-semibold text-foreground transition-transform active:scale-[0.98]"
+              >
+                Limpar busca
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={clearAllFilters}
+              className="rounded-full bg-[#9C2F45] px-6 py-2.5 font-body text-sm font-semibold text-white shadow-[0_8px_24px_-6px_rgba(156,47,69,0.45)] transition-transform active:scale-[0.98]"
+            >
+              Limpar filtros e busca
+            </button>
+          </div>
         </div>
       ) : (
         <div className="space-y-3 px-5 pb-8">
           {visibleFavorites.map((p) => (
             <div
               key={p.id}
-              className="flex gap-3 rounded-2xl border border-border/30 bg-white p-3 shadow-card"
+              className="flex gap-3 rounded-2xl border border-border/30 bg-white p-3 shadow-card transition-shadow duration-300"
             >
               <div
                 className="h-24 w-20 shrink-0 cursor-pointer overflow-hidden rounded-xl shadow-sm"
-                onClick={() => navigate(`/produto/${p.id}`)}
+                onClick={() => navigate(`/produto/${p.slug}`)}
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
-                    navigate(`/produto/${p.id}`);
+                    navigate(`/produto/${p.slug}`);
                   }
                 }}
               >
-                <img src={p.image} alt={p.name} className="h-full w-full object-cover" />
+                <img src={p.imagem} alt={p.nome} className="h-full w-full object-cover" />
               </div>
               <div className="flex min-w-0 flex-1 flex-col justify-between">
                 <div>
                   <p className="font-body text-xs text-muted-foreground">
-                    <HighlightedText text={p.category} query={searchQuery} />
+                    <HighlightedText text={p.categoriaTipo} query={searchQuery} />
                   </p>
                   <p className="line-clamp-2 font-display text-sm font-semibold leading-tight text-foreground">
-                    <HighlightedText text={p.name} query={searchQuery} />
+                    <HighlightedText text={p.nome} query={searchQuery} />
                   </p>
                 </div>
-                <p className="font-display text-base font-bold text-[#9C2F45]">R$ {p.price.toLocaleString("pt-BR")}</p>
+                <p className="font-display text-base font-bold text-[#9C2F45]">R$ {p.preco.toLocaleString("pt-BR")}</p>
               </div>
               <div className="flex shrink-0 flex-col items-end justify-between">
                 <button
@@ -169,7 +180,7 @@ const FavoritesScreen = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    addItem({ productId: p.id, size: "M", color: p.colors[0] });
+                    addItem({ productId: p.id, size: "M", color: p.coresDisponiveis[0] }, 1);
                     toast.success("Adicionado ao carrinho!");
                   }}
                   className="flex h-8 w-8 items-center justify-center rounded-full bg-[#9C2F45] shadow-sm"

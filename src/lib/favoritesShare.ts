@@ -3,8 +3,8 @@ import type { Product } from "@/data/products";
 const BASE = "https://closetfesta.com.br/produto";
 
 /** Gera slug em kebab-case a partir do nome (URLs de compartilhamento). */
-export function productSlug(name: string): string {
-  return name
+export function productSlug(nome: string): string {
+  return nome
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
@@ -24,9 +24,8 @@ export function buildFavoritesShareText(items: Product[]): string {
 
   for (const p of items) {
     const code = formatProductCode(p.id);
-    const slug = productSlug(p.name);
-    lines.push(`${code} / ${p.name}`);
-    lines.push(`Link: ${BASE}/${slug}`);
+    lines.push(`${code} / ${p.nome}`);
+    lines.push(`Link: ${BASE}/${p.slug}`);
   }
 
   lines.push("Veja todos os meus favoritos na Closet Festa!");

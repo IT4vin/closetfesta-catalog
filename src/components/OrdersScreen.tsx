@@ -88,10 +88,10 @@ const OrdersScreen = () => {
                   return (
                     <div key={idx} className="flex items-center gap-3">
                       <div className="w-12 h-14 rounded-lg overflow-hidden shrink-0 shadow-sm">
-                        <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                        <img src={product.imagem} alt={product.nome} className="w-full h-full object-cover" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-body text-sm font-semibold text-foreground truncate">{product.name}</p>
+                        <p className="font-body text-sm font-semibold text-foreground truncate">{product.nome}</p>
                         <p className="font-body text-xs text-muted-foreground">Tam. {item.size} · Qtd. {item.qty}</p>
                       </div>
                     </div>

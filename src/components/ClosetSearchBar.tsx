@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSearch } from "@/contexts/SearchContext";
@@ -8,6 +9,7 @@ type ClosetSearchBarProps = {
 };
 
 const ClosetSearchBar = ({ className }: ClosetSearchBarProps) => {
+  const navigate = useNavigate();
   const { searchQuery, setSearchQuery, clearSearch, filteredProducts, hasActiveSearch } = useSearch();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -44,12 +46,13 @@ const ClosetSearchBar = ({ className }: ClosetSearchBarProps) => {
   }, [open]);
 
   const pickSuggestion = useCallback(
-    (label: string) => {
+    (slug: string, label: string) => {
       setSearchQuery(label);
       setOpen(false);
       inputRef.current?.blur();
+      navigate(`/produto/${slug}`);
     },
-    [setSearchQuery],
+    [setSearchQuery, navigate],
   );
 
   const hasText = searchQuery.length > 0;
@@ -114,14 +117,14 @@ const ClosetSearchBar = ({ className }: ClosetSearchBarProps) => {
                 type="button"
                 className="flex w-full flex-col gap-0.5 px-4 py-3 text-left transition-colors hover:bg-[#9C2F45]/[0.07]"
                 onMouseDown={(e) => e.preventDefault()}
-                onClick={() => pickSuggestion(p.name)}
+                onClick={() => pickSuggestion(p.slug, p.nome)}
               >
-                <span className="font-body text-sm font-semibold text-foreground line-clamp-2">{p.name}</span>
+                <span className="font-body text-sm font-semibold text-foreground line-clamp-2">{p.nome}</span>
                 <span className="font-body text-xs text-muted-foreground">
-                  {p.category}
+                  {p.categoriaTipo}
                   <span className="mx-1.5 text-[#D4C4B8]">·</span>
-                  {p.colors.slice(0, 3).join(", ")}
-                  {p.colors.length > 3 ? "…" : ""}
+                  {p.coresDisponiveis.slice(0, 3).join(", ")}
+                  {p.coresDisponiveis.length > 3 ? "…" : ""}
                 </span>
               </button>
             </li>

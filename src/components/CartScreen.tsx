@@ -13,7 +13,7 @@ const CartScreen = () => {
 
   const subtotal = items.reduce((sum, item) => {
     const p = products.find((pr) => pr.id === item.productId);
-    return sum + (p?.price || 0) * item.qty;
+    return sum + (p?.preco || 0) * item.qty;
   }, 0);
 
   const shipping = subtotal > 500 ? 0 : 49.9;
@@ -62,8 +62,8 @@ const CartScreen = () => {
                     {/* Image */}
                     <div className="w-20 h-24 rounded-xl overflow-hidden shrink-0 shadow-sm">
                       <img
-                        src={product.image}
-                        alt={product.name}
+                        src={product.imagem}
+                        alt={product.nome}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -72,14 +72,14 @@ const CartScreen = () => {
                     <div className="flex-1 flex flex-col justify-between min-w-0">
                       <div>
                         <p className="font-display text-sm font-semibold text-foreground leading-tight truncate">
-                          {product.name}
+                          {product.nome}
                         </p>
                         <p className="font-body text-xs text-muted-foreground mt-0.5">
                           Tamanho {item.size}
                         </p>
                       </div>
                       <p className="font-display text-base font-bold text-primary">
-                        R$ {(product.price * item.qty).toLocaleString("pt-BR")}
+                        R$ {(product.preco * item.qty).toLocaleString("pt-BR")}
                       </p>
                     </div>
 
