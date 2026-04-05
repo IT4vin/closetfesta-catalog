@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Menu, ShoppingBag, Search, SlidersHorizontal, Heart, Home, Grid3X3, User, ArrowRight } from "lucide-react";
 import { products, colorMap } from "@/data/products";
 import bannerPromo from "@/assets/banner-promo.jpg";
+import SideDrawer from "@/components/SideDrawer";
 
 const categories = Object.entries(colorMap);
 
 const HomeScreen = () => {
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const toggleFav = (id: number) => {
     setFavorites((prev) => {
