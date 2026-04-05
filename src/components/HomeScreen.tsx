@@ -122,9 +122,9 @@ const HomeScreen = () => {
               <img
                 src={logoUrl}
                 alt="Closet Festa"
-                width={280}
-                height={79}
-                className="h-12 w-auto sm:h-14 max-w-[min(280px,80vw)] object-contain object-center"
+                width={1400}
+                height={395}
+                className="h-[15rem] w-auto sm:h-[17.5rem] max-w-[min(1400px,95vw)] object-contain object-center"
                 decoding="async"
                 fetchPriority="high"
               />
