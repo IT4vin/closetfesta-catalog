@@ -20,11 +20,17 @@ const HomeScreen = () => {
   };
 
   return (
-    <div className="relative flex flex-col min-h-screen bg-background">
+    <div className="relative min-h-screen bg-[hsl(var(--primary))]">
+      <SideDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+
+      {/* Main content - pushed right when drawer open */}
+      <div
+        className={`relative flex flex-col min-h-screen bg-background transition-transform duration-300 ease-out ${drawerOpen ? "translate-x-[78%] scale-[0.92] rounded-2xl overflow-hidden shadow-2xl pointer-events-none" : ""}`}
+      >
       <div className="flex-1 pb-24">
         {/* Top Bar */}
         <div className="flex items-center justify-between px-5 pt-5 pb-3">
-          <button className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center shadow-card">
+          <button onClick={() => setDrawerOpen(true)} className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center shadow-card">
             <Menu className="w-5 h-5 text-foreground" />
           </button>
           <h1 className="font-display text-lg font-semibold text-foreground tracking-wide">Closet Festa</h1>
