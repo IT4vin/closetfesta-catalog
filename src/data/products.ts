@@ -25,7 +25,7 @@ export const products: Product[] = [
     price: 1490,
     image: dressMarsala,
     category: "Madrinha",
-    colors: ["Marsala", "Rose Blush", "Champagne", "Branco"],
+    colors: ["Marsala", "Rosa Blush", "Champanhe", "Branco"],
     sizes: ["P", "M", "G", "GG"],
     description: "Vestido longo em chiffon com decote V profundo e drapeado na cintura. Caimento fluido e elegante, perfeito para madrinhas que desejam sofisticação e conforto.",
   },
