@@ -2,15 +2,23 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, ShoppingBag, Heart, Minus, Plus, ShoppingCart } from "lucide-react";
 import { products, colorMap } from "@/data/products";
+import { useCart } from "@/contexts/CartContext";
+import { toast } from "sonner";
 
 const ProductDetailScreen = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { addItem, totalItems } = useCart();
   const product = products.find((p) => p.id === Number(id)) || products[0];
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
   const [selectedSize, setSelectedSize] = useState("M");
   const [qty, setQty] = useState(1);
   const [fav, setFav] = useState(false);
+
+  const handleAddToCart = () => {
+    addItem({ productId: product.id, size: selectedSize, color: selectedColor }, qty);
+    toast.success("Adicionado ao carrinho!", { description: `${product.name} — Tam. ${selectedSize}` });
+  };
 
   return (
     <div className="relative flex flex-col min-h-screen bg-background">
@@ -21,8 +29,11 @@ const ProductDetailScreen = () => {
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
           <h1 className="font-display text-lg font-semibold text-foreground">Detalhes</h1>
-          <button className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center shadow-card relative">
+          <button onClick={() => navigate("/carrinho")} className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center shadow-card relative">
             <ShoppingBag className="w-5 h-5 text-foreground" />
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">{totalItems}</span>
+            )}
           </button>
         </div>
 
@@ -123,7 +134,7 @@ const ProductDetailScreen = () => {
               R$ {(product.price * qty).toLocaleString("pt-BR")}
             </p>
           </div>
-          <button className="flex items-center gap-2 bg-primary text-primary-foreground font-body font-bold text-sm px-6 py-3.5 rounded-2xl shadow-button transition-transform hover:scale-105 active:scale-95">
+          <button onClick={handleAddToCart} className="flex items-center gap-2 bg-primary text-primary-foreground font-body font-bold text-sm px-6 py-3.5 rounded-2xl shadow-button transition-transform hover:scale-105 active:scale-95">
             <ShoppingCart className="w-5 h-5" />
             Adicionar ao Carrinho
           </button>
