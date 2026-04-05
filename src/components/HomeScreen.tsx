@@ -109,11 +109,11 @@ const HomeScreen = () => {
         />
 
         <div className="flex-1 pb-24">
-          <div className="flex items-center justify-between px-5 pt-5 pb-3">
+          <div className="flex items-center justify-between px-5 pb-1 pt-[max(0.75rem,env(safe-area-inset-top))] sm:pb-1.5 sm:pt-4">
             <button
               type="button"
               onClick={() => setDrawerOpen(true)}
-              className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center shadow-card"
+              className="w-11 h-11 shrink-0 rounded-xl bg-secondary flex items-center justify-center shadow-card"
             >
               <Menu className="w-5 h-5 text-foreground" />
             </button>
@@ -122,9 +122,9 @@ const HomeScreen = () => {
               <img
                 src={logoUrl}
                 alt="Closet Festa"
-                width={1400}
-                height={395}
-                className="h-[15rem] w-auto sm:h-[17.5rem] max-w-[min(1400px,95vw)] object-contain object-center"
+                width={1792}
+                height={1792}
+                className="h-28 w-auto sm:h-32 max-w-[calc(100vw-7rem)] object-contain object-center drop-shadow-sm"
                 decoding="async"
                 fetchPriority="high"
               />
@@ -133,7 +133,7 @@ const HomeScreen = () => {
             <button
               type="button"
               onClick={() => navigate("/carrinho")}
-              className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center shadow-card relative"
+              className="w-11 h-11 shrink-0 rounded-xl bg-secondary flex items-center justify-center shadow-card relative"
             >
               <ShoppingBag className="w-5 h-5 text-foreground" />
               {totalItems > 0 && (
@@ -144,7 +144,7 @@ const HomeScreen = () => {
             </button>
           </div>
 
-          <div className="px-5 mt-2">
+          <div className="px-5 mt-1 sm:mt-1.5">
             <ClosetSearchBar />
           </div>
 
