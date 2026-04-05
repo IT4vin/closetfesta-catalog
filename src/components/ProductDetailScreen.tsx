@@ -4,6 +4,7 @@ import { ArrowLeft, ShoppingBag, Heart, Minus, Plus, ShoppingCart } from "lucide
 import { products, colorMap } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
+import BottomNav from "@/components/BottomNav";
 
 const ProductDetailScreen = () => {
   const { id } = useParams<{ id: string }>();
@@ -21,8 +22,8 @@ const ProductDetailScreen = () => {
   };
 
   return (
-    <div className="relative flex flex-col min-h-screen bg-background">
-      <div className="flex-1 pb-28">
+    <div className="relative flex min-h-screen flex-col bg-background">
+      <div className="flex-1 pb-48">
         {/* Top Bar */}
         <div className="flex items-center justify-between px-5 pt-5 pb-3">
           <button onClick={() => navigate("/")} className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center shadow-card">
@@ -125,21 +126,23 @@ const ProductDetailScreen = () => {
         </div>
       </div>
 
-      {/* Bottom CTA */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-md border-t border-border px-5 py-4 z-50">
-        <div className="flex items-center justify-between max-w-lg mx-auto">
+      {/* Faixa de compra — acima da bottom nav fixa */}
+      <div className="fixed bottom-24 left-0 right-0 z-40 border-t border-border bg-background/95 px-5 py-4 backdrop-blur-md">
+        <div className="mx-auto flex max-w-lg items-center justify-between">
           <div>
             <p className="font-body text-xs text-muted-foreground">Preço total</p>
             <p className="font-display text-2xl font-bold text-foreground">
               R$ {(product.price * qty).toLocaleString("pt-BR")}
             </p>
           </div>
-          <button onClick={handleAddToCart} className="flex items-center gap-2 bg-primary text-primary-foreground font-body font-bold text-sm px-6 py-3.5 rounded-2xl shadow-button transition-transform hover:scale-105 active:scale-95">
-            <ShoppingCart className="w-5 h-5" />
+          <button onClick={handleAddToCart} className="flex items-center gap-2 rounded-2xl bg-primary px-6 py-3.5 font-body text-sm font-bold text-primary-foreground shadow-button transition-transform hover:scale-105 active:scale-95">
+            <ShoppingCart className="h-5 w-5" />
             Adicionar ao Carrinho
           </button>
         </div>
       </div>
+
+      <BottomNav />
     </div>
   );
 };

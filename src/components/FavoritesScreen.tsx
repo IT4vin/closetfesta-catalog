@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Heart, ShoppingCart } from "lucide-react";
 import { products } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
+import BottomNav from "@/components/BottomNav";
 import { toast } from "sonner";
 
 const FavoritesScreen = () => {
@@ -22,7 +23,7 @@ const FavoritesScreen = () => {
   const favProducts = products.filter((p) => favIds.has(p.id));
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="relative flex min-h-screen flex-col bg-background pb-24">
       {/* Header */}
       <div className="flex items-center px-5 pt-5 pb-4">
         <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center shadow-card">
@@ -38,7 +39,7 @@ const FavoritesScreen = () => {
           <p className="font-body text-sm text-muted-foreground text-center">Explore nossos vestidos e salve os que mais amou</p>
         </div>
       ) : (
-        <div className="px-5 space-y-3 pb-8">
+        <div className="space-y-3 px-5 pb-8">
           {favProducts.map((p) => (
             <div key={p.id} className="flex gap-3 p-3 rounded-2xl bg-secondary/60 shadow-card">
               <div
@@ -72,6 +73,8 @@ const FavoritesScreen = () => {
           ))}
         </div>
       )}
+
+      <BottomNav />
     </div>
   );
 };

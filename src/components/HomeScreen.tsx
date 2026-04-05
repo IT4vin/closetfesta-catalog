@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, ShoppingBag, Search, SlidersHorizontal, Heart, Home, User, ArrowRight } from "lucide-react";
+import { Menu, ShoppingBag, Search, SlidersHorizontal, Heart, ArrowRight } from "lucide-react";
 import { products, colorMap } from "@/data/products";
 import bannerPromo from "@/assets/banner-promo.jpg";
 import SideDrawer from "@/components/SideDrawer";
+import BottomNav from "@/components/BottomNav";
 import { useCart } from "@/contexts/CartContext";
 
 const categories = Object.entries(colorMap);
@@ -45,7 +46,7 @@ const HomeScreen = () => {
       >
         {/* Dark overlay on displaced content */}
         <div
-          className={`absolute inset-0 bg-black/30 z-50 rounded-2xl transition-opacity duration-300 ${
+          className={`absolute inset-0 bg-black/30 z-[55] rounded-2xl transition-opacity duration-300 ${
             drawerOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
           }`}
           onClick={() => setDrawerOpen(false)}
@@ -159,29 +160,7 @@ const HomeScreen = () => {
           </div>
         </div>
 
-        {/* Bottom Nav — inside the sliding container, NOT fixed */}
-        <div className="sticky bottom-0 left-0 right-0 px-6 pb-4 pt-1 z-40 bg-gradient-to-t from-background via-background/80 to-transparent">
-          <div className="flex items-center justify-around max-w-sm mx-auto bg-background rounded-full px-3 py-2 shadow-[0_6px_32px_-6px_rgba(0,0,0,0.13),0_2px_8px_-2px_rgba(0,0,0,0.06)]">
-            <button
-              onClick={() => navigate("/")}
-              className="flex items-center gap-1.5 bg-primary/10 rounded-full pl-2 pr-4 py-1.5"
-            >
-              <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center shadow-button">
-                <Home className="w-4 h-4 text-primary-foreground" />
-              </div>
-              <span className="text-xs font-body font-bold text-primary">Home</span>
-            </button>
-            <button onClick={() => navigate("/carrinho")} className="w-9 h-9 flex items-center justify-center">
-              <ShoppingBag className="w-5 h-5 text-foreground/60" />
-            </button>
-            <button onClick={() => navigate("/favoritos")} className="w-9 h-9 flex items-center justify-center">
-              <Heart className="w-5 h-5 text-foreground/60" />
-            </button>
-            <button onClick={() => navigate("/perfil")} className="w-9 h-9 flex items-center justify-center">
-              <User className="w-5 h-5 text-foreground/60" />
-            </button>
-          </div>
-        </div>
+        <BottomNav />
       </div>
     </div>
   );

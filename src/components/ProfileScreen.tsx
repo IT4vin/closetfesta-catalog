@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, User, MapPin, CreditCard, Bell, HelpCircle, Shield, ChevronRight, LogOut } from "lucide-react";
+import BottomNav from "@/components/BottomNav";
 
 const menuSections = [
   {
@@ -24,7 +25,7 @@ const ProfileScreen = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="relative flex min-h-screen flex-col bg-background pb-24">
       {/* Header */}
       <div className="flex items-center px-5 pt-5 pb-4">
         <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center shadow-card">
@@ -93,6 +94,8 @@ const ProfileScreen = () => {
           <span className="font-body text-sm font-semibold text-destructive">Sair da conta</span>
         </button>
       </div>
+
+      <BottomNav />
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { products } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
+import BottomNav from "@/components/BottomNav";
 
 const CartScreen = () => {
   const navigate = useNavigate();
@@ -18,8 +19,8 @@ const CartScreen = () => {
   const total = subtotal + shipping;
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <div className="flex-1 pb-32">
+    <div className="relative flex min-h-screen flex-col bg-background">
+      <div className={`flex-1 ${items.length > 0 ? "pb-44" : "pb-24"}`}>
         {/* Header */}
         <div className="flex items-center px-5 pt-5 pb-4">
           <button
@@ -156,15 +157,16 @@ const CartScreen = () => {
         )}
       </div>
 
-      {/* Bottom CTA */}
       {items.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-md border-t border-border px-5 py-4 z-50">
-          <button className="w-full flex items-center justify-center gap-2 bg-primary text-white font-display font-bold text-base py-4 rounded-2xl shadow-button transition-transform hover:scale-[1.02] active:scale-95">
-            <ShoppingBag className="w-5 h-5" />
+        <div className="fixed bottom-24 left-0 right-0 z-40 border-t border-border bg-background/95 px-5 py-4 backdrop-blur-md">
+          <button className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 font-display text-base font-bold text-white shadow-button transition-transform hover:scale-[1.02] active:scale-95">
+            <ShoppingBag className="h-5 w-5" />
             Finalizar Compra
           </button>
         </div>
       )}
+
+      <BottomNav />
     </div>
   );
 };
