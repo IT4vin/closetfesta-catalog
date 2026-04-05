@@ -4,6 +4,7 @@ import { Menu, ShoppingBag, Search, SlidersHorizontal, Heart, Home, Grid3X3, Use
 import { products, colorMap } from "@/data/products";
 import bannerPromo from "@/assets/banner-promo.jpg";
 import SideDrawer from "@/components/SideDrawer";
+import { useCart } from "@/contexts/CartContext";
 
 const categories = Object.entries(colorMap);
 
