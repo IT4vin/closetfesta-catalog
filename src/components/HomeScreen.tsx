@@ -145,7 +145,8 @@ const HomeScreen = () => {
           </button>
         </div>
       </div>
-    </div>
+      </motion.div>
+    </>
   );
 };
 
