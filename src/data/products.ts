@@ -95,7 +95,7 @@ export const products: Product[] = [
     price: 1790,
     image: dressTerracota,
     category: "Festa",
-    colors: ["Terracota", "Marsala", "Champagne"],
+    colors: ["Terracota", "Marsala", "Champanhe"],
     sizes: ["P", "M", "G", "GG"],
     description: "Vestido longo em tecido fluido terracota com caimento sofisticado. Cor vibrante e elegante para festas inesquecíveis.",
   },
