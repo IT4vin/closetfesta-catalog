@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, ShoppingBag, Heart, Minus, Plus, ShoppingCart } from "lucide-react";
 import { products, colorMap } from "@/data/products";
+import { useCart } from "@/contexts/CartContext";
+import { toast } from "sonner";
 
 const ProductDetailScreen = () => {
   const { id } = useParams<{ id: string }>();
