@@ -65,7 +65,7 @@ export const products: Product[] = [
     price: 2290,
     image: dressLavanda,
     category: "Debutante",
-    colors: ["Lavanda", "Rose Blush", "Branco"],
+    colors: ["Lavanda", "Rosa Blush", "Branco"],
     sizes: ["P", "M", "G", "GG"],
     description: "Vestido de debutante em tule lavanda com decote princesa. Volume perfeito e detalhes que fazem os 15 anos inesquecíveis.",
   },
