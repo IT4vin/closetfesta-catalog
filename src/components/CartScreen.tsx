@@ -9,18 +9,6 @@ const CartScreen = () => {
   const { items, updateQty, removeItem } = useCart();
   const [promoCode, setPromoCode] = useState("");
 
-  const updateQty = (idx: number, delta: number) => {
-    setItems((prev) =>
-      prev.map((item, i) =>
-        i === idx ? { ...item, qty: Math.max(1, item.qty + delta) } : item
-      )
-    );
-  };
-
-  const removeItem = (idx: number) => {
-    setItems((prev) => prev.filter((_, i) => i !== idx));
-  };
-
   const subtotal = items.reduce((sum, item) => {
     const p = products.find((pr) => pr.id === item.productId);
     return sum + (p?.price || 0) * item.qty;
