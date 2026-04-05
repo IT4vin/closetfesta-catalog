@@ -45,7 +45,7 @@ export const products: Product[] = [
     price: 2890,
     image: dressChampagne,
     category: "Festa",
-    colors: ["Champagne", "Rose Blush", "Branco"],
+    colors: ["Champanhe", "Rosa Blush", "Branco"],
     sizes: ["P", "M", "G", "GG"],
     description: "Vestido tomara-que-caia em cetim acetinado champagne. Elegância atemporal com caimento impecável para festas de gala.",
   },
