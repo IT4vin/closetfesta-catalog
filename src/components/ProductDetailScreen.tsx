@@ -8,11 +8,17 @@ import { toast } from "sonner";
 const ProductDetailScreen = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { addItem, totalItems } = useCart();
   const product = products.find((p) => p.id === Number(id)) || products[0];
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
   const [selectedSize, setSelectedSize] = useState("M");
   const [qty, setQty] = useState(1);
   const [fav, setFav] = useState(false);
+
+  const handleAddToCart = () => {
+    addItem({ productId: product.id, size: selectedSize, color: selectedColor }, qty);
+    toast.success("Adicionado ao carrinho!", { description: `${product.name} — Tam. ${selectedSize}` });
+  };
 
   return (
     <div className="relative flex flex-col min-h-screen bg-background">
