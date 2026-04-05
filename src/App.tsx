@@ -19,6 +19,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/produto/:id" element={<ProductPage />} />
+          <Route path="/carrinho" element={<CartPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
