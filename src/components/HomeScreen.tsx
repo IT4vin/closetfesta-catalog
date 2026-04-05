@@ -10,6 +10,7 @@ const categories = Object.entries(colorMap);
 
 const HomeScreen = () => {
   const navigate = useNavigate();
+  const { totalItems } = useCart();
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
   const [drawerOpen, setDrawerOpen] = useState(false);
   const toggleFav = (id: number) => {
