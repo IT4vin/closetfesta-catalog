@@ -2,20 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { products } from "@/data/products";
-
-interface CartItem {
-  productId: number;
-  size: string;
-  qty: number;
-}
+import { useCart } from "@/contexts/CartContext";
 
 const CartScreen = () => {
   const navigate = useNavigate();
-  const [items, setItems] = useState<CartItem[]>([
-    { productId: 1, size: "M", qty: 1 },
-    { productId: 2, size: "G", qty: 1 },
-    { productId: 3, size: "P", qty: 1 },
-  ]);
+  const { items, updateQty, removeItem } = useCart();
   const [promoCode, setPromoCode] = useState("");
 
   const updateQty = (idx: number, delta: number) => {
