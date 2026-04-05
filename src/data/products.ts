@@ -35,7 +35,7 @@ export const products: Product[] = [
     price: 4890,
     image: dressWhite,
     category: "Noiva",
-    colors: ["Branco", "Champagne"],
+    colors: ["Branco", "Champanhe"],
     sizes: ["P", "M", "G", "GG"],
     description: "Vestido de noiva em renda francesa com detalhes em pedraria. Saia ampla em tule e corpete estruturado. Um sonho para o grande dia.",
   },
