@@ -55,7 +55,7 @@ export const products: Product[] = [
     price: 1690,
     image: dressRose,
     category: "Madrinha",
-    colors: ["Rose Blush", "Lavanda", "Champagne"],
+    colors: ["Rosa Blush", "Lavanda", "Champanhe"],
     sizes: ["P", "M", "G", "GG"],
     description: "Vestido longo em tule delicado com alças finas e costas abertas. Romântico e sofisticado em rose blush.",
   },
