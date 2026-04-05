@@ -27,6 +27,7 @@ const App = () => (
             <Route path="/carrinho" element={<CartPage />} />
             <Route path="/favoritos" element={<FavoritesPage />} />
             <Route path="/perfil" element={<ProfilePage />} />
+            <Route path="/pedidos" element={<OrdersPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
