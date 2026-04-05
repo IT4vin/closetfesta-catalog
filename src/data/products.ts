@@ -75,7 +75,7 @@ export const products: Product[] = [
     price: 1890,
     image: dressOlive,
     category: "Festa",
-    colors: ["Verde Oliva", "Marsala", "Champagne"],
+    colors: ["Verde Oliva", "Marsala", "Champanhe"],
     sizes: ["P", "M", "G", "GG"],
     description: "Vestido longo em cetim verde oliva com decote profundo. Sofisticação moderna para festas e eventos especiais.",
   },
