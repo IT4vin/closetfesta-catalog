@@ -1,17 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import { Menu, ShoppingBag, Search, SlidersHorizontal, Heart, Home, Grid3X3, User, ArrowRight } from "lucide-react";
 import { products, colorMap } from "@/data/products";
 import bannerPromo from "@/assets/banner-promo.jpg";
-import SideDrawer from "@/components/SideDrawer";
 
 const categories = Object.entries(colorMap);
 
 const HomeScreen = () => {
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const toggleFav = (id: number) => {
     setFavorites((prev) => {
@@ -22,21 +19,11 @@ const HomeScreen = () => {
   };
 
   return (
-    <>
-      <SideDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
-      <motion.div
-        className="relative flex flex-col min-h-screen bg-background"
-        animate={{ x: drawerOpen ? "78%" : "0%", scale: drawerOpen ? 0.92 : 1 }}
-        transition={{ type: "spring", damping: 28, stiffness: 300 }}
-        style={{ transformOrigin: "center center", borderRadius: drawerOpen ? "1.5rem" : "0" }}
-      >
+    <div className="relative flex flex-col min-h-screen bg-background">
       <div className="flex-1 pb-24">
         {/* Top Bar */}
         <div className="flex items-center justify-between px-5 pt-5 pb-3">
-          <button
-            onClick={() => setDrawerOpen(true)}
-            className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center shadow-card"
-          >
+          <button className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center shadow-card">
             <Menu className="w-5 h-5 text-foreground" />
           </button>
           <h1 className="font-display text-lg font-semibold text-foreground tracking-wide">Closet Festa</h1>
@@ -145,8 +132,7 @@ const HomeScreen = () => {
           </button>
         </div>
       </div>
-      </motion.div>
-    </>
+    </div>
   );
 };
 
