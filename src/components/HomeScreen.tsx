@@ -1,17 +1,21 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, ShoppingBag, Search, SlidersHorizontal, Heart, ArrowRight } from "lucide-react";
-import { products, colorMap } from "@/data/products";
+import { Menu, ShoppingBag, Heart, ArrowRight } from "lucide-react";
+import { colorMap } from "@/data/products";
 import bannerPromo from "@/assets/banner-promo.jpg";
 import SideDrawer from "@/components/SideDrawer";
 import BottomNav from "@/components/BottomNav";
+import ClosetSearchBar from "@/components/ClosetSearchBar";
+import HighlightedText from "@/components/HighlightedText";
 import { useCart } from "@/contexts/CartContext";
+import { useSearch } from "@/contexts/SearchContext";
 
 const categories = Object.entries(colorMap);
 
 const HomeScreen = () => {
   const navigate = useNavigate();
   const { totalItems } = useCart();
+  const { filteredProducts, hasActiveSearch, searchQuery, clearSearch } = useSearch();
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -29,7 +33,7 @@ const HomeScreen = () => {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden" style={{ backgroundColor: "#9C2F45" }}>
+    <div className="relative min-h-screen overflow-x-hidden" style={{ backgroundColor: "#9C2F45" }}>
       {/* Drawer content — always rendered behind the main content */}
       <div className="absolute inset-y-0 left-0 w-[78%] max-w-xs z-10">
         <SideDrawer onClose={() => setDrawerOpen(false)} onNavigate={handleDrawerNav} />
@@ -77,11 +81,7 @@ const HomeScreen = () => {
 
           {/* Search */}
           <div className="px-5 mt-2">
-            <div className="flex items-center gap-3 bg-secondary rounded-2xl px-4 py-3 shadow-card">
-              <Search className="w-5 h-5 text-muted-foreground" />
-              <span className="text-muted-foreground text-sm font-body flex-1">Buscar vestidos...</span>
-              <SlidersHorizontal className="w-5 h-5 text-muted-foreground" />
-            </div>
+            <ClosetSearchBar />
           </div>
 
           {/* Banner */}
@@ -129,33 +129,56 @@ const HomeScreen = () => {
               <button className="text-primary text-sm font-semibold font-body">Ver todos</button>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              {products.map((p) => (
-                <div
-                  key={p.id}
-                  className="bg-secondary rounded-2xl overflow-hidden shadow-card cursor-pointer transition-all hover:shadow-elevated hover:-translate-y-1"
-                  onClick={() => navigate(`/produto/${p.id}`)}
-                >
-                  <div className="relative aspect-[3/4] overflow-hidden">
-                    <img src={p.image} alt={p.name} className="w-full h-full object-cover" loading="lazy" />
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleFav(p.id);
-                      }}
-                      className="absolute top-3 right-3 w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center shadow-card"
-                    >
-                      <Heart className={`w-4 h-4 ${favorites.has(p.id) ? "fill-primary text-primary" : "text-foreground"}`} />
-                    </button>
-                  </div>
-                  <div className="p-3">
-                    <p className="font-body text-xs text-muted-foreground line-clamp-1">{p.category}</p>
-                    <p className="font-body text-sm font-semibold text-foreground mt-0.5 line-clamp-1">{p.name}</p>
-                    <p className="font-display text-base font-bold text-primary mt-1">
-                      R$ {p.price.toLocaleString("pt-BR")}
-                    </p>
-                  </div>
+              {hasActiveSearch && filteredProducts.length === 0 ? (
+                <div className="col-span-2 flex flex-col items-center justify-center rounded-2xl border border-[#E8DFD6] bg-[#FFFCFA] px-6 py-14 text-center shadow-[0_12px_40px_-16px_rgba(156,47,69,0.2)]">
+                  <p className="font-display text-base font-semibold text-foreground">
+                    Nenhum vestido encontrado para esta busca
+                  </p>
+                  <p className="mt-2 max-w-xs font-body text-sm text-muted-foreground">
+                    Tente outra cor, categoria ou estilo — temos opções em Marsala, Champanhe, Rosa Blush e muito mais.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={clearSearch}
+                    className="mt-6 rounded-full bg-[#9C2F45] px-6 py-2.5 font-body text-sm font-semibold text-white shadow-[0_8px_24px_-6px_rgba(156,47,69,0.45)] transition-transform active:scale-[0.98]"
+                  >
+                    Limpar busca
+                  </button>
                 </div>
-              ))}
+              ) : (
+                filteredProducts.map((p) => (
+                  <div
+                    key={p.id}
+                    className="bg-secondary rounded-2xl overflow-hidden shadow-card cursor-pointer transition-all hover:shadow-elevated hover:-translate-y-1"
+                    onClick={() => navigate(`/produto/${p.id}`)}
+                  >
+                    <div className="relative aspect-[3/4] overflow-hidden">
+                      <img src={p.image} alt={p.name} className="w-full h-full object-cover" loading="lazy" />
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleFav(p.id);
+                        }}
+                        className="absolute top-3 right-3 w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center shadow-card"
+                      >
+                        <Heart className={`w-4 h-4 ${favorites.has(p.id) ? "fill-primary text-primary" : "text-foreground"}`} />
+                      </button>
+                    </div>
+                    <div className="p-3">
+                      <p className="font-body text-xs text-muted-foreground line-clamp-1">
+                        <HighlightedText text={p.category} query={searchQuery} />
+                      </p>
+                      <p className="font-body text-sm font-semibold text-foreground mt-0.5 line-clamp-2">
+                        <HighlightedText text={p.name} query={searchQuery} />
+                      </p>
+                      <p className="font-display text-base font-bold text-primary mt-1">
+                        R$ {p.price.toLocaleString("pt-BR")}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

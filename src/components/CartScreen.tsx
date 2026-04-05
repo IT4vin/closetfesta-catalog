@@ -4,6 +4,7 @@ import { ArrowLeft, Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { products } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import BottomNav from "@/components/BottomNav";
+import ClosetSearchBar from "@/components/ClosetSearchBar";
 
 const CartScreen = () => {
   const navigate = useNavigate();
@@ -32,6 +33,10 @@ const CartScreen = () => {
           <h1 className="flex-1 text-center font-display text-lg font-bold text-foreground pr-10">
             Carrinho
           </h1>
+        </div>
+
+        <div className="px-5 pb-2">
+          <ClosetSearchBar />
         </div>
 
         {items.length === 0 ? (

@@ -13,6 +13,8 @@ export interface Product {
   price: number;
   image: string;
   category: string;
+  /** Estilo/corte do vestido (ex.: longo, tomara que caia, princesa). */
+  dressType: string;
   colors: string[];
   sizes: string[];
   description: string;
@@ -25,6 +27,7 @@ export const products: Product[] = [
     price: 1490,
     image: dressMarsala,
     category: "Madrinha",
+    dressType: "Longo chiffon decote V",
     colors: ["Marsala", "Rosa Blush", "Champanhe", "Branco"],
     sizes: ["P", "M", "G", "GG"],
     description: "Vestido longo em chiffon com decote V profundo e drapeado na cintura. Caimento fluido e elegante, perfeito para madrinhas que desejam sofisticação e conforto.",
@@ -35,6 +38,7 @@ export const products: Product[] = [
     price: 4890,
     image: dressWhite,
     category: "Noiva",
+    dressType: "Renda saia ampla",
     colors: ["Branco", "Champanhe"],
     sizes: ["P", "M", "G", "GG"],
     description: "Vestido de noiva em renda francesa com detalhes em pedraria. Saia ampla em tule e corpete estruturado. Um sonho para o grande dia.",
@@ -45,6 +49,7 @@ export const products: Product[] = [
     price: 2890,
     image: dressChampagne,
     category: "Festa",
+    dressType: "Tomara que caia cetim",
     colors: ["Champanhe", "Rosa Blush", "Branco"],
     sizes: ["P", "M", "G", "GG"],
     description: "Vestido tomara-que-caia em cetim acetinado champagne. Elegância atemporal com caimento impecável para festas de gala.",
@@ -55,6 +60,7 @@ export const products: Product[] = [
     price: 1690,
     image: dressRose,
     category: "Madrinha",
+    dressType: "Longo tule alças finas",
     colors: ["Rosa Blush", "Lavanda", "Champanhe"],
     sizes: ["P", "M", "G", "GG"],
     description: "Vestido longo em tule delicado com alças finas e costas abertas. Romântico e sofisticado em rose blush.",
@@ -65,6 +71,7 @@ export const products: Product[] = [
     price: 2290,
     image: dressLavanda,
     category: "Debutante",
+    dressType: "Princesa tule",
     colors: ["Lavanda", "Rosa Blush", "Branco"],
     sizes: ["P", "M", "G", "GG"],
     description: "Vestido de debutante em tule lavanda com decote princesa. Volume perfeito e detalhes que fazem os 15 anos inesquecíveis.",
@@ -75,6 +82,7 @@ export const products: Product[] = [
     price: 1890,
     image: dressOlive,
     category: "Festa",
+    dressType: "Longo cetim decote profundo",
     colors: ["Verde Oliva", "Marsala", "Champanhe"],
     sizes: ["P", "M", "G", "GG"],
     description: "Vestido longo em cetim verde oliva com decote profundo. Sofisticação moderna para festas e eventos especiais.",
@@ -85,6 +93,7 @@ export const products: Product[] = [
     price: 1590,
     image: dressSerenity,
     category: "Madrinha",
+    dressType: "Longo chiffon costas abertas",
     colors: ["Azul Serenity", "Lavanda", "Rosa Blush"],
     sizes: ["P", "M", "G", "GG"],
     description: "Vestido longo em chiffon azul serenity com costas elegantes. Leveza e sofisticação para cerimônias ao ar livre.",
@@ -95,6 +104,7 @@ export const products: Product[] = [
     price: 1790,
     image: dressTerracota,
     category: "Festa",
+    dressType: "Longo fluido",
     colors: ["Terracota", "Marsala", "Champanhe"],
     sizes: ["P", "M", "G", "GG"],
     description: "Vestido longo em tecido fluido terracota com caimento sofisticado. Cor vibrante e elegante para festas inesquecíveis.",

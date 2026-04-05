@@ -1,15 +1,20 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Heart, ShoppingCart, Share2 } from "lucide-react";
 import { products } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import BottomNav from "@/components/BottomNav";
+import ClosetSearchBar from "@/components/ClosetSearchBar";
+import HighlightedText from "@/components/HighlightedText";
+import { useSearch } from "@/contexts/SearchContext";
+import { filterProductsByQuery } from "@/lib/searchUtils";
 import { toast } from "sonner";
 import { buildFavoritesShareText } from "@/lib/favoritesShare";
 
 const FavoritesScreen = () => {
   const navigate = useNavigate();
   const { addItem } = useCart();
+  const { searchQuery, hasActiveSearch, clearSearch } = useSearch();
   const [favIds, setFavIds] = useState<Set<number>>(new Set(products.slice(0, 4).map((p) => p.id)));
 
   const removeFav = (id: number) => {
@@ -22,6 +27,11 @@ const FavoritesScreen = () => {
   };
 
   const favProducts = products.filter((p) => favIds.has(p.id));
+
+  const visibleFavorites = useMemo(
+    () => filterProductsByQuery(favProducts, searchQuery),
+    [favProducts, searchQuery],
+  );
 
   const handleShare = async () => {
     if (favProducts.length === 0) {
@@ -87,6 +97,10 @@ const FavoritesScreen = () => {
         </button>
       </div>
 
+      <div className="px-5 pb-3">
+        <ClosetSearchBar />
+      </div>
+
       {favProducts.length === 0 ? (
         <div className="flex flex-col items-center justify-center px-6 py-20">
           <Heart className="mb-4 h-16 w-16 text-muted-foreground/30" />
@@ -95,9 +109,25 @@ const FavoritesScreen = () => {
             Explore nossos vestidos e salve os que mais amou
           </p>
         </div>
+      ) : hasActiveSearch && visibleFavorites.length === 0 ? (
+        <div className="mx-5 flex flex-col items-center justify-center rounded-2xl border border-[#E8DFD6] bg-white px-6 py-14 text-center shadow-[0_12px_40px_-16px_rgba(156,47,69,0.15)]">
+          <p className="font-display text-base font-semibold text-foreground">
+            Nenhum vestido encontrado para esta busca
+          </p>
+          <p className="mt-2 font-body text-sm text-muted-foreground">
+            Ajuste os termos ou limpe a busca para ver todos os favoritos.
+          </p>
+          <button
+            type="button"
+            onClick={clearSearch}
+            className="mt-6 rounded-full bg-[#9C2F45] px-6 py-2.5 font-body text-sm font-semibold text-white shadow-[0_8px_24px_-6px_rgba(156,47,69,0.45)] transition-transform active:scale-[0.98]"
+          >
+            Limpar busca
+          </button>
+        </div>
       ) : (
         <div className="space-y-3 px-5 pb-8">
-          {favProducts.map((p) => (
+          {visibleFavorites.map((p) => (
             <div
               key={p.id}
               className="flex gap-3 rounded-2xl border border-border/30 bg-white p-3 shadow-card"
@@ -118,9 +148,11 @@ const FavoritesScreen = () => {
               </div>
               <div className="flex min-w-0 flex-1 flex-col justify-between">
                 <div>
-                  <p className="font-body text-xs text-muted-foreground">{p.category}</p>
+                  <p className="font-body text-xs text-muted-foreground">
+                    <HighlightedText text={p.category} query={searchQuery} />
+                  </p>
                   <p className="line-clamp-2 font-display text-sm font-semibold leading-tight text-foreground">
-                    {p.name}
+                    <HighlightedText text={p.name} query={searchQuery} />
                   </p>
                 </div>
                 <p className="font-display text-base font-bold text-[#9C2F45]">R$ {p.price.toLocaleString("pt-BR")}</p>

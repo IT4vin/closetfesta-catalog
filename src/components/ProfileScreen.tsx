@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, User, MapPin, CreditCard, Bell, HelpCircle, Shield, ChevronRight, LogOut } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
+import ClosetSearchBar from "@/components/ClosetSearchBar";
 
 const menuSections = [
   {
@@ -32,6 +33,10 @@ const ProfileScreen = () => {
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <h1 className="flex-1 text-center font-display text-lg font-bold text-foreground pr-10">Perfil</h1>
+      </div>
+
+      <div className="px-5 pb-2">
+        <ClosetSearchBar />
       </div>
 
       {/* Avatar Card */}

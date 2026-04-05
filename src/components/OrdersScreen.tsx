@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronRight, Truck, CheckCircle2, Clock } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
+import ClosetSearchBar from "@/components/ClosetSearchBar";
 import { products } from "@/data/products";
 
 const orders = [
@@ -54,6 +55,10 @@ const OrdersScreen = () => {
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <h1 className="flex-1 text-center font-display text-lg font-bold text-foreground pr-10">Meus Pedidos</h1>
+      </div>
+
+      <div className="px-5 pb-2">
+        <ClosetSearchBar />
       </div>
 
       {/* Orders */}

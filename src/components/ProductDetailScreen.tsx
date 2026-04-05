@@ -5,6 +5,7 @@ import { products, colorMap } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
 import BottomNav from "@/components/BottomNav";
+import ClosetSearchBar from "@/components/ClosetSearchBar";
 
 const ProductDetailScreen = () => {
   const { id } = useParams<{ id: string }>();
@@ -36,6 +37,10 @@ const ProductDetailScreen = () => {
               <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">{totalItems}</span>
             )}
           </button>
+        </div>
+
+        <div className="px-5 pb-2">
+          <ClosetSearchBar />
         </div>
 
         {/* Product Image */}
