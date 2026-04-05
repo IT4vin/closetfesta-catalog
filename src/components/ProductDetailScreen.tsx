@@ -29,8 +29,11 @@ const ProductDetailScreen = () => {
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
           <h1 className="font-display text-lg font-semibold text-foreground">Detalhes</h1>
-          <button className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center shadow-card relative">
+          <button onClick={() => navigate("/carrinho")} className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center shadow-card relative">
             <ShoppingBag className="w-5 h-5 text-foreground" />
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">{totalItems}</span>
+            )}
           </button>
         </div>
 
