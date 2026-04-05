@@ -29,24 +29,33 @@ const FavoritesScreen = () => {
       return;
     }
 
-    const text = buildFavoritesShareText(favProducts);
+    const textoCompleto = buildFavoritesShareText(favProducts);
+    const shareTitle = "Meus Favoritos - Closet Festa";
+
+    const copyToClipboard = async () => {
+      await navigator.clipboard.writeText(textoCompleto);
+      toast.success("Texto copiado! Cole no WhatsApp ou outro app.");
+    };
 
     try {
       if (typeof navigator.share === "function") {
-        try {
-          await navigator.share({
-            title: "Meus Favoritos - Closet Festa",
-            text,
-          });
-          toast.success("Pronto para compartilhar!");
-          return;
-        } catch (err) {
-          if (err instanceof Error && err.name === "AbortError") return;
+        // WhatsApp/Telegram em vários Androids usam só `url` e descartam `text` se ambos forem enviados.
+        const payload: ShareData = { title: shareTitle, text: textoCompleto };
+        const can =
+          typeof navigator.canShare !== "function" ? true : navigator.canShare(payload);
+
+        if (can) {
+          try {
+            await navigator.share(payload);
+            toast.success("Compartilhado!");
+            return;
+          } catch (err) {
+            if (err instanceof Error && err.name === "AbortError") return;
+          }
         }
       }
 
-      await navigator.clipboard.writeText(text);
-      toast.success("Lista de favoritos copiada para a área de transferência!");
+      await copyToClipboard();
     } catch {
       toast.error("Não foi possível compartilhar ou copiar. Tente novamente.");
     }
