@@ -134,7 +134,7 @@ const ProductDetailScreen = () => {
               R$ {(product.price * qty).toLocaleString("pt-BR")}
             </p>
           </div>
-          <button className="flex items-center gap-2 bg-primary text-primary-foreground font-body font-bold text-sm px-6 py-3.5 rounded-2xl shadow-button transition-transform hover:scale-105 active:scale-95">
+          <button onClick={handleAddToCart} className="flex items-center gap-2 bg-primary text-primary-foreground font-body font-bold text-sm px-6 py-3.5 rounded-2xl shadow-button transition-transform hover:scale-105 active:scale-95">
             <ShoppingCart className="w-5 h-5" />
             Adicionar ao Carrinho
           </button>
