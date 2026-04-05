@@ -132,13 +132,13 @@ const HomeScreen = () => {
             </div>
             <span className="text-xs font-body font-bold text-primary">Home</span>
           </button>
-          <button className="w-9 h-9 flex items-center justify-center">
+          <button onClick={() => navigate("/carrinho")} className="w-9 h-9 flex items-center justify-center">
             <ShoppingBag className="w-5 h-5 text-foreground/60" />
           </button>
-          <button className="w-9 h-9 flex items-center justify-center">
+          <button onClick={() => navigate("/favoritos")} className="w-9 h-9 flex items-center justify-center">
             <Heart className="w-5 h-5 text-foreground/60" />
           </button>
-          <button className="w-9 h-9 flex items-center justify-center">
+          <button onClick={() => navigate("/perfil")} className="w-9 h-9 flex items-center justify-center">
             <User className="w-5 h-5 text-foreground/60" />
           </button>
         </div>
