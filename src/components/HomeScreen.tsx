@@ -1,7 +1,5 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   Menu,
   ShoppingBag,
@@ -33,33 +31,10 @@ import { useCart } from "@/contexts/CartContext";
 import { useSearch } from "@/contexts/SearchContext";
 import { cn } from "@/lib/utils";
 
-gsap.registerPlugin(ScrollTrigger);
+
 
 const MARSALA = "#9C2F45";
 
-/**
- * Ajustes finos do scroll premium (home).
- * Altere aqui sem caçar valores espalhados no JSX.
- */
-const HOME_SCROLL = {
-  /** z-index: camada fixa (logo + busca) */
-  zHeader: 90,
-  /** z-index: bloco promocional + filtros durante o pin */
-  zPinnedBlock: 30,
-  /** z-index: grade “Novos Chegados” — passa por cima do bloco fixo */
-  zProducts: 40,
-  /**
-   * Margem acima do bloco pinado (px). Cria rolagem antes do pin “engatar”:
-   * sem isso, o topo do banner já estaria em top+=header e o pin dispararia no scroll 0.
-   */
-  prePinScrollPx: 28,
-  /** Sombra / borda quando o bloco está pinado (Tailwind arbitrary) */
-  pinnedShadow:
-    "shadow-[0_12px_40px_-12px_rgba(0,0,0,0.12),0_4px_16px_-4px_rgba(156,47,69,0.08)]",
-  pinnedBorder: "border-b border-[#E8DFD6]/90",
-  /** Antecipa pin em mobile (ScrollTrigger) */
-  anticipatePin: 1,
-} as const;
 
 const tipoIcons: Record<TipoCategoria, typeof Crown> = {
   "Vestidos de Noiva": Crown,
@@ -91,14 +66,9 @@ const HomeScreen = () => {
 
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
   const [drawerOpen, setDrawerOpen] = useState(false);
-  /** Bloco promocional + filtros está pinado (GSAP) — ativa sombra/borda premium */
-  const [pinned, setPinned] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
 
   const headerRef = useRef<HTMLElement>(null);
-  const pinBlockRef = useRef<HTMLDivElement>(null);
-  const scrollEndRef = useRef<HTMLElement>(null);
-  const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
 
   const toggleFav = (id: number) => {
     setFavorites((prev) => {
@@ -124,59 +94,14 @@ const HomeScreen = () => {
   const showEmpty =
     filteredProducts.length === 0 && (hasActiveSearch || hasActiveCategoryFilter);
 
-  /** Altura do header fixo (logo + busca) para pin start/end e espaçador */
   useLayoutEffect(() => {
     const el = headerRef.current;
     if (!el) return;
-    const ro = new ResizeObserver(() => {
-      setHeaderHeight(el.offsetHeight);
-    });
+    const ro = new ResizeObserver(() => setHeaderHeight(el.offsetHeight));
     ro.observe(el);
     setHeaderHeight(el.offsetHeight);
     return () => ro.disconnect();
   }, []);
-
-  /** GSAP ScrollTrigger: fixa oferta + Cores + Estilo sob a busca; produtos sobrepõem com z-index maior */
-  useLayoutEffect(() => {
-    const pinEl = pinBlockRef.current;
-    const endEl = scrollEndRef.current;
-    const reduceMotion =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (!pinEl || !endEl || reduceMotion || headerHeight <= 0) {
-      return;
-    }
-
-    scrollTriggerRef.current?.kill();
-    scrollTriggerRef.current = null;
-
-    const st = ScrollTrigger.create({
-      trigger: pinEl,
-      start: () => `top top+=${headerHeight}`,
-      endTrigger: endEl,
-      end: () => `top top+=${headerHeight}`,
-      pin: true,
-      pinSpacing: true,
-      anticipatePin: HOME_SCROLL.anticipatePin,
-      invalidateOnRefresh: true,
-      onPin: () => setPinned(true),
-      onUnpin: () => setPinned(false),
-    });
-
-    scrollTriggerRef.current = st;
-
-    return () => {
-      st.kill();
-      scrollTriggerRef.current = null;
-      setPinned(false);
-    };
-  }, [headerHeight]);
-
-  /** Recalcula posições quando o drawer anima ou o conteúdo da home muda de altura */
-  useLayoutEffect(() => {
-    ScrollTrigger.refresh();
-  }, [drawerOpen, filteredProducts.length, showEmpty]);
 
   return (
     <div className="relative min-h-screen overflow-x-hidden" style={{ backgroundColor: MARSALA }}>
@@ -199,16 +124,9 @@ const HomeScreen = () => {
           onClick={() => setDrawerOpen(false)}
         />
 
-        {/* Header fixo: logo, menu, carrinho + barra de busca — sempre visíveis no topo */}
         <header
           ref={headerRef}
-          className={cn(
-            "fixed left-0 right-0 top-0 bg-background/95 backdrop-blur-md",
-            "pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 sm:pb-3.5",
-            "transition-[box-shadow] duration-300 ease-out",
-            pinned && "shadow-[0_8px_24px_-8px_rgba(0,0,0,0.08)]",
-          )}
-          style={{ zIndex: HOME_SCROLL.zHeader, willChange: "transform" }}
+          className="fixed left-0 right-0 top-0 z-50 bg-background/95 backdrop-blur-md pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 sm:pb-3.5 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.06)]"
         >
           <div className="flex items-center justify-between px-5 pb-1 sm:pb-1.5">
             <button
@@ -258,23 +176,7 @@ const HomeScreen = () => {
         />
 
         <div className="flex-1 pb-24">
-          {/*
-            Bloco pinado (GSAP): Oferta Limitada + Cores + Estilo.
-            zProducts > zPinnedBlock: a grade passa por cima (layering).
-          */}
-          <div
-            ref={pinBlockRef}
-            className={cn(
-              "relative bg-background",
-              pinned && HOME_SCROLL.pinnedShadow,
-              pinned && HOME_SCROLL.pinnedBorder,
-            )}
-            style={{
-              zIndex: HOME_SCROLL.zPinnedBlock,
-              marginTop: HOME_SCROLL.prePinScrollPx,
-              willChange: pinned ? "transform" : "auto",
-            }}
-          >
+          <div className="relative bg-background">
             <div className="px-5 pt-2">
               <div className="relative overflow-hidden rounded-2xl bg-primary shadow-elevated">
                 <img
@@ -399,8 +301,7 @@ const HomeScreen = () => {
             </div>
           </div>
 
-          {/* Novos Chegados: rola por cima do bloco pinado (z-index + fundo sólido) */}
-          <div className="relative isolate bg-background" style={{ zIndex: HOME_SCROLL.zProducts }}>
+          <div className="relative bg-background">
             <div className="mt-6 px-5">
               <div className="mb-3 flex items-center justify-between">
                 <h3 className="font-display text-base font-semibold text-foreground">Novos Chegados</h3>
@@ -505,9 +406,7 @@ const HomeScreen = () => {
             </div>
           </div>
 
-          {/* Fim do pin: quando esta seção alinha sob o header, o ScrollTrigger solta o pin — scroll volta ao normal */}
           <section
-            ref={scrollEndRef}
             className="relative mt-10 px-5 pb-8"
             aria-labelledby="ofertas-ilimitadas-heading"
           >
