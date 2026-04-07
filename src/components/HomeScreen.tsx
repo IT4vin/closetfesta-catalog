@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   Menu,
   ShoppingBag,
@@ -12,6 +14,7 @@ import {
   Columns2,
   Flower2,
   Waves,
+  Sparkles,
 } from "lucide-react";
 import {
   CORES_CATEGORIA,
@@ -30,6 +33,34 @@ import { useCart } from "@/contexts/CartContext";
 import { useSearch } from "@/contexts/SearchContext";
 import { cn } from "@/lib/utils";
 
+gsap.registerPlugin(ScrollTrigger);
+
+const MARSALA = "#9C2F45";
+
+/**
+ * Ajustes finos do scroll premium (home).
+ * Altere aqui sem caçar valores espalhados no JSX.
+ */
+const HOME_SCROLL = {
+  /** z-index: camada fixa (logo + busca) */
+  zHeader: 90,
+  /** z-index: bloco promocional + filtros durante o pin */
+  zPinnedBlock: 30,
+  /** z-index: grade “Novos Chegados” — passa por cima do bloco fixo */
+  zProducts: 40,
+  /**
+   * Margem acima do bloco pinado (px). Cria rolagem antes do pin “engatar”:
+   * sem isso, o topo do banner já estaria em top+=header e o pin dispararia no scroll 0.
+   */
+  prePinScrollPx: 28,
+  /** Sombra / borda quando o bloco está pinado (Tailwind arbitrary) */
+  pinnedShadow:
+    "shadow-[0_12px_40px_-12px_rgba(0,0,0,0.12),0_4px_16px_-4px_rgba(156,47,69,0.08)]",
+  pinnedBorder: "border-b border-[#E8DFD6]/90",
+  /** Antecipa pin em mobile (ScrollTrigger) */
+  anticipatePin: 1,
+} as const;
+
 const tipoIcons: Record<TipoCategoria, typeof Crown> = {
   "Vestidos de Noiva": Crown,
   "Vestidos de Madrinha": Heart,
@@ -40,8 +71,6 @@ const tipoIcons: Record<TipoCategoria, typeof Crown> = {
   "Vestidos Evase": Flower2,
   "Vestidos Sereia": Waves,
 };
-
-const MARSALA = "#9C2F45";
 
 const HomeScreen = () => {
   const navigate = useNavigate();
@@ -62,6 +91,14 @@ const HomeScreen = () => {
 
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
   const [drawerOpen, setDrawerOpen] = useState(false);
+  /** Bloco promocional + filtros está pinado (GSAP) — ativa sombra/borda premium */
+  const [pinned, setPinned] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(0);
+
+  const headerRef = useRef<HTMLElement>(null);
+  const pinBlockRef = useRef<HTMLDivElement>(null);
+  const scrollEndRef = useRef<HTMLElement>(null);
+  const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
 
   const toggleFav = (id: number) => {
     setFavorites((prev) => {
@@ -87,6 +124,60 @@ const HomeScreen = () => {
   const showEmpty =
     filteredProducts.length === 0 && (hasActiveSearch || hasActiveCategoryFilter);
 
+  /** Altura do header fixo (logo + busca) para pin start/end e espaçador */
+  useLayoutEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      setHeaderHeight(el.offsetHeight);
+    });
+    ro.observe(el);
+    setHeaderHeight(el.offsetHeight);
+    return () => ro.disconnect();
+  }, []);
+
+  /** GSAP ScrollTrigger: fixa oferta + Cores + Estilo sob a busca; produtos sobrepõem com z-index maior */
+  useLayoutEffect(() => {
+    const pinEl = pinBlockRef.current;
+    const endEl = scrollEndRef.current;
+    const reduceMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (!pinEl || !endEl || reduceMotion || headerHeight <= 0) {
+      return;
+    }
+
+    scrollTriggerRef.current?.kill();
+    scrollTriggerRef.current = null;
+
+    const st = ScrollTrigger.create({
+      trigger: pinEl,
+      start: () => `top top+=${headerHeight}`,
+      endTrigger: endEl,
+      end: () => `top top+=${headerHeight}`,
+      pin: true,
+      pinSpacing: true,
+      anticipatePin: HOME_SCROLL.anticipatePin,
+      invalidateOnRefresh: true,
+      onPin: () => setPinned(true),
+      onUnpin: () => setPinned(false),
+    });
+
+    scrollTriggerRef.current = st;
+
+    return () => {
+      st.kill();
+      scrollTriggerRef.current = null;
+      setPinned(false);
+    };
+  }, [headerHeight]);
+
+  /** Recalcula posições quando o drawer anima ou o conteúdo da home muda de altura */
+  useLayoutEffect(() => {
+    ScrollTrigger.refresh();
+  }, [drawerOpen, filteredProducts.length, showEmpty]);
+
   return (
     <div className="relative min-h-screen overflow-x-hidden" style={{ backgroundColor: MARSALA }}>
       <div className="absolute inset-y-0 left-0 w-[78%] max-w-xs z-10">
@@ -108,14 +199,24 @@ const HomeScreen = () => {
           onClick={() => setDrawerOpen(false)}
         />
 
-        <div className="flex-1 pb-24">
-          <div className="flex items-center justify-between px-5 pb-1 pt-[max(0.75rem,env(safe-area-inset-top))] sm:pb-1.5 sm:pt-4">
+        {/* Header fixo: logo, menu, carrinho + barra de busca — sempre visíveis no topo */}
+        <header
+          ref={headerRef}
+          className={cn(
+            "fixed left-0 right-0 top-0 bg-background/95 backdrop-blur-md",
+            "pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 sm:pb-3.5",
+            "transition-[box-shadow] duration-300 ease-out",
+            pinned && "shadow-[0_8px_24px_-8px_rgba(0,0,0,0.08)]",
+          )}
+          style={{ zIndex: HOME_SCROLL.zHeader, willChange: "transform" }}
+        >
+          <div className="flex items-center justify-between px-5 pb-1 sm:pb-1.5">
             <button
               type="button"
               onClick={() => setDrawerOpen(true)}
-              className="w-11 h-11 shrink-0 rounded-xl bg-secondary flex items-center justify-center shadow-card"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-secondary shadow-card"
             >
-              <Menu className="w-5 h-5 text-foreground" />
+              <Menu className="h-5 w-5 text-foreground" />
             </button>
 
             <div className="flex min-w-0 flex-1 items-center justify-center px-2">
@@ -124,7 +225,7 @@ const HomeScreen = () => {
                 alt="Closet Festa"
                 width={1792}
                 height={1792}
-                className="h-28 w-auto sm:h-32 max-w-[calc(100vw-7rem)] object-contain object-center drop-shadow-sm"
+                className="h-28 w-auto max-w-[calc(100vw-7rem)] object-contain object-center drop-shadow-sm sm:h-32"
                 decoding="async"
                 fetchPriority="high"
               />
@@ -133,233 +234,311 @@ const HomeScreen = () => {
             <button
               type="button"
               onClick={() => navigate("/carrinho")}
-              className="w-11 h-11 shrink-0 rounded-xl bg-secondary flex items-center justify-center shadow-card relative"
+              className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-secondary shadow-card"
             >
-              <ShoppingBag className="w-5 h-5 text-foreground" />
+              <ShoppingBag className="h-5 w-5 text-foreground" />
               {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
                   {totalItems}
                 </span>
               )}
             </button>
           </div>
 
-          <div className="px-5 mt-1 sm:mt-1.5">
+          <div className="mt-1 px-5 sm:mt-1.5">
             <ClosetSearchBar />
           </div>
+        </header>
 
-          <div className="px-5 mt-5">
-            <div className="relative rounded-2xl overflow-hidden shadow-elevated bg-primary">
-              <img src={bannerPromo} alt="Promoção Closet Festa" className="w-full h-44 object-cover opacity-40" />
-              <div className="absolute inset-0 flex flex-col justify-center px-5">
-                <span className="inline-block bg-background/90 text-foreground text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full w-fit mb-2">
-                  Oferta Limitada
-                </span>
-                <h2 className="font-display text-primary-foreground text-lg font-bold leading-tight">
-                  Primeira Compra com<br />Desconto Especial
-                </h2>
-                <button
-                  type="button"
-                  className="mt-3 flex items-center gap-2 bg-background text-foreground font-body font-bold text-sm px-5 py-2.5 rounded-full w-fit shadow-button transition-transform hover:scale-105"
-                >
-                  Comprar Agora
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+        {/* Reserva espaço do header fixo para o conteúdo não “pular” por baixo */}
+        <div
+          className="shrink-0"
+          style={{ height: headerHeight }}
+          aria-hidden
+        />
+
+        <div className="flex-1 pb-24">
+          {/*
+            Bloco pinado (GSAP): Oferta Limitada + Cores + Estilo.
+            zProducts > zPinnedBlock: a grade passa por cima (layering).
+          */}
+          <div
+            ref={pinBlockRef}
+            className={cn(
+              "relative bg-background",
+              pinned && HOME_SCROLL.pinnedShadow,
+              pinned && HOME_SCROLL.pinnedBorder,
+            )}
+            style={{
+              zIndex: HOME_SCROLL.zPinnedBlock,
+              marginTop: HOME_SCROLL.prePinScrollPx,
+              willChange: pinned ? "transform" : "auto",
+            }}
+          >
+            <div className="px-5 pt-2">
+              <div className="relative overflow-hidden rounded-2xl bg-primary shadow-elevated">
+                <img
+                  src={bannerPromo}
+                  alt="Promoção Closet Festa"
+                  className="h-44 w-full object-cover opacity-40"
+                />
+                <div className="absolute inset-0 flex flex-col justify-center px-5">
+                  <span className="mb-2 inline-block w-fit rounded-full bg-background/90 px-3 py-1 font-body text-[10px] font-bold uppercase tracking-widest text-foreground">
+                    Oferta Limitada
+                  </span>
+                  <h2 className="font-display text-lg font-bold leading-tight text-primary-foreground">
+                    Primeira Compra com
+                    <br />
+                    Desconto Especial
+                  </h2>
+                  <button
+                    type="button"
+                    className="mt-3 flex w-fit items-center gap-2 rounded-full bg-background px-5 py-2.5 font-body text-sm font-bold text-foreground shadow-button transition-transform hover:scale-105"
+                  >
+                    Comprar Agora
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="mt-6 px-5">
-            <div className="flex items-center justify-between mb-3 gap-2">
-              <h3 className="font-display text-base font-semibold text-foreground">Cores</h3>
-              <div className="flex items-center gap-2 shrink-0">
-                {hasActiveCategoryFilter && (
+            <div className="mt-6 px-5">
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <h3 className="font-display text-base font-semibold text-foreground">Cores</h3>
+                <div className="flex shrink-0 items-center gap-2">
+                  {hasActiveCategoryFilter && (
+                    <button
+                      type="button"
+                      onClick={clearCategoryFilters}
+                      className="font-body text-xs font-semibold text-[#9C2F45] underline-offset-2 hover:underline"
+                    >
+                      Limpar filtro
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={clearCategoryFilters}
-                    className="text-[#9C2F45] text-xs font-semibold font-body underline-offset-2 hover:underline"
+                    className="font-body text-sm font-semibold text-primary"
                   >
-                    Limpar filtro
+                    Ver todas
                   </button>
-                )}
+                </div>
+              </div>
+              <div className="scrollbar-hide flex gap-2.5 overflow-x-auto pb-2">
+                {CORES_CATEGORIA.map((nomeCor) => {
+                  const selected = colorCategoryFilter === nomeCor;
+                  const hex = colorMap[nomeCor];
+                  return (
+                    <button
+                      key={nomeCor}
+                      type="button"
+                      onClick={() => onPickColor(nomeCor)}
+                      className={cn(
+                        "flex shrink-0 items-center gap-2 rounded-xl px-3.5 py-2.5 shadow-card transition-all duration-200",
+                        "bg-[#F5F0EB] hover:shadow-[0_8px_24px_-8px_rgba(156,47,69,0.2)]",
+                        selected &&
+                          "bg-white shadow-[0_12px_32px_-10px_rgba(156,47,69,0.35)] ring-2 ring-[#9C2F45] ring-offset-2 ring-offset-background",
+                      )}
+                    >
+                      <span
+                        className="h-4 w-4 shrink-0 rounded-full border border-black/10"
+                        style={{ backgroundColor: hex }}
+                      />
+                      <span
+                        className={cn(
+                          "whitespace-nowrap font-body text-sm font-medium",
+                          selected ? "font-semibold text-[#9C2F45]" : "text-foreground",
+                        )}
+                      >
+                        {nomeCor}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="mt-5 px-5 pb-2">
+              <h3 className="mb-3 font-display text-base font-semibold text-foreground">Estilo</h3>
+              <div className="scrollbar-hide flex gap-2.5 overflow-x-auto pb-2">
+                {TIPOS_CATEGORIA.map((tipo) => {
+                  const Icon = tipoIcons[tipo];
+                  const selected = typeCategoryFilter === tipo;
+                  return (
+                    <button
+                      key={tipo}
+                      type="button"
+                      onClick={() => onPickTipo(tipo)}
+                      className={cn(
+                        "flex shrink-0 items-center gap-2 rounded-xl px-3.5 py-2.5 shadow-card transition-all duration-200",
+                        "bg-[#F5F0EB] hover:shadow-[0_8px_24px_-8px_rgba(156,47,69,0.2)]",
+                        selected &&
+                          "bg-white shadow-[0_12px_32px_-10px_rgba(156,47,69,0.35)] ring-2 ring-[#9C2F45] ring-offset-2 ring-offset-background",
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-sm",
+                          selected ? "text-[#9C2F45]" : "text-foreground/70",
+                        )}
+                      >
+                        <Icon className="h-4 w-4" strokeWidth={2} />
+                      </span>
+                      <span
+                        className={cn(
+                          "max-w-[140px] text-left font-body text-xs font-medium leading-tight whitespace-nowrap",
+                          selected ? "font-semibold text-[#9C2F45]" : "text-foreground",
+                        )}
+                      >
+                        {tipo}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Novos Chegados: rola por cima do bloco pinado (z-index + fundo sólido) */}
+          <div className="relative isolate bg-background" style={{ zIndex: HOME_SCROLL.zProducts }}>
+            <div className="mt-6 px-5">
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="font-display text-base font-semibold text-foreground">Novos Chegados</h3>
                 <button
                   type="button"
-                  onClick={clearCategoryFilters}
-                  className="text-primary text-sm font-semibold font-body"
+                  onClick={clearAllFilters}
+                  className="font-body text-sm font-semibold text-primary"
                 >
-                  Ver todas
+                  Ver todos
+                </button>
+              </div>
+              <div
+                key={`${colorCategoryFilter ?? ""}-${typeCategoryFilter ?? ""}-${searchQuery}`}
+                className="grid animate-fade-in grid-cols-2 gap-4"
+              >
+                {showEmpty ? (
+                  <div className="col-span-2 flex flex-col items-center justify-center rounded-2xl border border-[#E8DFD6] bg-[#FFFCFA] px-6 py-14 text-center shadow-[0_12px_40px_-16px_rgba(156,47,69,0.2)]">
+                    <p className="font-display text-base font-semibold text-foreground">
+                      Nenhum vestido encontrado para esta busca
+                    </p>
+                    <p className="mt-2 max-w-xs font-body text-sm text-muted-foreground">
+                      Combine cores, estilo e busca — ou limpe os filtros para ver todo o catálogo.
+                    </p>
+                    <div className="mt-6 flex flex-wrap justify-center gap-3">
+                      {hasActiveCategoryFilter && (
+                        <button
+                          type="button"
+                          onClick={clearCategoryFilters}
+                          className="rounded-full border-2 border-[#9C2F45] bg-transparent px-5 py-2.5 font-body text-sm font-semibold text-[#9C2F45] transition-transform active:scale-[0.98]"
+                        >
+                          Limpar filtro
+                        </button>
+                      )}
+                      {hasActiveSearch && (
+                        <button
+                          type="button"
+                          onClick={clearSearch}
+                          className="rounded-full border-2 border-[#9C2F45]/40 px-5 py-2.5 font-body text-sm font-semibold text-foreground transition-transform active:scale-[0.98]"
+                        >
+                          Limpar busca
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={clearAllFilters}
+                        className="rounded-full bg-[#9C2F45] px-6 py-2.5 font-body text-sm font-semibold text-white shadow-[0_8px_24px_-6px_rgba(156,47,69,0.45)] transition-transform active:scale-[0.98]"
+                      >
+                        Limpar tudo
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  filteredProducts.map((p) => (
+                    <div
+                      key={p.id}
+                      role="button"
+                      tabIndex={0}
+                      className="cursor-pointer overflow-hidden rounded-2xl bg-secondary shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-elevated"
+                      onClick={() => navigate(`/produto/${p.slug}`)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          navigate(`/produto/${p.slug}`);
+                        }
+                      }}
+                    >
+                      <div className="relative aspect-[3/4] overflow-hidden">
+                        <img
+                          src={p.imagem}
+                          alt={p.nome}
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleFav(p.id);
+                          }}
+                          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-background/80 shadow-card backdrop-blur-sm"
+                        >
+                          <Heart
+                            className={`h-4 w-4 ${favorites.has(p.id) ? "fill-primary text-primary" : "text-foreground"}`}
+                          />
+                        </button>
+                      </div>
+                      <div className="p-3">
+                        <p className="line-clamp-1 font-body text-xs text-muted-foreground">
+                          <HighlightedText text={p.categoriaTipo} query={searchQuery} />
+                        </p>
+                        <p className="mt-0.5 line-clamp-2 font-body text-sm font-semibold text-foreground">
+                          <HighlightedText text={p.nome} query={searchQuery} />
+                        </p>
+                        <p className="mt-1 font-display text-base font-bold text-primary">
+                          R$ {p.preco.toLocaleString("pt-BR")}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Fim do pin: quando esta seção alinha sob o header, o ScrollTrigger solta o pin — scroll volta ao normal */}
+          <section
+            ref={scrollEndRef}
+            className="relative mt-10 px-5 pb-8"
+            aria-labelledby="ofertas-ilimitadas-heading"
+          >
+            <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-[#9C2F45] via-[#B84A62] to-[#7A2436] p-6 text-primary-foreground shadow-elevated">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-3">
+                  <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15">
+                    <Sparkles className="h-5 w-5" strokeWidth={2} />
+                  </span>
+                  <div>
+                    <p className="font-body text-[10px] font-bold uppercase tracking-[0.2em] text-white/80">
+                      Próxima parada
+                    </p>
+                    <h2 id="ofertas-ilimitadas-heading" className="font-display text-xl font-bold leading-tight">
+                      Ofertas Ilimitadas
+                    </h2>
+                    <p className="mt-1 max-w-md font-body text-sm text-white/90">
+                      Novas peças e condições especiais em breve. Continue rolando para explorar o restante do site.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => navigate("/")}
+                  className="shrink-0 rounded-full bg-white px-6 py-3 font-body text-sm font-bold text-[#9C2F45] shadow-button transition-transform hover:scale-[1.02]"
+                >
+                  Explorar catálogo
                 </button>
               </div>
             </div>
-            <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-hide">
-              {CORES_CATEGORIA.map((nomeCor) => {
-                const selected = colorCategoryFilter === nomeCor;
-                const hex = colorMap[nomeCor];
-                return (
-                  <button
-                    key={nomeCor}
-                    type="button"
-                    onClick={() => onPickColor(nomeCor)}
-                    className={cn(
-                      "flex items-center gap-2 rounded-xl px-3.5 py-2.5 shadow-card shrink-0 transition-all duration-200",
-                      "bg-[#F5F0EB] hover:shadow-[0_8px_24px_-8px_rgba(156,47,69,0.2)]",
-                      selected &&
-                        "ring-2 ring-[#9C2F45] ring-offset-2 ring-offset-background bg-white shadow-[0_12px_32px_-10px_rgba(156,47,69,0.35)]",
-                    )}
-                  >
-                    <span
-                      className="w-4 h-4 rounded-full shrink-0 border border-black/10"
-                      style={{ backgroundColor: hex }}
-                    />
-                    <span
-                      className={cn(
-                        "text-sm font-body font-medium whitespace-nowrap",
-                        selected ? "text-[#9C2F45] font-semibold" : "text-foreground",
-                      )}
-                    >
-                      {nomeCor}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="mt-5 px-5">
-            <h3 className="font-display text-base font-semibold text-foreground mb-3">Estilo</h3>
-            <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-hide">
-              {TIPOS_CATEGORIA.map((tipo) => {
-                const Icon = tipoIcons[tipo];
-                const selected = typeCategoryFilter === tipo;
-                return (
-                  <button
-                    key={tipo}
-                    type="button"
-                    onClick={() => onPickTipo(tipo)}
-                    className={cn(
-                      "flex items-center gap-2 rounded-xl px-3.5 py-2.5 shadow-card shrink-0 transition-all duration-200",
-                      "bg-[#F5F0EB] hover:shadow-[0_8px_24px_-8px_rgba(156,47,69,0.2)]",
-                      selected &&
-                        "ring-2 ring-[#9C2F45] ring-offset-2 ring-offset-background bg-white shadow-[0_12px_32px_-10px_rgba(156,47,69,0.35)]",
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        "flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-sm",
-                        selected ? "text-[#9C2F45]" : "text-foreground/70",
-                      )}
-                    >
-                      <Icon className="h-4 w-4" strokeWidth={2} />
-                    </span>
-                    <span
-                      className={cn(
-                        "text-xs font-body font-medium whitespace-nowrap max-w-[140px] text-left leading-tight",
-                        selected ? "text-[#9C2F45] font-semibold" : "text-foreground",
-                      )}
-                    >
-                      {tipo}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="mt-6 px-5">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-display text-base font-semibold text-foreground">Novos Chegados</h3>
-              <button
-                type="button"
-                onClick={clearAllFilters}
-                className="text-primary text-sm font-semibold font-body"
-              >
-                Ver todos
-              </button>
-            </div>
-            <div
-              key={`${colorCategoryFilter ?? ""}-${typeCategoryFilter ?? ""}-${searchQuery}`}
-              className="grid grid-cols-2 gap-4 animate-fade-in"
-            >
-              {showEmpty ? (
-                <div className="col-span-2 flex flex-col items-center justify-center rounded-2xl border border-[#E8DFD6] bg-[#FFFCFA] px-6 py-14 text-center shadow-[0_12px_40px_-16px_rgba(156,47,69,0.2)]">
-                  <p className="font-display text-base font-semibold text-foreground">
-                    Nenhum vestido encontrado para esta busca
-                  </p>
-                  <p className="mt-2 max-w-xs font-body text-sm text-muted-foreground">
-                    Combine cores, estilo e busca — ou limpe os filtros para ver todo o catálogo.
-                  </p>
-                  <div className="mt-6 flex flex-wrap justify-center gap-3">
-                    {hasActiveCategoryFilter && (
-                      <button
-                        type="button"
-                        onClick={clearCategoryFilters}
-                        className="rounded-full border-2 border-[#9C2F45] bg-transparent px-5 py-2.5 font-body text-sm font-semibold text-[#9C2F45] transition-transform active:scale-[0.98]"
-                      >
-                        Limpar filtro
-                      </button>
-                    )}
-                    {hasActiveSearch && (
-                      <button
-                        type="button"
-                        onClick={clearSearch}
-                        className="rounded-full border-2 border-[#9C2F45]/40 px-5 py-2.5 font-body text-sm font-semibold text-foreground transition-transform active:scale-[0.98]"
-                      >
-                        Limpar busca
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={clearAllFilters}
-                      className="rounded-full bg-[#9C2F45] px-6 py-2.5 font-body text-sm font-semibold text-white shadow-[0_8px_24px_-6px_rgba(156,47,69,0.45)] transition-transform active:scale-[0.98]"
-                    >
-                      Limpar tudo
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                filteredProducts.map((p) => (
-                  <div
-                    key={p.id}
-                    role="button"
-                    tabIndex={0}
-                    className="bg-secondary rounded-2xl overflow-hidden shadow-card cursor-pointer transition-all duration-300 hover:shadow-elevated hover:-translate-y-1"
-                    onClick={() => navigate(`/produto/${p.slug}`)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        navigate(`/produto/${p.slug}`);
-                      }
-                    }}
-                  >
-                    <div className="relative aspect-[3/4] overflow-hidden">
-                      <img src={p.imagem} alt={p.nome} className="w-full h-full object-cover" loading="lazy" />
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleFav(p.id);
-                        }}
-                        className="absolute top-3 right-3 w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center shadow-card"
-                      >
-                        <Heart className={`w-4 h-4 ${favorites.has(p.id) ? "fill-primary text-primary" : "text-foreground"}`} />
-                      </button>
-                    </div>
-                    <div className="p-3">
-                      <p className="font-body text-xs text-muted-foreground line-clamp-1">
-                        <HighlightedText text={p.categoriaTipo} query={searchQuery} />
-                      </p>
-                      <p className="font-body text-sm font-semibold text-foreground mt-0.5 line-clamp-2">
-                        <HighlightedText text={p.nome} query={searchQuery} />
-                      </p>
-                      <p className="font-display text-base font-bold text-primary mt-1">
-                        R$ {p.preco.toLocaleString("pt-BR")}
-                      </p>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
+          </section>
         </div>
 
         <BottomNav />
