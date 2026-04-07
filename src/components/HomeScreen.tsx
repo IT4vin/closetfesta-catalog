@@ -35,29 +35,6 @@ import { cn } from "@/lib/utils";
 
 const MARSALA = "#9C2F45";
 
-/**
- * Ajustes finos do scroll premium (home).
- * Altere aqui sem caçar valores espalhados no JSX.
- */
-const HOME_SCROLL = {
-  /** z-index: camada fixa (logo + busca) */
-  zHeader: 90,
-  /** z-index: bloco promocional + filtros durante o pin */
-  zPinnedBlock: 30,
-  /** z-index: grade “Novos Chegados” — passa por cima do bloco fixo */
-  zProducts: 40,
-  /**
-   * Margem acima do bloco pinado (px). Cria rolagem antes do pin “engatar”:
-   * sem isso, o topo do banner já estaria em top+=header e o pin dispararia no scroll 0.
-   */
-  prePinScrollPx: 28,
-  /** Sombra / borda quando o bloco está pinado (Tailwind arbitrary) */
-  pinnedShadow:
-    "shadow-[0_12px_40px_-12px_rgba(0,0,0,0.12),0_4px_16px_-4px_rgba(156,47,69,0.08)]",
-  pinnedBorder: "border-b border-[#E8DFD6]/90",
-  /** Antecipa pin em mobile (ScrollTrigger) */
-  anticipatePin: 1,
-} as const;
 
 const tipoIcons: Record<TipoCategoria, typeof Crown> = {
   "Vestidos de Noiva": Crown,
