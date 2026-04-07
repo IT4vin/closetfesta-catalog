@@ -31,7 +31,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useSearch } from "@/contexts/SearchContext";
 import { cn } from "@/lib/utils";
 
-gsap.registerPlugin(ScrollTrigger);
+
 
 const MARSALA = "#9C2F45";
 
