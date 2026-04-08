@@ -92,27 +92,21 @@ async function main() {
 
   if (!inputExists) {
     const empty = `// AUTO-GENERATED. DO NOT EDIT.
-export type CorCategoria = string;
-export type TipoCategoria = string;
-
 export interface Product {
   id: number;
   codigo: string;
   nome: string;
   preco: number;
   imagem: string;
-  cor: CorCategoria;
+  cor: string;
   categoriaTipo: string;
   slug: string;
-  coresDisponiveis: CorCategoria[];
+  coresDisponiveis: string[];
   tamanhos: string[];
   descricao: string;
-  tipos: TipoCategoria[];
+  tipos: string[];
 }
 
-export const CORES_CATEGORIA: CorCategoria[] = [];
-export const TIPOS_CATEGORIA: TipoCategoria[] = [];
-export const colorMap: Record<string, string> = {};
 export const products: Product[] = [];
 
 export function findProductByRouteParam(param: string | undefined): Product | undefined {
@@ -190,33 +184,25 @@ export function findProductByRouteParam(param: string | undefined): Product | un
 
   products.sort((a, b) => a.id - b.id);
 
-  const CORES_CATEGORIA = Array.from(colorsSet).sort((a, b) => a.localeCompare(b, "pt-BR"));
-  const TIPOS_CATEGORIA = Array.from(typesSet).sort((a, b) => a.localeCompare(b, "pt-BR"));
+  // Mantemos sets apenas para validação/inspeção futura; categorias oficiais ficam em `src/data/catalogMeta.ts`.
+  const _CORES_DETECTADAS = Array.from(colorsSet).sort((a, b) => a.localeCompare(b, "pt-BR"));
+  const _TIPOS_DETECTADOS = Array.from(typesSet).sort((a, b) => a.localeCompare(b, "pt-BR"));
 
   const out = `// AUTO-GENERATED. DO NOT EDIT.
-export type CorCategoria = string;
-export type TipoCategoria = string;
-
 export interface Product {
   id: number;
   codigo: string;
   nome: string;
   preco: number;
   imagem: string;
-  cor: CorCategoria;
+  cor: string;
   categoriaTipo: string;
   slug: string;
-  coresDisponiveis: CorCategoria[];
+  coresDisponiveis: string[];
   tamanhos: string[];
   descricao: string;
-  tipos: TipoCategoria[];
+  tipos: string[];
 }
-
-export const CORES_CATEGORIA: CorCategoria[] = ${JSON.stringify(CORES_CATEGORIA, null, 2)};
-export const TIPOS_CATEGORIA: TipoCategoria[] = ${JSON.stringify(TIPOS_CATEGORIA, null, 2)};
-
-// Pode ser preenchido depois (hex por cor); por enquanto o app usa fallback quando não existe.
-export const colorMap: Record<string, string> = {};
 
 export const products: Product[] = ${JSON.stringify(products, null, 2).replaceAll('"', '"')};
 
