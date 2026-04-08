@@ -6,7 +6,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { products, type CorCategoria, type Product, type TipoCategoria } from "@/data/products";
+import { products, type CorCategoria, type Product, type TipoCategoria } from "@/data/catalog";
 import { filterProductsByCategoryAndQuery, tokenizeQuery } from "@/lib/searchUtils";
 
 export type SearchContextValue = {

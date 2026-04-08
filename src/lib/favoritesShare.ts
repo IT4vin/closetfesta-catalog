@@ -1,4 +1,4 @@
-import type { Product } from "@/data/products";
+import type { Product } from "@/data/catalog";
 
 const BASE = "https://closetfesta.com.br/produto";
 

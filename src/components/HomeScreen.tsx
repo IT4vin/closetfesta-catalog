@@ -20,7 +20,7 @@ import {
   colorMap,
   type CorCategoria,
   type TipoCategoria,
-} from "@/data/products";
+} from "@/data/catalog";
 import bannerPromo from "@/assets/banner-promo.jpg";
 import logoUrl from "@/assets/logo.svg?url";
 import SideDrawer from "@/components/SideDrawer";
@@ -36,16 +36,19 @@ import { cn } from "@/lib/utils";
 const MARSALA = "#9C2F45";
 
 
-const tipoIcons: Record<TipoCategoria, typeof Crown> = {
-  "Vestidos de Noiva": Crown,
-  "Vestidos de Madrinha": Heart,
-  "Vestidos de Debutante": Cake,
-  "Vestidos para Festa": PartyPopper,
-  "Vestidos Longos": ArrowDownWideNarrow,
-  "Vestidos com Fenda": Columns2,
-  "Vestidos Evase": Flower2,
-  "Vestidos Sereia": Waves,
-};
+function getTipoIcon(tipo: TipoCategoria): typeof Crown {
+  const t = String(tipo).toLowerCase();
+  if (t.includes("noiva")) return Crown;
+  if (t.includes("madrinha")) return Heart;
+  if (t.includes("debut")) return Cake;
+  if (t.includes("festa")) return PartyPopper;
+  if (t.includes("longo")) return ArrowDownWideNarrow;
+  if (t.includes("fenda")) return Columns2;
+  if (t.includes("evase") || t.includes("evasê")) return Flower2;
+  if (t.includes("sereia")) return Waves;
+  // pasta/label genérica (ex.: "vestidos")
+  return Sparkles;
+}
 
 const HomeScreen = () => {
   const navigate = useNavigate();
@@ -264,7 +267,7 @@ const HomeScreen = () => {
               <h3 className="mb-3 font-display text-base font-semibold text-foreground">Estilo</h3>
               <div className="scrollbar-hide flex gap-2.5 overflow-x-auto pb-2">
                 {TIPOS_CATEGORIA.map((tipo) => {
-                  const Icon = tipoIcons[tipo];
+                  const Icon = getTipoIcon(tipo);
                   const selected = typeCategoryFilter === tipo;
                   return (
                     <button

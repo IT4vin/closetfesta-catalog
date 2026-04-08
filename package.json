@@ -4,7 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "catalog:generate": "node scripts/generate-catalog.mjs",
+    "predev": "npm run catalog:generate",
     "dev": "vite",
+    "prebuild": "npm run catalog:generate",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",

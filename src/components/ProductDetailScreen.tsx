@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, ShoppingBag, Heart, Minus, Plus, ShoppingCart } from "lucide-react";
-import { findProductByRouteParam, products, colorMap, type CorCategoria } from "@/data/products";
+import { findProductByRouteParam, products, colorMap, type CorCategoria } from "@/data/catalog";
 import { useCart } from "@/contexts/CartContext";
 import { useSearch } from "@/contexts/SearchContext";
 import { toast } from "sonner";

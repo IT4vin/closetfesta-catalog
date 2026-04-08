@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronRight, Truck, CheckCircle2, Clock } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import ClosetSearchBar from "@/components/ClosetSearchBar";
-import { products } from "@/data/products";
+import { products } from "@/data/catalog";
 
 const orders = [
   {
