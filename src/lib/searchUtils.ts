@@ -18,6 +18,11 @@ export function tokenizeQuery(raw: string): string[] {
 
 function productSearchBlob(p: Product): string {
   const parts = [
+    // código é importante pra busca direta (#010001 / 010001)
+    // e também aparece no nome quando gerado automaticamente.
+    // (mantemos ambos por compatibilidade)
+    // @ts-expect-error - compat com catálogos gerados
+    (p.codigo as string | undefined) ?? "",
     p.nome,
     p.categoriaTipo,
     p.cor,

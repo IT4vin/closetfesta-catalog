@@ -5,30 +5,20 @@
 //
 // If you add/remove files in `produtos/`, run the generator to update this catalog.
 
-export type CorCategoria = string;
-export type TipoCategoria = string;
-
 export interface Product {
   id: number;
   codigo: string;
   nome: string;
   preco: number;
   imagem: string; // URL under /public
-  cor: CorCategoria;
+  cor: string;
   categoriaTipo: string;
   slug: string;
-  coresDisponiveis: CorCategoria[];
+  coresDisponiveis: string[];
   tamanhos: string[];
   descricao: string;
-  tipos: TipoCategoria[];
+  tipos: string[];
 }
-
-export const CORES_CATEGORIA: CorCategoria[] = ["Branco"];
-export const TIPOS_CATEGORIA: TipoCategoria[] = ["vestidos"];
-
-export const colorMap: Record<string, string> = {
-  Branco: "#FFFFFF",
-};
 
 export const products: Product[] = [
   {

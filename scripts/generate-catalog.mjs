@@ -36,6 +36,19 @@ function parseCodeFromFilename(name) {
   return m[1];
 }
 
+function parseNameFromFilename(name, codigo) {
+  // Supports:
+  // "010002 - R$ 1.140,00"                 => null (falls back to "<tipo> <codigo>")
+  // "010002 - Petra - R$ 1.140,00"         => "Petra"
+  // "010002 - Petra Longo - R$ 1.140,00"   => "Petra Longo"
+  const safe = name.replace(/\s+/g, " ").trim();
+  const re = new RegExp(`^\\s*${codigo}\\s*-\\s*(.*?)\\s*-\\s*R\\$`, "i");
+  const m = safe.match(re);
+  const raw = m?.[1]?.trim();
+  if (!raw) return null;
+  return raw;
+}
+
 async function ensureDir(dir) {
   await fs.mkdir(dir, { recursive: true });
 }
@@ -145,6 +158,7 @@ export function findProductByRouteParam(param: string | undefined): Product | un
 
     const tipo = tipoFolder.trim();
     const cor = corFolder.trim();
+    const nomeExtra = parseNameFromFilename(base, codigo);
 
     // Copy image preserving structure
     const publicRel = path.join(tipoFolder, corFolder, fileName);
@@ -158,7 +172,7 @@ export function findProductByRouteParam(param: string | undefined): Product | un
     products.push({
       id,
       codigo,
-      nome: `${tipo} ${codigo}`,
+      nome: nomeExtra ? `${tipo} ${nomeExtra}` : `${tipo} ${codigo}`,
       preco,
       imagem: imageUrl,
       cor,
