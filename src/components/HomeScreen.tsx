@@ -1,26 +1,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Menu,
-  ShoppingBag,
-  Heart,
-  ArrowRight,
-  Crown,
-  Cake,
-  PartyPopper,
-  ArrowDownWideNarrow,
-  Columns2,
-  Flower2,
-  Waves,
-  Sparkles,
-} from "lucide-react";
-import {
-  CORES_CATEGORIA,
-  TIPOS_CATEGORIA,
-  colorMap,
-  type CorCategoria,
-  type TipoCategoria,
-} from "@/data/catalog";
+import { Menu, ShoppingBag, Heart, ArrowRight, Sparkles } from "lucide-react";
+import { CORES_CATEGORIA, colorMap, type CorCategoria } from "@/data/catalog";
 import bannerPromo from "@/assets/banner-promo.jpg";
 import logoUrl from "@/assets/logo.svg?url";
 import SideDrawer from "@/components/SideDrawer";
@@ -35,21 +16,6 @@ import { cn } from "@/lib/utils";
 
 const MARSALA = "#9C2F45";
 
-
-function getTipoIcon(tipo: TipoCategoria): typeof Crown {
-  const t = String(tipo).toLowerCase();
-  if (t.includes("noiva")) return Crown;
-  if (t.includes("madrinha")) return Heart;
-  if (t.includes("debut")) return Cake;
-  if (t.includes("festa")) return PartyPopper;
-  if (t.includes("longo")) return ArrowDownWideNarrow;
-  if (t.includes("fenda")) return Columns2;
-  if (t.includes("evase") || t.includes("evasê")) return Flower2;
-  if (t.includes("sereia")) return Waves;
-  // pasta/label genérica (ex.: "vestidos")
-  return Sparkles;
-}
-
 const HomeScreen = () => {
   const navigate = useNavigate();
   const { totalItems } = useCart();
@@ -59,9 +25,7 @@ const HomeScreen = () => {
     searchQuery,
     clearSearch,
     colorCategoryFilter,
-    typeCategoryFilter,
     setColorCategoryFilter,
-    setTypeCategoryFilter,
     clearCategoryFilters,
     clearAllFilters,
     hasActiveCategoryFilter,
@@ -88,10 +52,6 @@ const HomeScreen = () => {
 
   const onPickColor = (c: CorCategoria) => {
     setColorCategoryFilter(colorCategoryFilter === c ? null : c);
-  };
-
-  const onPickTipo = (t: TipoCategoria) => {
-    setTypeCategoryFilter(typeCategoryFilter === t ? null : t);
   };
 
   const showEmpty =
@@ -262,46 +222,6 @@ const HomeScreen = () => {
                 })}
               </div>
             </div>
-
-            <div className="mt-5 px-5 pb-2">
-              <h3 className="mb-3 font-display text-base font-semibold text-foreground">Estilo</h3>
-              <div className="scrollbar-hide flex gap-2.5 overflow-x-auto pb-2">
-                {TIPOS_CATEGORIA.map((tipo) => {
-                  const Icon = getTipoIcon(tipo);
-                  const selected = typeCategoryFilter === tipo;
-                  return (
-                    <button
-                      key={tipo}
-                      type="button"
-                      onClick={() => onPickTipo(tipo)}
-                      className={cn(
-                        "flex shrink-0 items-center gap-2 rounded-xl px-3.5 py-2.5 shadow-card transition-all duration-200",
-                        "bg-[#F5F0EB] hover:shadow-[0_8px_24px_-8px_rgba(156,47,69,0.2)]",
-                        selected &&
-                          "bg-white shadow-[0_12px_32px_-10px_rgba(156,47,69,0.35)] ring-2 ring-[#9C2F45] ring-offset-2 ring-offset-background",
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          "flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-sm",
-                          selected ? "text-[#9C2F45]" : "text-foreground/70",
-                        )}
-                      >
-                        <Icon className="h-4 w-4" strokeWidth={2} />
-                      </span>
-                      <span
-                        className={cn(
-                          "max-w-[140px] text-left font-body text-xs font-medium leading-tight whitespace-nowrap",
-                          selected ? "font-semibold text-[#9C2F45]" : "text-foreground",
-                        )}
-                      >
-                        {tipo}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
           </div>
 
           <div className="relative bg-background">
@@ -317,7 +237,7 @@ const HomeScreen = () => {
                 </button>
               </div>
               <div
-                key={`${colorCategoryFilter ?? ""}-${typeCategoryFilter ?? ""}-${searchQuery}`}
+                key={`${colorCategoryFilter ?? ""}-${searchQuery}`}
                 className="grid animate-fade-in grid-cols-2 gap-4"
               >
                 {showEmpty ? (
@@ -326,7 +246,7 @@ const HomeScreen = () => {
                       Nenhum vestido encontrado para esta busca
                     </p>
                     <p className="mt-2 max-w-xs font-body text-sm text-muted-foreground">
-                      Combine cores, estilo e busca — ou limpe os filtros para ver todo o catálogo.
+                      Combine cor e busca — ou limpe os filtros para ver todo o catálogo.
                     </p>
                     <div className="mt-6 flex flex-wrap justify-center gap-3">
                       {hasActiveCategoryFilter && (
