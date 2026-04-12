@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Home, ShoppingBag, Heart, User, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WhatsAppNavButton } from "@/components/WhatsAppFloat";
+import { useCart } from "@/contexts/CartContext";
 
 const MARSALA = "#9C2F45";
 
@@ -23,6 +24,9 @@ function indexForPath(pathname: string): number {
 const BottomNav = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { totalItems, reservationFeedbackGeneration } = useCart();
+  const prevFeedbackGen = useRef<number | null>(null);
+  const [reservationIconBumpKey, setReservationIconBumpKey] = useState(0);
 
   const routeIndex = indexForPath(pathname);
   /** Mantido em sincronia com a rota; preserva última aba em rotas fora das tabs (ex.: produto). */
@@ -31,6 +35,17 @@ const BottomNav = () => {
   useEffect(() => {
     if (routeIndex >= 0) setActiveTab(routeIndex);
   }, [routeIndex]);
+
+  useEffect(() => {
+    if (prevFeedbackGen.current === null) {
+      prevFeedbackGen.current = reservationFeedbackGeneration;
+      return;
+    }
+    if (reservationFeedbackGeneration > prevFeedbackGen.current) {
+      setReservationIconBumpKey((k) => k + 1);
+    }
+    prevFeedbackGen.current = reservationFeedbackGeneration;
+  }, [reservationFeedbackGeneration]);
 
   const showMarsalaPill = routeIndex >= 0;
   const slideIndex = showMarsalaPill ? routeIndex : activeTab;
@@ -70,6 +85,7 @@ const BottomNav = () => {
 
           {TABS.map((tab, index) => {
             const isActive = pathname === tab.path;
+            const isReservationTab = tab.path === "/carrinho";
             return (
               <button
                 key={tab.path}
@@ -82,14 +98,28 @@ const BottomNav = () => {
                 )}
                 aria-current={isActive ? "page" : undefined}
               >
-                <tab.Icon
+                <span
+                  key={isReservationTab ? reservationIconBumpKey : tab.path}
+                  data-reservation-nav-target={isReservationTab ? "reservation" : undefined}
                   className={cn(
-                    "h-5 w-5 shrink-0 transition-colors duration-[280ms] ease-out motion-reduce:transition-none",
-                    isActive ? "text-white" : "text-foreground/55",
+                    "relative inline-flex shrink-0",
+                    isReservationTab && reservationIconBumpKey > 0 && "motion-safe:animate-reservation-bump",
                   )}
-                  strokeWidth={isActive ? 2.25 : 2}
-                  aria-hidden
-                />
+                >
+                  <tab.Icon
+                    className={cn(
+                      "h-5 w-5 shrink-0 transition-colors duration-[280ms] ease-out motion-reduce:transition-none",
+                      isActive ? "text-white" : "text-foreground/55",
+                    )}
+                    strokeWidth={isActive ? 2.25 : 2}
+                    aria-hidden
+                  />
+                  {isReservationTab && totalItems > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                      {totalItems}
+                    </span>
+                  )}
+                </span>
                 <span
                   className={cn(
                     "pointer-events-none w-full overflow-hidden text-center font-body text-[10px] font-medium leading-tight",

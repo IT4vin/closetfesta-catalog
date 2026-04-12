@@ -1,32 +1,112 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, ShoppingBag, Heart, Minus, Plus, ShoppingCart } from "lucide-react";
 import { findProductByRouteParam, products, colorMap, type CorCategoria } from "@/data/catalog";
 import { useCart } from "@/contexts/CartContext";
 import { useSearch } from "@/contexts/SearchContext";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import BottomNav from "@/components/BottomNav";
 import ClosetSearchBar from "@/components/ClosetSearchBar";
 
+type FlyParticle = { id: number; sx: number; sy: number; ex: number; ey: number };
+
+function ReservationFlyDot({
+  sx,
+  sy,
+  ex,
+  ey,
+  onDone,
+}: {
+  sx: number;
+  sy: number;
+  ex: number;
+  ey: number;
+  onDone: () => void;
+}) {
+  const elRef = useRef<HTMLDivElement>(null);
+  const onDoneRef = useRef(onDone);
+  onDoneRef.current = onDone;
+
+  useEffect(() => {
+    const el = elRef.current;
+    if (!el) return;
+    const dx = ex - sx;
+    const dy = ey - sy;
+    const anim = el.animate(
+      [
+        { transform: "translate(-50%, -50%) scale(1)", opacity: 1 },
+        { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.4)`, opacity: 0.2 },
+      ],
+      { duration: 520, easing: "cubic-bezier(0.33, 1, 0.68, 1)" },
+    );
+    anim.finished.then(() => onDoneRef.current()).catch(() => {});
+    return () => anim.cancel();
+  }, [sx, sy, ex, ey]);
+
+  return (
+    <div
+      ref={elRef}
+      className="pointer-events-none fixed z-[60] h-4 w-4 rounded-full bg-primary shadow-[0_2px_8px_rgba(156,47,69,0.45)] motion-reduce:hidden"
+      style={{ left: sx, top: sy }}
+      aria-hidden
+    />
+  );
+}
+
 const ProductDetailScreen = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const { addItem, totalItems } = useCart();
+  const { addItem, totalItems, reservationFeedbackGeneration } = useCart();
   const { setColorCategoryFilter } = useSearch();
   const product = findProductByRouteParam(slug) ?? products[0];
   const [selectedColor, setSelectedColor] = useState<CorCategoria>(product.cor);
   const [selectedSize, setSelectedSize] = useState("M");
   const [qty, setQty] = useState(1);
   const [fav, setFav] = useState(false);
+  const addReservationBtnRef = useRef<HTMLButtonElement>(null);
+  const prevFeedbackGen = useRef<number | null>(null);
+  const [headerBasketBumpKey, setHeaderBasketBumpKey] = useState(0);
+  const [flyParticle, setFlyParticle] = useState<FlyParticle | null>(null);
 
   useEffect(() => {
     setSelectedColor(product.cor);
     setQty(1);
   }, [product.id, product.cor]);
 
+  useEffect(() => {
+    if (prevFeedbackGen.current === null) {
+      prevFeedbackGen.current = reservationFeedbackGeneration;
+      return;
+    }
+    if (reservationFeedbackGeneration > prevFeedbackGen.current) {
+      setHeaderBasketBumpKey((k) => k + 1);
+    }
+    prevFeedbackGen.current = reservationFeedbackGeneration;
+  }, [reservationFeedbackGeneration]);
+
   const handleAddToCart = () => {
     addItem({ productId: product.id, size: selectedSize, color: selectedColor }, qty);
     toast.success("Adicionado à reserva!", { description: `${product.nome} — Tam. ${selectedSize}` });
+
+    const skipMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (skipMotion) return;
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const from = addReservationBtnRef.current?.getBoundingClientRect();
+        const target = document.querySelector<HTMLElement>("[data-reservation-nav-target]");
+        const to = target?.getBoundingClientRect();
+        if (!from || !to) return;
+        setFlyParticle({
+          id: performance.now(),
+          sx: from.left + from.width / 2,
+          sy: from.top + from.height / 2,
+          ex: to.left + to.width / 2,
+          ey: to.top + to.height / 2,
+        });
+      });
+    });
   };
 
   const goShopByColor = (c: CorCategoria) => {
@@ -49,14 +129,22 @@ const ProductDetailScreen = () => {
           <button
             type="button"
             onClick={() => navigate("/carrinho")}
-            className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center shadow-card relative"
+            className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-secondary shadow-card"
           >
-            <ShoppingBag className="w-5 h-5 text-foreground" />
-            {totalItems > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
-                {totalItems}
-              </span>
-            )}
+            <span
+              key={headerBasketBumpKey}
+              className={cn(
+                "relative inline-flex",
+                headerBasketBumpKey > 0 && "motion-safe:animate-reservation-bump",
+              )}
+            >
+              <ShoppingBag className="h-5 w-5 text-foreground" />
+              {totalItems > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                  {totalItems}
+                </span>
+              )}
+            </span>
           </button>
         </div>
 
@@ -189,6 +277,7 @@ const ProductDetailScreen = () => {
             </p>
           </div>
           <button
+            ref={addReservationBtnRef}
             type="button"
             onClick={handleAddToCart}
             className="flex items-center gap-2 rounded-2xl bg-primary px-6 py-3.5 font-body text-sm font-bold text-primary-foreground shadow-button transition-transform hover:scale-105 active:scale-95"
@@ -198,6 +287,17 @@ const ProductDetailScreen = () => {
           </button>
         </div>
       </div>
+
+      {flyParticle && (
+        <ReservationFlyDot
+          key={flyParticle.id}
+          sx={flyParticle.sx}
+          sy={flyParticle.sy}
+          ex={flyParticle.ex}
+          ey={flyParticle.ey}
+          onDone={() => setFlyParticle(null)}
+        />
+      )}
 
       <BottomNav />
     </div>

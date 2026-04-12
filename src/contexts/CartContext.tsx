@@ -13,6 +13,8 @@ interface CartContextType {
   updateQty: (idx: number, delta: number) => void;
   removeItem: (idx: number) => void;
   totalItems: number;
+  /** Incrementa a cada `addItem` — para sincronizar feedback visual (header, bottom nav). */
+  reservationFeedbackGeneration: number;
 }
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -25,8 +27,10 @@ export const useCart = () => {
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [reservationFeedbackGeneration, setReservationFeedbackGeneration] = useState(0);
 
   const addItem = (item: Omit<CartItem, "qty">, qty = 1) => {
+    setReservationFeedbackGeneration((g) => g + 1);
     setItems((prev) => {
       const idx = prev.findIndex(
         (i) => i.productId === item.productId && i.size === item.size && i.color === item.color
@@ -51,7 +55,16 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const totalItems = items.reduce((s, i) => s + i.qty, 0);
 
   return (
-    <CartContext.Provider value={{ items, addItem, updateQty, removeItem, totalItems }}>
+    <CartContext.Provider
+      value={{
+        items,
+        addItem,
+        updateQty,
+        removeItem,
+        totalItems,
+        reservationFeedbackGeneration,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
