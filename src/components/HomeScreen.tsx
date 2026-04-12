@@ -91,7 +91,7 @@ const HomeScreen = () => {
           ref={headerRef}
           className="fixed left-0 right-0 top-0 z-50 bg-background/95 backdrop-blur-md pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 sm:pb-3.5 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.06)]"
         >
-          <div className="flex items-center justify-between px-5 pb-1 sm:pb-1.5">
+          <div className="flex items-center justify-between px-5 pb-0 sm:pb-px">
             <button
               type="button"
               onClick={() => setDrawerOpen(true)}
@@ -126,7 +126,7 @@ const HomeScreen = () => {
             </button>
           </div>
 
-          <div className="mt-1 px-5 sm:mt-1.5">
+          <div className="px-5">
             <ClosetSearchBar />
           </div>
         </header>
