@@ -24,7 +24,7 @@ export const products: Product[] = [
   {
     id: 10001,
     codigo: "010001",
-    nome: "vestidos 010001",
+    nome: "Vestido 010001",
     preco: 960,
     imagem: "/produtos/vestidos/Branco/010001 - R$ 960,00.jpg",
     cor: "Branco",
@@ -38,7 +38,7 @@ export const products: Product[] = [
   {
     id: 10002,
     codigo: "010002",
-    nome: "vestidos 010002",
+    nome: "Vestido 010002",
     preco: 1140,
     imagem: "/produtos/vestidos/Branco/010002 - R$ 1.140,00.jpg",
     cor: "Branco",
@@ -52,7 +52,7 @@ export const products: Product[] = [
   {
     id: 10004,
     codigo: "010004",
-    nome: "vestidos 010004",
+    nome: "Vestido 010004",
     preco: 960,
     imagem: "/produtos/vestidos/Branco/010004 - R$ 960,00.avif",
     cor: "Branco",
