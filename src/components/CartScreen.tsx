@@ -8,6 +8,11 @@ import ClosetSearchBar from "@/components/ClosetSearchBar";
 import { getWhatsAppHref, getWhatsAppHrefWithText } from "@/components/WhatsAppFloat";
 import { buildReservationWhatsAppMessage } from "@/lib/cartWhatsAppMessage";
 import {
+  FIRST_RENTAL_COUPON_CODE,
+  FIRST_RENTAL_DISCOUNT_RATE,
+  isFirstRentalCouponCode,
+} from "@/lib/firstRentalPromo";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -22,6 +27,8 @@ const CartScreen = () => {
   const navigate = useNavigate();
   const { items, updateQty, removeItem } = useCart();
   const [promoCode, setPromoCode] = useState("");
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [promoFeedback, setPromoFeedback] = useState<"ok" | "err" | null>(null);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [eventDate, setEventDate] = useState("");
 
@@ -30,8 +37,34 @@ const CartScreen = () => {
     return sum + (p?.preco || 0) * item.qty;
   }, 0);
 
-  const shipping = subtotal > 500 ? 0 : 49.9;
-  const total = subtotal + shipping;
+  const discountAmount = couponApplied
+    ? Math.round(subtotal * FIRST_RENTAL_DISCOUNT_RATE * 100) / 100
+    : 0;
+  const subtotalAfterDiscount = Math.max(0, subtotal - discountAmount);
+  const shipping = subtotalAfterDiscount > 500 ? 0 : 49.9;
+  const total = subtotalAfterDiscount + shipping;
+
+  const applyPromo = () => {
+    const raw = promoCode.trim();
+    if (!raw) {
+      setCouponApplied(false);
+      setPromoFeedback(null);
+      return;
+    }
+    if (isFirstRentalCouponCode(raw)) {
+      setCouponApplied(true);
+      setPromoFeedback("ok");
+    } else {
+      setCouponApplied(false);
+      setPromoFeedback("err");
+    }
+  };
+
+  const removeCoupon = () => {
+    setCouponApplied(false);
+    setPromoCode("");
+    setPromoFeedback(null);
+  };
 
   const openCheckoutDialog = () => {
     setEventDate("");
@@ -40,7 +73,11 @@ const CartScreen = () => {
 
   const finalizeToWhatsApp = () => {
     if (!eventDate.trim() || items.length === 0) return;
-    const text = buildReservationWhatsAppMessage(items, eventDate, products);
+    const text = buildReservationWhatsAppMessage(items, eventDate, products, {
+      couponApplied,
+      discountAmount,
+      totalWithShipping: total,
+    });
     window.open(getWhatsAppHrefWithText(text), "_blank", "noopener,noreferrer");
     setCheckoutOpen(false);
   };
@@ -142,18 +179,53 @@ const CartScreen = () => {
 
             {/* Promo Code */}
             <div className="px-5 mt-5">
+              <p className="mb-2 font-body text-[11px] text-muted-foreground">
+                Primeiro aluguel: use{" "}
+                <span className="font-semibold text-foreground">{FIRST_RENTAL_COUPON_CODE}</span> para 15% de
+                desconto.
+              </p>
               <div className="flex gap-2 p-1.5 rounded-2xl bg-secondary/80 shadow-card">
                 <input
                   type="text"
                   value={promoCode}
-                  onChange={(e) => setPromoCode(e.target.value)}
-                  placeholder="Código promocional"
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setPromoCode(v);
+                    setPromoFeedback(null);
+                    if (couponApplied && !isFirstRentalCouponCode(v)) {
+                      setCouponApplied(false);
+                    }
+                  }}
+                  placeholder="Digite o cupom"
+                  autoCapitalize="characters"
+                  spellCheck={false}
                   className="flex-1 bg-transparent px-4 py-2.5 font-body text-sm text-foreground placeholder:text-muted-foreground outline-none"
                 />
-                <button className="px-5 py-2.5 rounded-xl bg-primary text-white font-body text-sm font-semibold shadow-button transition-transform active:scale-95">
+                <button
+                  type="button"
+                  onClick={applyPromo}
+                  className="px-5 py-2.5 rounded-xl bg-primary text-white font-body text-sm font-semibold shadow-button transition-transform active:scale-95"
+                >
                   Aplicar
                 </button>
               </div>
+              {promoFeedback === "ok" && (
+                <p className="mt-2 font-body text-xs text-emerald-700">
+                  Cupom {FIRST_RENTAL_COUPON_CODE} aplicado: 15% no seu primeiro aluguel.{" "}
+                  <button
+                    type="button"
+                    onClick={removeCoupon}
+                    className="font-semibold text-primary underline underline-offset-2"
+                  >
+                    Remover
+                  </button>
+                </p>
+              )}
+              {promoFeedback === "err" && (
+                <p className="mt-2 font-body text-xs text-destructive">
+                  Cupom não encontrado. Use {FIRST_RENTAL_COUPON_CODE} para o primeiro aluguel.
+                </p>
+              )}
             </div>
 
             {/* Order Summary */}
@@ -164,6 +236,16 @@ const CartScreen = () => {
                   R$ {subtotal.toLocaleString("pt-BR")}
                 </span>
               </div>
+              {couponApplied && discountAmount > 0 && (
+                <div className="flex justify-between items-center text-primary">
+                  <span className="font-body text-sm">
+                    Desconto {FIRST_RENTAL_COUPON_CODE} (15% — primeiro aluguel)
+                  </span>
+                  <span className="font-body text-sm font-semibold">
+                    - R$ {discountAmount.toLocaleString("pt-BR")}
+                  </span>
+                </div>
+              )}
               <div className="border-t border-border/50" />
               <div className="flex justify-between items-start gap-3">
                 <span className="shrink-0 font-body text-sm text-muted-foreground">Frete</span>

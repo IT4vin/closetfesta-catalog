@@ -32,7 +32,7 @@ const SideDrawer = ({ onClose, onNavigate }: SideDrawerProps) => {
           <User className="w-8 h-8 text-white" />
         </div>
         <p className="text-white/70 text-sm font-body">Bem-vinda,</p>
-        <p className="text-white text-xl font-display font-bold">Ana Silva</p>
+        <p className="text-white text-xl font-display font-bold">Nome do usuário</p>
       </div>
 
       <nav className="flex-1 px-4 space-y-1">

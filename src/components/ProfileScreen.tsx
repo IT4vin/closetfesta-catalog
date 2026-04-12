@@ -46,8 +46,8 @@ const ProfileScreen = () => {
             <User className="w-8 h-8 text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-display text-lg font-bold text-white">Ana Silva</p>
-            <p className="font-body text-sm text-white/70 truncate">ana.silva@email.com</p>
+            <p className="font-display text-lg font-bold text-white">Nome do usuário</p>
+            <p className="font-body text-sm text-white/70 truncate">@usuario.email.com</p>
           </div>
           <button className="px-3 py-1.5 rounded-xl bg-white/20 text-white text-xs font-body font-semibold">
             Editar
@@ -58,9 +58,9 @@ const ProfileScreen = () => {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3 mx-5 mt-4">
         {[
-          { value: "12", label: "Aluguéis" },
-          { value: "4", label: "Favoritos" },
-          { value: "2", label: "Cupons" },
+          { value: "0", label: "Aluguéis" },
+          { value: "0", label: "Favoritos" },
+          { value: "0", label: "Cupons" },
         ].map((s) => (
           <div key={s.label} className="bg-secondary/60 rounded-2xl p-4 text-center shadow-card">
             <p className="font-display text-xl font-bold text-primary">{s.value}</p>

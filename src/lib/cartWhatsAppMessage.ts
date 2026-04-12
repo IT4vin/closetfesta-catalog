@@ -8,11 +8,18 @@ function formatEventDateBr(iso: string): string {
   return `${m[3]}/${m[2]}/${m[1]}`;
 }
 
+export type CartCheckoutWhatsAppExtra = {
+  couponApplied: boolean;
+  discountAmount: number;
+  totalWithShipping: number;
+};
+
 /** Monta o texto enviado ao WhatsApp ao finalizar a reserva no carrinho. */
 export function buildReservationWhatsAppMessage(
   items: CartItem[],
   eventDateIso: string,
   productList: Product[],
+  extra?: CartCheckoutWhatsAppExtra,
 ): string {
   const subtotal = items.reduce((sum, item) => {
     const p = productList.find((pr) => pr.id === item.productId);
@@ -41,5 +48,14 @@ export function buildReservationWhatsAppMessage(
 
   lines.push("");
   lines.push(`Subtotal: R$ ${subtotal.toLocaleString("pt-BR")}`);
+  if (extra?.couponApplied && extra.discountAmount > 0) {
+    lines.push(
+      `Desconto cupom EUQUERO15 (15% — primeiro aluguel): - R$ ${extra.discountAmount.toLocaleString("pt-BR")}`,
+    );
+  }
+  if (extra) {
+    lines.push(`Total estimado: R$ ${extra.totalWithShipping.toLocaleString("pt-BR")}`);
+  }
+
   return lines.join("\n");
 }
