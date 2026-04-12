@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu, ShoppingBag, Heart, ArrowRight, Sparkles } from "lucide-react";
 import { CORES_CATEGORIA, colorMap, type CorCategoria } from "@/data/catalog";
-import bannerPromo from "@/assets/banner-promo.jpg";
+import lojaBanner from "@loja-imagem/loja-imagem.svg";
 import logoUrl from "@/assets/logo.svg?url";
 import SideDrawer from "@/components/SideDrawer";
 import BottomNav from "@/components/BottomNav";
@@ -143,7 +143,7 @@ const HomeScreen = () => {
             <div className="px-5 pt-2">
               <div className="relative overflow-hidden rounded-2xl bg-primary shadow-elevated">
                 <img
-                  src={bannerPromo}
+                  src={lojaBanner}
                   alt="Promoção Closet Festa"
                   className="h-44 w-full object-cover opacity-40"
                 />

@@ -19,6 +19,9 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@loja-imagem/*": [
+        "./loja-imagem/*"
       ]
     },
     "skipLibCheck": true,
