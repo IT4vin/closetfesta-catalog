@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, ShoppingBag, Heart, ArrowRight, Sparkles } from "lucide-react";
+import { Menu, ShoppingBag, Heart, Sparkles } from "lucide-react";
 import { CORES_CATEGORIA, colorMap, type CorCategoria } from "@/data/catalog";
 import lojaBanner from "@loja-imagem/loja-imagem.svg";
 import logoUrl from "@/assets/logo.svg?url";
@@ -141,29 +141,12 @@ const HomeScreen = () => {
         <div className="flex-1 pb-24">
           <div className="relative bg-background">
             <div className="px-5 pt-2">
-              <div className="relative overflow-hidden rounded-2xl bg-primary shadow-elevated">
+              <div className="overflow-hidden rounded-2xl shadow-elevated">
                 <img
                   src={lojaBanner}
-                  alt="Promoção Closet Festa"
-                  className="h-44 w-full object-cover opacity-40"
+                  alt="Closet Festa"
+                  className="h-44 w-full object-cover"
                 />
-                <div className="absolute inset-0 flex flex-col justify-center px-5">
-                  <span className="mb-2 inline-block w-fit rounded-full bg-background/90 px-3 py-1 font-body text-[10px] font-bold uppercase tracking-widest text-foreground">
-                    Oferta Limitada
-                  </span>
-                  <h2 className="font-display text-lg font-bold leading-tight text-primary-foreground">
-                    Primeira Compra com
-                    <br />
-                    Desconto Especial
-                  </h2>
-                  <button
-                    type="button"
-                    className="mt-3 flex w-fit items-center gap-2 rounded-full bg-background px-5 py-2.5 font-body text-sm font-bold text-foreground shadow-button transition-transform hover:scale-105"
-                  >
-                    Comprar Agora
-                    <ArrowRight className="h-4 w-4" />
-                  </button>
-                </div>
               </div>
             </div>
 
