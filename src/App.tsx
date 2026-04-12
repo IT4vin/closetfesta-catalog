@@ -12,6 +12,7 @@ import FavoritesPage from "./pages/FavoritesPage.tsx";
 import ProfilePage from "./pages/ProfilePage.tsx";
 import OrdersPage from "./pages/OrdersPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import WhatsAppFloat from "@/components/WhatsAppFloat";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/pedidos" element={<OrdersPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <WhatsAppFloat />
           </SearchProvider>
         </BrowserRouter>
       </TooltipProvider>

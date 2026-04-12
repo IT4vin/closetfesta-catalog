@@ -9,9 +9,9 @@ interface SideDrawerProps {
 const menuItems = [
   { icon: User, label: "Perfil", path: "/perfil" },
   { icon: Home, label: "Página Inicial", path: "/" },
-  { icon: ShoppingBag, label: "Meu Carrinho", path: "/carrinho" },
+  { icon: ShoppingBag, label: "Minha reserva", path: "/carrinho" },
   { icon: Heart, label: "Favoritos", path: "/favoritos" },
-  { icon: Truck, label: "Meus Pedidos", path: "/pedidos" },
+  { icon: Truck, label: "Meus aluguéis", path: "/pedidos" },
   { icon: Bell, label: "Notificações", path: "/notificacoes" },
 ];
 

@@ -149,18 +149,18 @@ const HomeScreen = () => {
                 />
                 <div className="absolute inset-0 flex flex-col justify-center px-5">
                   <span className="mb-2 inline-block w-fit rounded-full bg-background/90 px-3 py-1 font-body text-[10px] font-bold uppercase tracking-widest text-foreground">
-                    Oferta Limitada
+                    Promoção de aluguel
                   </span>
                   <h2 className="font-display text-lg font-bold leading-tight text-primary-foreground">
-                    Primeira Compra com
+                    Primeiro aluguel com
                     <br />
-                    Desconto Especial
+                    desconto especial
                   </h2>
                   <button
                     type="button"
                     className="mt-3 flex w-fit items-center gap-2 rounded-full bg-background px-5 py-2.5 font-body text-sm font-bold text-foreground shadow-button transition-transform hover:scale-105"
                   >
-                    Comprar Agora
+                    Alugar agora
                     <ArrowRight className="h-4 w-4" />
                   </button>
                 </div>
@@ -331,7 +331,7 @@ const HomeScreen = () => {
 
           <section
             className="relative mt-10 px-5 pb-8"
-            aria-labelledby="ofertas-ilimitadas-heading"
+            aria-labelledby="aluguel-destaques-heading"
           >
             <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-[#9C2F45] via-[#B84A62] to-[#7A2436] p-6 text-primary-foreground shadow-elevated">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -343,11 +343,11 @@ const HomeScreen = () => {
                     <p className="font-body text-[10px] font-bold uppercase tracking-[0.2em] text-white/80">
                       Próxima parada
                     </p>
-                    <h2 id="ofertas-ilimitadas-heading" className="font-display text-xl font-bold leading-tight">
-                      Ofertas Ilimitadas
+                    <h2 id="aluguel-destaques-heading" className="font-display text-xl font-bold leading-tight">
+                      Mais opções de aluguel
                     </h2>
                     <p className="mt-1 max-w-md font-body text-sm text-white/90">
-                      Novas peças e condições especiais em breve. Continue rolando para explorar o restante do site.
+                      Novas peças e condições de aluguel em breve. Continue rolando para explorar o restante do site.
                     </p>
                   </div>
                 </div>

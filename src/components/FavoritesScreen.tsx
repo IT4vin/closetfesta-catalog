@@ -181,10 +181,10 @@ const FavoritesScreen = () => {
                   type="button"
                   onClick={() => {
                     addItem({ productId: p.id, size: "M", color: p.coresDisponiveis[0] }, 1);
-                    toast.success("Adicionado ao carrinho!");
+                    toast.success("Adicionado à reserva!");
                   }}
                   className="flex h-8 w-8 items-center justify-center rounded-full bg-[#9C2F45] shadow-sm"
-                  aria-label="Adicionar ao carrinho"
+                  aria-label="Adicionar à reserva"
                 >
                   <ShoppingCart className="h-3.5 w-3.5 text-white" />
                 </button>

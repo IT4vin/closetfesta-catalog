@@ -8,7 +8,7 @@ const menuSections = [
     title: "Minha Conta",
     items: [
       { icon: User, label: "Dados Pessoais", desc: "Nome, e-mail, telefone" },
-      { icon: MapPin, label: "Endereços", desc: "Endereços de entrega" },
+      { icon: MapPin, label: "Endereços", desc: "Retirada e devolução do aluguel" },
       { icon: CreditCard, label: "Pagamento", desc: "Cartões salvos" },
     ],
   },
@@ -58,7 +58,7 @@ const ProfileScreen = () => {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3 mx-5 mt-4">
         {[
-          { value: "12", label: "Pedidos" },
+          { value: "12", label: "Aluguéis" },
           { value: "4", label: "Favoritos" },
           { value: "2", label: "Cupons" },
         ].map((s) => (

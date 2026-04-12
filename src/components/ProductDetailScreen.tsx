@@ -26,7 +26,7 @@ const ProductDetailScreen = () => {
 
   const handleAddToCart = () => {
     addItem({ productId: product.id, size: selectedSize, color: selectedColor }, qty);
-    toast.success("Adicionado ao carrinho!", { description: `${product.nome} — Tam. ${selectedSize}` });
+    toast.success("Adicionado à reserva!", { description: `${product.nome} — Tam. ${selectedSize}` });
   };
 
   const goShopByColor = (c: CorCategoria) => {
@@ -91,14 +91,14 @@ const ProductDetailScreen = () => {
             </div>
             <div>
               <p className="font-body text-sm font-semibold text-foreground">Closet Festa</p>
-              <p className="font-body text-xs text-muted-foreground">Loja Oficial ✦</p>
+              <p className="font-body text-xs text-muted-foreground">Aluguel oficial ✦</p>
             </div>
           </div>
 
           <div className="mt-5">
             <p className="font-body text-sm font-semibold text-foreground mb-1">Cores disponíveis</p>
             <p className="font-body text-xs text-muted-foreground mb-3">
-              Toque na cor para ver mais vestidos neste tom na loja.
+              Toque na cor para ver mais vestidos neste tom no catálogo de aluguel.
             </p>
             <div className="flex flex-wrap gap-3">
               {product.coresDisponiveis.map((c) => (
@@ -109,14 +109,14 @@ const ProductDetailScreen = () => {
                   className="group relative h-11 w-11 rounded-full border-2 border-border shadow-[0_4px_14px_-4px_rgba(0,0,0,0.15)] transition-all duration-200 hover:scale-110 hover:shadow-[0_8px_24px_-6px_rgba(156,47,69,0.35)] hover:ring-2 hover:ring-[#9C2F45]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9C2F45]"
                   style={{ backgroundColor: colorMap[c] || "#ccc" }}
                   title={`Ver vestidos em ${c}`}
-                  aria-label={`Filtrar loja pela cor ${c}`}
+                  aria-label={`Filtrar catálogo pela cor ${c}`}
                 />
               ))}
             </div>
           </div>
 
           <div className="mt-5">
-            <p className="font-body text-sm font-semibold text-foreground mb-2">Cor do seu pedido</p>
+            <p className="font-body text-sm font-semibold text-foreground mb-2">Cor do aluguel</p>
             <div className="relative">
               <select
                 value={selectedColor}
@@ -183,7 +183,7 @@ const ProductDetailScreen = () => {
       <div className="fixed bottom-24 left-0 right-0 z-40 border-t border-border bg-background/95 px-5 py-4 backdrop-blur-md">
         <div className="mx-auto flex max-w-lg items-center justify-between">
           <div>
-            <p className="font-body text-xs text-muted-foreground">Preço total</p>
+            <p className="font-body text-xs text-muted-foreground">Total do aluguel</p>
             <p className="font-display text-2xl font-bold text-foreground">
               R$ {(product.preco * qty).toLocaleString("pt-BR")}
             </p>
@@ -194,7 +194,7 @@ const ProductDetailScreen = () => {
             className="flex items-center gap-2 rounded-2xl bg-primary px-6 py-3.5 font-body text-sm font-bold text-primary-foreground shadow-button transition-transform hover:scale-105 active:scale-95"
           >
             <ShoppingCart className="h-5 w-5" />
-            Adicionar ao Carrinho
+            Adicionar à reserva
           </button>
         </div>
       </div>

@@ -31,7 +31,7 @@ const CartScreen = () => {
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
           <h1 className="flex-1 text-center font-display text-lg font-bold text-foreground pr-10">
-            Carrinho
+            Reserva
           </h1>
         </div>
 
@@ -42,9 +42,9 @@ const CartScreen = () => {
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 px-6">
             <ShoppingBag className="w-16 h-16 text-muted-foreground/40 mb-4" />
-            <p className="font-display text-lg font-semibold text-foreground mb-1">Carrinho vazio</p>
+            <p className="font-display text-lg font-semibold text-foreground mb-1">Reserva vazia</p>
             <p className="font-body text-sm text-muted-foreground text-center">
-              Adicione vestidos incríveis ao seu carrinho
+              Adicione vestidos incríveis à sua reserva de aluguel
             </p>
           </div>
         ) : (
@@ -166,7 +166,7 @@ const CartScreen = () => {
         <div className="fixed bottom-24 left-0 right-0 z-40 border-t border-border bg-background/95 px-5 py-4 backdrop-blur-md">
           <button className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 font-display text-base font-bold text-white shadow-button transition-transform hover:scale-[1.02] active:scale-95">
             <ShoppingBag className="h-5 w-5" />
-            Finalizar Compra
+            Finalizar aluguel
           </button>
         </div>
       )}

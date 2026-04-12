@@ -54,7 +54,7 @@ const OrdersScreen = () => {
         <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center shadow-card">
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
-        <h1 className="flex-1 text-center font-display text-lg font-bold text-foreground pr-10">Meus Pedidos</h1>
+        <h1 className="flex-1 text-center font-display text-lg font-bold text-foreground pr-10">Meus aluguéis</h1>
       </div>
 
       <div className="px-5 pb-2">
