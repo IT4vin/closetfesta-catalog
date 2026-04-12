@@ -5,11 +5,25 @@ import { products } from "@/data/catalog";
 import { useCart } from "@/contexts/CartContext";
 import BottomNav from "@/components/BottomNav";
 import ClosetSearchBar from "@/components/ClosetSearchBar";
+import { getWhatsAppHref, getWhatsAppHrefWithText } from "@/components/WhatsAppFloat";
+import { buildReservationWhatsAppMessage } from "@/lib/cartWhatsAppMessage";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
 const CartScreen = () => {
   const navigate = useNavigate();
   const { items, updateQty, removeItem } = useCart();
   const [promoCode, setPromoCode] = useState("");
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [eventDate, setEventDate] = useState("");
 
   const subtotal = items.reduce((sum, item) => {
     const p = products.find((pr) => pr.id === item.productId);
@@ -18,6 +32,18 @@ const CartScreen = () => {
 
   const shipping = subtotal > 500 ? 0 : 49.9;
   const total = subtotal + shipping;
+
+  const openCheckoutDialog = () => {
+    setEventDate("");
+    setCheckoutOpen(true);
+  };
+
+  const finalizeToWhatsApp = () => {
+    if (!eventDate.trim() || items.length === 0) return;
+    const text = buildReservationWhatsAppMessage(items, eventDate, products);
+    window.open(getWhatsAppHrefWithText(text), "_blank", "noopener,noreferrer");
+    setCheckoutOpen(false);
+  };
 
   return (
     <div className="relative flex min-h-screen flex-col bg-background">
@@ -139,10 +165,25 @@ const CartScreen = () => {
                 </span>
               </div>
               <div className="border-t border-border/50" />
-              <div className="flex justify-between items-center">
-                <span className="font-body text-sm text-muted-foreground">Frete</span>
-                <span className="font-body text-sm font-semibold text-foreground">
-                  {shipping === 0 ? "Grátis" : `R$ ${shipping.toLocaleString("pt-BR")}`}
+              <div className="flex justify-between items-start gap-3">
+                <span className="shrink-0 font-body text-sm text-muted-foreground">Frete</span>
+                <span className="max-w-[min(100%,14rem)] text-right font-body text-sm font-semibold leading-snug text-foreground">
+                  {shipping === 0 ? (
+                    <>
+                      Consulte disponibilidade para o seu evento no{" "}
+                      <a
+                        href={getWhatsAppHref()}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary underline decoration-primary/40 underline-offset-2 transition-colors hover:text-primary/90"
+                      >
+                        WhatsApp
+                      </a>
+                      .
+                    </>
+                  ) : (
+                    `R$ ${shipping.toLocaleString("pt-BR")}`
+                  )}
                 </span>
               </div>
               <div className="border-t border-border/50" />
@@ -164,12 +205,53 @@ const CartScreen = () => {
 
       {items.length > 0 && (
         <div className="fixed bottom-24 left-0 right-0 z-40 border-t border-border bg-background/95 px-5 py-4 backdrop-blur-md">
-          <button className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 font-display text-base font-bold text-white shadow-button transition-transform hover:scale-[1.02] active:scale-95">
+          <button
+            type="button"
+            onClick={openCheckoutDialog}
+            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 font-display text-base font-bold text-white shadow-button transition-transform hover:scale-[1.02] active:scale-95"
+          >
             <ShoppingBag className="h-5 w-5" />
             Finalizar aluguel
           </button>
         </div>
       )}
+
+      <Dialog open={checkoutOpen} onOpenChange={setCheckoutOpen}>
+        <DialogContent className="z-[60] max-w-[min(100vw-2rem,22rem)] rounded-2xl sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl">Data do evento</DialogTitle>
+            <DialogDescription className="text-left font-body text-sm">
+              Informe quando será o evento para enviarmos sua reserva pelo WhatsApp com os itens do carrinho.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-2 py-1">
+            <Label htmlFor="checkout-event-date" className="font-body">
+              Data do evento
+            </Label>
+            <input
+              id="checkout-event-date"
+              type="date"
+              value={eventDate}
+              onChange={(e) => setEventDate(e.target.value)}
+              className="flex h-11 w-full rounded-xl border border-border bg-background px-3 py-2 font-body text-sm text-foreground shadow-sm outline-none transition-[box-shadow] focus-visible:ring-2 focus-visible:ring-[#9C2F45]/30"
+              required
+            />
+          </div>
+          <DialogFooter className="flex-col gap-2 sm:flex-row sm:justify-end">
+            <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={() => setCheckoutOpen(false)}>
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              className="w-full sm:w-auto"
+              disabled={!eventDate.trim()}
+              onClick={finalizeToWhatsApp}
+            >
+              Finalizar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <BottomNav />
     </div>

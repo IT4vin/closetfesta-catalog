@@ -9,10 +9,15 @@ Código do produto:
 Meu nome:
 Data do evento:`;
 
-export const getWhatsAppHref = () =>
+const whatsappSendBase = (text: string) =>
   `https://api.whatsapp.com/send/?phone=${WHATSAPP_PHONE}&text=${encodeURIComponent(
-    WHATSAPP_MESSAGE,
+    text,
   )}&type=phone_number&app_absent=0`;
+
+export const getWhatsAppHref = () => whatsappSendBase(WHATSAPP_MESSAGE);
+
+/** Mensagem personalizada (ex.: carrinho + data do evento). */
+export const getWhatsAppHrefWithText = (text: string) => whatsappSendBase(text);
 
 /** Ícone + link; usado embutido na barra inferior. */
 export function WhatsAppNavButton() {
