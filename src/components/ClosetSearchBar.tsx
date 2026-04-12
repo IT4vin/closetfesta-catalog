@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { isGenericVestidosCategory, productDisplayName } from "@/lib/productDisplay";
 import { useSearch } from "@/contexts/SearchContext";
 
 type ClosetSearchBarProps = {
@@ -120,12 +121,18 @@ const ClosetSearchBar = ({ className, compact }: ClosetSearchBarProps) => {
                 type="button"
                 className="flex w-full flex-col gap-0.5 px-4 py-3 text-left transition-colors hover:bg-[#9C2F45]/[0.07]"
                 onMouseDown={(e) => e.preventDefault()}
-                onClick={() => pickSuggestion(p.slug, p.nome)}
+                onClick={() => pickSuggestion(p.slug, productDisplayName(p.nome))}
               >
-                <span className="font-body text-sm font-semibold text-foreground line-clamp-2">{p.nome}</span>
+                <span className="line-clamp-2 font-body text-sm font-semibold text-foreground">
+                  {productDisplayName(p.nome)}
+                </span>
                 <span className="font-body text-xs text-muted-foreground">
-                  {p.categoriaTipo}
-                  <span className="mx-1.5 text-[#D4C4B8]">·</span>
+                  {!isGenericVestidosCategory(p.categoriaTipo) && (
+                    <>
+                      {p.categoriaTipo}
+                      <span className="mx-1.5 text-[#D4C4B8]">·</span>
+                    </>
+                  )}
                   {p.coresDisponiveis.slice(0, 3).join(", ")}
                   {p.coresDisponiveis.length > 3 ? "…" : ""}
                 </span>

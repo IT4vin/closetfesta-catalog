@@ -13,6 +13,7 @@ import { useSearch } from "@/contexts/SearchContext";
 import { cn } from "@/lib/utils";
 import { getWhatsAppHrefWithText } from "@/components/WhatsAppFloat";
 import { WHATSAPP_FIRST_RENTAL_PROMO_MESSAGE } from "@/lib/firstRentalPromo";
+import { isGenericVestidosCategory, productDisplayName } from "@/lib/productDisplay";
 
 
 
@@ -299,7 +300,7 @@ const HomeScreen = () => {
                       <div className="relative aspect-[3/4] overflow-hidden">
                         <img
                           src={p.imagem}
-                          alt={p.nome}
+                          alt={productDisplayName(p.nome)}
                           className="h-full w-full object-cover"
                           loading="lazy"
                         />
@@ -316,12 +317,14 @@ const HomeScreen = () => {
                           />
                         </button>
                       </div>
-                      <div className="p-3">
-                        <p className="line-clamp-1 font-body text-xs text-muted-foreground">
-                          <HighlightedText text={p.categoriaTipo} query={searchQuery} />
-                        </p>
-                        <p className="mt-0.5 line-clamp-2 font-body text-sm font-semibold text-foreground">
-                          <HighlightedText text={p.nome} query={searchQuery} />
+                      <div className="flex flex-col gap-0.5 p-3">
+                        {!isGenericVestidosCategory(p.categoriaTipo) && (
+                          <p className="line-clamp-1 font-body text-xs text-muted-foreground">
+                            <HighlightedText text={p.categoriaTipo} query={searchQuery} />
+                          </p>
+                        )}
+                        <p className="line-clamp-2 font-body text-sm font-semibold text-foreground">
+                          <HighlightedText text={productDisplayName(p.nome)} query={searchQuery} />
                         </p>
                         <p className="mt-1 font-display text-base font-bold text-primary">
                           R$ {p.preco.toLocaleString("pt-BR")}

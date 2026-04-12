@@ -9,6 +9,7 @@ import HighlightedText from "@/components/HighlightedText";
 import { useSearch } from "@/contexts/SearchContext";
 import { toast } from "sonner";
 import { buildFavoritesShareText } from "@/lib/favoritesShare";
+import { isGenericVestidosCategory, productDisplayName } from "@/lib/productDisplay";
 
 const FavoritesScreen = () => {
   const navigate = useNavigate();
@@ -155,15 +156,17 @@ const FavoritesScreen = () => {
                   }
                 }}
               >
-                <img src={p.imagem} alt={p.nome} className="h-full w-full object-cover" />
+                <img src={p.imagem} alt={productDisplayName(p.nome)} className="h-full w-full object-cover" />
               </div>
               <div className="flex min-w-0 flex-1 flex-col justify-between">
-                <div>
-                  <p className="font-body text-xs text-muted-foreground">
-                    <HighlightedText text={p.categoriaTipo} query={searchQuery} />
-                  </p>
+                <div className="flex min-w-0 flex-col gap-0.5">
+                  {!isGenericVestidosCategory(p.categoriaTipo) && (
+                    <p className="font-body text-xs text-muted-foreground">
+                      <HighlightedText text={p.categoriaTipo} query={searchQuery} />
+                    </p>
+                  )}
                   <p className="line-clamp-2 font-display text-sm font-semibold leading-tight text-foreground">
-                    <HighlightedText text={p.nome} query={searchQuery} />
+                    <HighlightedText text={productDisplayName(p.nome)} query={searchQuery} />
                   </p>
                 </div>
                 <p className="font-display text-base font-bold text-[#9C2F45]">R$ {p.preco.toLocaleString("pt-BR")}</p>

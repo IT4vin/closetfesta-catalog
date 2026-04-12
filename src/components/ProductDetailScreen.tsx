@@ -5,6 +5,7 @@ import { findProductByRouteParam, products, colorMap, type CorCategoria } from "
 import { useCart } from "@/contexts/CartContext";
 import { useSearch } from "@/contexts/SearchContext";
 import { cn } from "@/lib/utils";
+import { isGenericVestidosCategory, productDisplayName } from "@/lib/productDisplay";
 import { toast } from "sonner";
 import BottomNav from "@/components/BottomNav";
 import ClosetSearchBar from "@/components/ClosetSearchBar";
@@ -87,7 +88,9 @@ const ProductDetailScreen = () => {
 
   const handleAddToCart = () => {
     addItem({ productId: product.id, size: selectedSize, color: selectedColor }, qty);
-    toast.success("Adicionado à reserva!", { description: `${product.nome} — Tam. ${selectedSize}` });
+    toast.success("Adicionado à reserva!", {
+      description: `${productDisplayName(product.nome)} — Tam. ${selectedSize}`,
+    });
 
     const skipMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (skipMotion) return;
@@ -154,15 +157,28 @@ const ProductDetailScreen = () => {
 
         <div className="px-5 mt-2">
           <div className="rounded-2xl overflow-hidden shadow-elevated bg-secondary transition-shadow duration-300">
-            <img src={product.imagem} alt={product.nome} className="w-full aspect-[3/4] object-cover" />
+            <img
+              src={product.imagem}
+              alt={productDisplayName(product.nome)}
+              className="w-full aspect-[3/4] object-cover"
+            />
           </div>
         </div>
 
         <div className="px-5 mt-5">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-sm font-body text-muted-foreground">{product.categoriaTipo}</p>
-              <h2 className="font-display text-xl font-bold text-foreground mt-1">{product.nome}</h2>
+              {!isGenericVestidosCategory(product.categoriaTipo) && (
+                <p className="font-body text-sm text-muted-foreground">{product.categoriaTipo}</p>
+              )}
+              <h2
+                className={cn(
+                  "font-display text-xl font-bold text-foreground",
+                  !isGenericVestidosCategory(product.categoriaTipo) && "mt-1",
+                )}
+              >
+                {productDisplayName(product.nome)}
+              </h2>
             </div>
             <button
               type="button"
