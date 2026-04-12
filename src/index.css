@@ -107,7 +107,7 @@
   }
 }
 
-/* Botão WhatsApp flutuante (whatsapp-button.html) — pulso e entrada */
+/* Pulso do botão WhatsApp (ao lado da bottom nav) */
 @keyframes wa-float-pulse {
   0% {
     transform: scale(1);
@@ -119,22 +119,7 @@
   }
 }
 
-@keyframes wa-float-slide-in {
-  from {
-    opacity: 0;
-    transform: translateY(40px) scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
 @layer components {
-  .wa-float-entrance {
-    animation: wa-float-slide-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.8s both;
-  }
-
   .wa-float-btn-pulse {
     position: relative;
     isolation: isolate;
@@ -158,12 +143,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .wa-float-entrance {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
-
   .wa-float-btn-pulse::before,
   .wa-float-btn-pulse::after {
     animation: none;

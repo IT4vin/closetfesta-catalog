@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Home, ShoppingBag, Heart, User, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { WhatsAppNavButton } from "@/components/WhatsAppFloat";
 
 const MARSALA = "#9C2F45";
 
@@ -41,15 +42,16 @@ const BottomNav = () => {
 
   return (
     <nav
-      className="pointer-events-none fixed bottom-0 left-0 right-0 z-50 px-6 pt-2 pb-[max(1rem,env(safe-area-inset-bottom))]"
+      className="pointer-events-none fixed bottom-0 left-0 right-0 z-50 px-4 pt-2 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6"
       aria-label="Navegação principal"
     >
-      <div
-        className={cn(
-          "pointer-events-auto mx-auto max-w-sm overflow-hidden rounded-full bg-background px-2 py-2",
-          "shadow-[0_6px_32px_-6px_rgba(0,0,0,0.13),0_2px_8px_-2px_rgba(0,0,0,0.06)]",
-        )}
-      >
+      <div className="pointer-events-none mx-auto flex w-full max-w-lg items-center justify-center gap-2">
+        <div
+          className={cn(
+            "pointer-events-auto min-w-0 flex-1 max-w-sm overflow-hidden rounded-full bg-background px-2 py-2",
+            "shadow-[0_6px_32px_-6px_rgba(0,0,0,0.13),0_2px_8px_-2px_rgba(0,0,0,0.06)]",
+          )}
+        >
         <div className="relative flex items-stretch">
           <div className="pointer-events-none absolute inset-x-0 inset-y-1.5">
             <div
@@ -102,6 +104,11 @@ const BottomNav = () => {
               </button>
             );
           })}
+        </div>
+        </div>
+
+        <div className="pointer-events-auto shrink-0 self-center pb-0.5">
+          <WhatsAppNavButton />
         </div>
       </div>
     </nav>
