@@ -126,8 +126,8 @@ const HomeScreen = () => {
             </button>
           </div>
 
-          <div className="px-5">
-            <ClosetSearchBar />
+          <div className="px-5 -mt-4 sm:-mt-6">
+            <ClosetSearchBar compact />
           </div>
         </header>
 

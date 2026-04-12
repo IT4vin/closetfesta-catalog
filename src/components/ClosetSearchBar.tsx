@@ -6,9 +6,11 @@ import { useSearch } from "@/contexts/SearchContext";
 
 type ClosetSearchBarProps = {
   className?: string;
+  /** Menos padding vertical (ex.: header da home, menos espaço até a logo). */
+  compact?: boolean;
 };
 
-const ClosetSearchBar = ({ className }: ClosetSearchBarProps) => {
+const ClosetSearchBar = ({ className, compact }: ClosetSearchBarProps) => {
   const navigate = useNavigate();
   const { searchQuery, setSearchQuery, clearSearch, filteredProducts, hasActiveSearch } = useSearch();
   const [open, setOpen] = useState(false);
@@ -61,7 +63,8 @@ const ClosetSearchBar = ({ className }: ClosetSearchBarProps) => {
     <div ref={rootRef} className={cn("relative z-[60]", className)}>
       <div
         className={cn(
-          "flex items-center gap-2 rounded-2xl border border-transparent bg-[#F5F0EB] px-3 py-2.5 shadow-card transition-[box-shadow,border-color] duration-200",
+          "flex items-center gap-2 rounded-2xl border border-transparent bg-[#F5F0EB] px-3 shadow-card transition-[box-shadow,border-color] duration-200",
+          compact ? "py-2" : "py-2.5",
           open && "border-[#9C2F45]/25 shadow-[0_12px_40px_-12px_rgba(156,47,69,0.35),0_4px_16px_-4px_rgba(0,0,0,0.08)]",
         )}
       >
