@@ -11,6 +11,7 @@ import HighlightedText from "@/components/HighlightedText";
 import { useCart } from "@/contexts/CartContext";
 import { useSearch } from "@/contexts/SearchContext";
 import { cn } from "@/lib/utils";
+import { getWhatsAppHref } from "@/components/WhatsAppFloat";
 
 
 
@@ -156,13 +157,16 @@ const HomeScreen = () => {
                     <br />
                     desconto especial
                   </h2>
-                  <button
-                    type="button"
-                    className="mt-3 flex w-fit items-center gap-2 rounded-full bg-background px-5 py-2.5 font-body text-sm font-bold text-foreground shadow-button transition-transform hover:scale-105"
+                  <a
+                    href={getWhatsAppHref()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-flex w-fit items-center gap-2 rounded-full bg-background px-5 py-2.5 font-body text-sm font-bold text-foreground shadow-button transition-transform hover:scale-105"
+                    aria-label="Alugar agora — abrir WhatsApp da Closet Festa com mensagem sobre disponibilidade"
                   >
                     Alugar agora
-                    <ArrowRight className="h-4 w-4" />
-                  </button>
+                    <ArrowRight className="h-4 w-4" aria-hidden />
+                  </a>
                 </div>
               </div>
             </div>
