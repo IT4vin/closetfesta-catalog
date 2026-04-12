@@ -189,7 +189,7 @@ const HomeScreen = () => {
                   </button>
                 </div>
               </div>
-              <div className="scrollbar-hide flex gap-2.5 overflow-x-auto pb-2">
+              <div className="scrollbar-hide -mx-1 flex items-center gap-2.5 overflow-x-auto px-1 py-3 pb-4">
                 {CORES_CATEGORIA.map((nomeCor) => {
                   const selected = colorCategoryFilter === nomeCor;
                   const hex = colorMap[nomeCor];
@@ -202,7 +202,7 @@ const HomeScreen = () => {
                         "flex shrink-0 items-center gap-2 rounded-xl px-3.5 py-2.5 shadow-card transition-all duration-200",
                         "bg-[#F5F0EB] hover:shadow-[0_8px_24px_-8px_rgba(156,47,69,0.2)]",
                         selected &&
-                          "bg-white shadow-[0_12px_32px_-10px_rgba(156,47,69,0.35)] ring-2 ring-[#9C2F45] ring-offset-2 ring-offset-background",
+                          "bg-white shadow-[0_10px_28px_-12px_rgba(156,47,69,0.35)] ring-2 ring-[#9C2F45] ring-inset",
                       )}
                     >
                       <span
