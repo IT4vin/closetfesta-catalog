@@ -233,7 +233,7 @@ const HomeScreen = () => {
           <div className="relative bg-background">
             <div className="mt-6 px-5">
               <div className="mb-3 flex items-center justify-between">
-                <h3 className="font-display text-base font-semibold text-foreground">Produtos</h3>
+                <h3 className="font-display text-base font-semibold text-foreground">Produto</h3>
                 <button
                   type="button"
                   onClick={clearAllFilters}
