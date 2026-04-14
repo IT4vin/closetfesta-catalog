@@ -287,7 +287,7 @@ const CartScreen = () => {
 
       {items.length > 0 && (
        <div className="fixed bottom-24 left-0 right-0 z-40 px-5 py-4">
-       <div className="mx-auto max-w-lg rounded-2xl bg-secondary/80 backdrop-blur-lg p-3 shadow-lg">
+       <div className="mx-auto max-w-lg">
          <button
            type="button"
            onClick={openCheckoutDialog}
