@@ -284,8 +284,8 @@ const ProductDetailScreen = () => {
         </div>
       </div>
 
-      <div className="fixed bottom-24 left-0 right-0 z-40 border-t border-border bg-background/95 px-5 py-4 backdrop-blur-md">
-        <div className="mx-auto flex max-w-lg items-center justify-between">
+      <div className="fixed bottom-24 left-0 right-0 z-40 px-5 py-4">
+  <div className="mx-auto flex max-w-lg items-center justify-between rounded-2xl bg-white/10 backdrop-blur-lg px-4 py-3">
           <div>
             <p className="font-body text-xs text-muted-foreground">Total do aluguel</p>
             <p className="font-display text-2xl font-bold text-foreground">

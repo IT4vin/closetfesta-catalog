@@ -286,15 +286,17 @@ const CartScreen = () => {
       </div>
 
       {items.length > 0 && (
-        <div className="fixed bottom-24 left-0 right-0 z-40 border-t border-border bg-background/95 px-5 py-4 backdrop-blur-md">
-          <button
-            type="button"
-            onClick={openCheckoutDialog}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 font-display text-base font-bold text-white shadow-button transition-transform hover:scale-[1.02] active:scale-95"
-          >
+       <div className="fixed bottom-24 left-0 right-0 z-40 px-5 py-4">
+       <div className="mx-auto max-w-lg rounded-2xl bg-secondary/80 backdrop-blur-lg p-3 shadow-lg">
+         <button
+           type="button"
+           onClick={openCheckoutDialog}
+           className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-4 font-display text-base font-bold text-white"
+         >
             <ShoppingBag className="h-5 w-5" />
             Finalizar aluguel
           </button>
+        </div>
         </div>
       )}
 
