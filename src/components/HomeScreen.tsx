@@ -101,7 +101,7 @@ const HomeScreen = () => {
           ref={headerRef}
           className="fixed left-0 right-0 top-0 z-50 bg-background/95 backdrop-blur-md pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 sm:pb-3.5 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.06)]"
         >
-          <div className="flex items-center justify-between px-5 pb-0 sm:pb-px">
+          <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 pb-0 sm:px-5 sm:pb-px lg:px-8">
             <button
               type="button"
               onClick={() => setDrawerOpen(true)}
@@ -116,7 +116,7 @@ const HomeScreen = () => {
                 alt="Closet Festa"
                 width={1792}
                 height={1792}
-                className="h-28 w-auto max-w-[calc(100vw-7rem)] object-contain object-center drop-shadow-sm sm:h-32"
+                className="h-24 w-auto max-w-[calc(100vw-7rem)] object-contain object-center drop-shadow-sm sm:h-28 lg:h-24 xl:h-28"
                 decoding="async"
                 fetchPriority="high"
               />
@@ -136,8 +136,10 @@ const HomeScreen = () => {
             </button>
           </div>
 
-          <div className="px-5 -mt-4 sm:-mt-6">
-            <ClosetSearchBar compact />
+          <div className="mx-auto w-full max-w-7xl px-4 -mt-4 sm:px-5 sm:-mt-6 lg:px-8">
+            <div className="mx-auto w-full max-w-3xl lg:max-w-4xl">
+              <ClosetSearchBar compact />
+            </div>
           </div>
         </header>
 
@@ -150,19 +152,19 @@ const HomeScreen = () => {
 
         <div className="flex-1 pb-24">
           <div className="relative bg-background">
-            <div className="px-5 pt-2">
+            <div className="mx-auto w-full max-w-7xl px-4 pt-2 sm:px-5 lg:px-8">
               <div className="relative overflow-hidden rounded-2xl bg-primary shadow-elevated">
                 <CatalogImage
                   src={lojaBanner}
                   alt="Closet Festa"
-                  className="h-44 w-full object-cover opacity-40"
+                  className="h-44 w-full object-cover opacity-40 md:h-52 lg:h-56"
                   priority
                 />
                 <div className="absolute inset-0 flex flex-col justify-center px-5">
                   <span className="mb-2 inline-block w-fit rounded-full bg-background/90 px-3 py-1 font-body text-[10px] font-bold uppercase tracking-widest text-foreground">
                     Promoção de aluguel
                   </span>
-                  <h2 className="font-display text-lg font-bold leading-tight text-primary-foreground">
+                  <h2 className="font-display text-lg font-bold leading-tight text-primary-foreground md:text-xl lg:text-2xl">
                     Primeiro aluguel com
                     <br />
                     desconto especial
@@ -171,7 +173,7 @@ const HomeScreen = () => {
                     href={getWhatsAppHrefWithText(WHATSAPP_FIRST_RENTAL_PROMO_MESSAGE)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-3 inline-flex w-fit items-center gap-2 rounded-full bg-background px-5 py-2.5 font-body text-sm font-bold text-foreground shadow-button transition-transform hover:scale-105"
+                    className="mt-3 inline-flex w-fit items-center gap-2 rounded-full bg-background px-5 py-2.5 font-body text-sm font-bold text-foreground shadow-button transition-transform hover:scale-105 md:text-base"
                     aria-label="Alugar agora — abrir WhatsApp com cupom EUQUERO15 e primeiro aluguel"
                   >
                     Alugar agora
@@ -181,7 +183,7 @@ const HomeScreen = () => {
               </div>
             </div>
 
-            <div className="mt-6 px-5">
+            <div className="mx-auto mt-6 w-full max-w-7xl px-4 sm:px-5 lg:px-8">
               <div className="mb-3 flex items-center justify-between gap-2">
                 <h3 className="font-display text-base font-semibold text-foreground">Cores</h3>
                 <div className="flex shrink-0 items-center gap-2">
@@ -239,7 +241,7 @@ const HomeScreen = () => {
           </div>
 
           <div className="relative bg-background">
-            <div className="mt-6 px-5">
+            <div className="mx-auto mt-6 w-full max-w-7xl px-4 sm:px-5 lg:px-8">
               <div className="mb-3 flex items-center justify-between">
                 <h3 className="font-display text-base font-semibold text-foreground">Produto</h3>
                 <button

@@ -14,8 +14,6 @@ import { CatalogImage } from "@/components/CatalogImage";
 import HighlightedText from "@/components/HighlightedText";
 import { isGenericVestidosCategory, productDisplayName } from "@/lib/productDisplay";
 
-const COLUMN_COUNT = 2;
-const ROW_HEIGHT = 312;
 const GRID_GAP = 16;
 
 type GridItemData = {
@@ -24,6 +22,7 @@ type GridItemData = {
   favorites: Set<number>;
   onToggleFav: (id: number) => void;
   onNavigateProduct: (slug: string) => void;
+  columnCount: number;
 };
 
 type ProductGridVirtualProps = {
@@ -98,7 +97,7 @@ function ProductCard({
 }
 
 function Cell({ columnIndex, rowIndex, style, data }: GridChildComponentProps<GridItemData>) {
-  const index = rowIndex * COLUMN_COUNT + columnIndex;
+  const index = rowIndex * data.columnCount + columnIndex;
   const product = data.products[index];
   if (!product) return null;
 
@@ -137,24 +136,40 @@ const ProductGridVirtual = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   const [gridHeight, setGridHeight] = useState(520);
+  const [viewportHeight, setViewportHeight] = useState(0);
+
+  const columnCount = useMemo(() => {
+    if (width >= 1280) return 5;
+    if (width >= 1024) return 4;
+    if (width >= 768) return 3;
+    return 2;
+  }, [width]);
 
   const visibleProducts = useMemo(() => products.slice(0, visibleLimit), [products, visibleLimit]);
-  const rowCount = Math.ceil(visibleProducts.length / COLUMN_COUNT) || 1;
-  const columnWidth = width > 0 ? Math.floor((width - GRID_GAP) / COLUMN_COUNT) : 0;
+  const rowCount = Math.ceil(visibleProducts.length / columnCount) || 1;
+  const columnWidth = width > 0 ? Math.floor((width - GRID_GAP * (columnCount - 1)) / columnCount) : 0;
+  const rowHeight = Math.max(260, Math.round(columnWidth * 1.48 + 108));
 
   useLayoutEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const ro = new ResizeObserver(() => {
       setWidth(el.clientWidth);
-      const vh = window.innerHeight;
-      setGridHeight(Math.max(400, Math.min(Math.round(vh * 0.62), 720)));
+      setViewportHeight(window.innerHeight);
     });
     ro.observe(el);
     setWidth(el.clientWidth);
-    setGridHeight(Math.max(400, Math.min(Math.round(window.innerHeight * 0.62), 720)));
+    setViewportHeight(window.innerHeight);
     return () => ro.disconnect();
   }, []);
+
+  useLayoutEffect(() => {
+    if (!viewportHeight) return;
+    const ratio = width >= 1024 ? 0.68 : width >= 768 ? 0.64 : 0.6;
+    const maxHeight = width >= 1280 ? 840 : 760;
+    const minHeight = width >= 1024 ? 520 : 400;
+    setGridHeight(Math.max(minHeight, Math.min(Math.round(viewportHeight * ratio), maxHeight)));
+  }, [width, viewportHeight]);
 
   const itemData = useMemo<GridItemData>(
     () => ({
@@ -163,19 +178,20 @@ const ProductGridVirtual = ({
       favorites,
       onToggleFav,
       onNavigateProduct: (slug) => navigate(`/produto/${slug}`),
+      columnCount,
     }),
-    [visibleProducts, searchQuery, favorites, onToggleFav, navigate],
+    [visibleProducts, searchQuery, favorites, onToggleFav, navigate, columnCount],
   );
 
   const handleItemsRendered = useCallback(
     ({ visibleRowStopIndex }: { visibleRowStopIndex: number }) => {
       if (!hasMore) return;
-      const lastVisible = (visibleRowStopIndex + 1) * COLUMN_COUNT;
-      if (lastVisible >= visibleProducts.length - COLUMN_COUNT) {
+      const lastVisible = (visibleRowStopIndex + 1) * columnCount;
+      if (lastVisible >= visibleProducts.length - columnCount) {
         onLoadMore();
       }
     },
-    [hasMore, visibleProducts.length, onLoadMore],
+    [hasMore, visibleProducts.length, onLoadMore, columnCount],
   );
 
   if (catalogLoading) {
@@ -197,11 +213,11 @@ const ProductGridVirtual = ({
     <div ref={containerRef} className="w-full">
       {width > 0 && columnWidth > 0 && (
         <Grid
-          columnCount={COLUMN_COUNT}
+          columnCount={columnCount}
           columnWidth={columnWidth}
           height={gridHeight}
           rowCount={rowCount}
-          rowHeight={ROW_HEIGHT}
+          rowHeight={rowHeight}
           width={width}
           itemData={itemData}
           onItemsRendered={handleItemsRendered}
