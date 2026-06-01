@@ -1,4 +1,5 @@
-import type { CorCategoria, Product, TipoCategoria } from "@/data/catalog";
+import type { CorCategoria, TipoCategoria } from "@/data/catalogMeta";
+import type { Product } from "@/data/catalog/product";
 
 /** Lowercase ASCII-ish: removes diacritics for case- and accent-insensitive matching. */
 export function normalizeSearch(s: string): string {

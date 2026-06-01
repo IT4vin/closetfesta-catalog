@@ -1,6 +1,6 @@
 /**
  * Metadados fixos do catálogo (cores, tipos e mapa de cores).
- * Produtos em si vêm de `catalog.generated.ts` (gerado a partir da pasta `produtos/`).
+ * Produtos vêm de `catalog/search-index` e chunks por cor (gerados a partir da pasta `produtos/`).
  *
  * CORES_CATEGORIA deve coincidir com os nomes das pastas em `produtos/vestidos/<cor>/`
  * (cada subpasta é uma cor). Ao adicionar pastas novas, inclua o nome e um hex em colorMap.

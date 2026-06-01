@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, ShoppingBag, Heart, Minus, Plus, ShoppingCart } from "lucide-react";
-import { findProductByRouteParam, products, colorMap, type CorCategoria } from "@/data/catalog";
+import { findProductByRouteParam, colorMap, type CorCategoria } from "@/data/catalog";
+import type { Product } from "@/data/catalog/product";
 import { useCart } from "@/contexts/CartContext";
 import { useSearch } from "@/contexts/SearchContext";
 import { cn } from "@/lib/utils";
@@ -9,6 +10,7 @@ import { isGenericVestidosCategory, productDisplayName } from "@/lib/productDisp
 import { toast } from "sonner";
 import BottomNav from "@/components/BottomNav";
 import ClosetSearchBar from "@/components/ClosetSearchBar";
+import { CatalogImage } from "@/components/CatalogImage";
 
 type FlyParticle = { id: number; sx: number; sy: number; ex: number; ey: number };
 
@@ -55,13 +57,24 @@ function ReservationFlyDot({
   );
 }
 
+function ProductDetailSkeleton() {
+  return (
+    <div className="px-5 mt-2 space-y-5 animate-pulse">
+      <div className="aspect-[3/4] w-full rounded-2xl bg-secondary" />
+      <div className="h-6 w-2/3 rounded-lg bg-secondary" />
+      <div className="h-4 w-1/2 rounded-lg bg-secondary" />
+    </div>
+  );
+}
+
 const ProductDetailScreen = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { addItem, totalItems, reservationFeedbackGeneration } = useCart();
   const { setColorCategoryFilter } = useSearch();
-  const product = findProductByRouteParam(slug) ?? products[0];
-  const [selectedColor, setSelectedColor] = useState<CorCategoria>(product.cor);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedColor, setSelectedColor] = useState<CorCategoria>("Branco");
   const [selectedSize, setSelectedSize] = useState("M");
   const [qty, setQty] = useState(1);
   const [fav, setFav] = useState(false);
@@ -71,9 +84,28 @@ const ProductDetailScreen = () => {
   const [flyParticle, setFlyParticle] = useState<FlyParticle | null>(null);
 
   useEffect(() => {
-    setSelectedColor(product.cor);
+    let cancelled = false;
+    setLoading(true);
+    findProductByRouteParam(slug)
+      .then((p) => {
+        if (!cancelled) {
+          setProduct(p ?? null);
+          if (p) setSelectedColor(p.cor as CorCategoria);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [slug]);
+
+  useEffect(() => {
+    if (!product) return;
+    setSelectedColor(product.cor as CorCategoria);
     setQty(1);
-  }, [product.id, product.cor]);
+  }, [product?.id, product?.cor, product]);
 
   useEffect(() => {
     if (prevFeedbackGen.current === null) {
@@ -85,6 +117,40 @@ const ProductDetailScreen = () => {
     }
     prevFeedbackGen.current = reservationFeedbackGeneration;
   }, [reservationFeedbackGeneration]);
+
+  if (loading) {
+    return (
+      <div className="relative flex min-h-screen flex-col bg-background">
+        <div className="flex items-center justify-between px-5 pt-5 pb-3">
+          <button
+            type="button"
+            onClick={() => navigate("/")}
+            className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center shadow-card"
+          >
+            <ArrowLeft className="w-5 h-5 text-foreground" />
+          </button>
+          <h1 className="font-display text-lg font-semibold text-foreground">Detalhes</h1>
+          <div className="w-11" />
+        </div>
+        <ProductDetailSkeleton />
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background px-6">
+        <p className="font-display text-lg font-semibold text-foreground">Produto não encontrado</p>
+        <button
+          type="button"
+          onClick={() => navigate("/")}
+          className="rounded-full bg-primary px-6 py-2.5 font-body text-sm font-semibold text-primary-foreground"
+        >
+          Voltar ao catálogo
+        </button>
+      </div>
+    );
+  }
 
   const handleAddToCart = () => {
     addItem({ productId: product.id, size: selectedSize, color: selectedColor }, qty);
@@ -157,10 +223,11 @@ const ProductDetailScreen = () => {
 
         <div className="px-5 mt-2">
           <div className="rounded-2xl overflow-hidden shadow-elevated bg-secondary transition-shadow duration-300">
-            <img
+            <CatalogImage
               src={product.imagem}
               alt={productDisplayName(product.nome)}
               className="w-full aspect-[3/4] object-cover"
+              priority
             />
           </div>
         </div>
@@ -209,9 +276,9 @@ const ProductDetailScreen = () => {
                 <button
                   key={c}
                   type="button"
-                  onClick={() => goShopByColor(c)}
+                  onClick={() => goShopByColor(c as CorCategoria)}
                   className="group relative h-11 w-11 rounded-full border-2 border-border shadow-[0_4px_14px_-4px_rgba(0,0,0,0.15)] transition-all duration-200 hover:scale-110 hover:shadow-[0_8px_24px_-6px_rgba(156,47,69,0.35)] hover:ring-2 hover:ring-[#9C2F45]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9C2F45]"
-                  style={{ backgroundColor: colorMap[c] || "#ccc" }}
+                  style={{ backgroundColor: colorMap[c as CorCategoria] || "#ccc" }}
                   title={`Ver vestidos em ${c}`}
                   aria-label={`Filtrar catálogo pela cor ${c}`}
                 />
@@ -285,7 +352,7 @@ const ProductDetailScreen = () => {
       </div>
 
       <div className="fixed bottom-24 left-0 right-0 z-40 px-5 py-4">
-  <div className="mx-auto flex max-w-lg items-center justify-between rounded-2xl bg-white/10 backdrop-blur-lg px-4 py-3">
+        <div className="mx-auto flex max-w-lg items-center justify-between rounded-2xl bg-white/10 backdrop-blur-lg px-4 py-3">
           <div>
             <p className="font-body text-xs text-muted-foreground">Total do aluguel</p>
             <p className="font-display text-2xl font-bold text-foreground">

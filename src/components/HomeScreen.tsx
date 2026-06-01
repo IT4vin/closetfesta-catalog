@@ -1,19 +1,19 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, ShoppingBag, Heart, ArrowRight, Sparkles } from "lucide-react";
+import { Menu, ShoppingBag, ArrowRight, Sparkles } from "lucide-react";
 import { CORES_CATEGORIA, colorMap, type CorCategoria } from "@/data/catalog";
 import lojaBanner from "@loja-imagem/loja-imagem.svg";
 import logoUrl from "@/assets/logo.svg?url";
 import SideDrawer from "@/components/SideDrawer";
 import BottomNav from "@/components/BottomNav";
 import ClosetSearchBar from "@/components/ClosetSearchBar";
-import HighlightedText from "@/components/HighlightedText";
+import ProductGridVirtual from "@/components/ProductGridVirtual";
+import { CatalogImage } from "@/components/CatalogImage";
 import { useCart } from "@/contexts/CartContext";
 import { useSearch } from "@/contexts/SearchContext";
 import { cn } from "@/lib/utils";
 import { getWhatsAppHrefWithText } from "@/components/WhatsAppFloat";
 import { WHATSAPP_FIRST_RENTAL_PROMO_MESSAGE } from "@/lib/firstRentalPromo";
-import { isGenericVestidosCategory, productDisplayName } from "@/lib/productDisplay";
 
 
 
@@ -32,6 +32,11 @@ const HomeScreen = () => {
     clearCategoryFilters,
     clearAllFilters,
     hasActiveCategoryFilter,
+    catalogLoading,
+    catalogError,
+    visibleLimit,
+    loadMoreProducts,
+    hasMoreProducts,
   } = useSearch();
 
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
@@ -58,7 +63,9 @@ const HomeScreen = () => {
   };
 
   const showEmpty =
-    filteredProducts.length === 0 && (hasActiveSearch || hasActiveCategoryFilter);
+    !catalogLoading &&
+    filteredProducts.length === 0 &&
+    (hasActiveSearch || hasActiveCategoryFilter);
 
   useLayoutEffect(() => {
     const el = headerRef.current;
@@ -145,10 +152,11 @@ const HomeScreen = () => {
           <div className="relative bg-background">
             <div className="px-5 pt-2">
               <div className="relative overflow-hidden rounded-2xl bg-primary shadow-elevated">
-                <img
+                <CatalogImage
                   src={lojaBanner}
                   alt="Closet Festa"
                   className="h-44 w-full object-cover opacity-40"
+                  priority
                 />
                 <div className="absolute inset-0 flex flex-col justify-center px-5">
                   <span className="mb-2 inline-block w-fit rounded-full bg-background/90 px-3 py-1 font-body text-[10px] font-bold uppercase tracking-widest text-foreground">
@@ -242,11 +250,11 @@ const HomeScreen = () => {
                   Ver todos
                 </button>
               </div>
-              <div
-                key={`${colorCategoryFilter ?? ""}-${searchQuery}`}
-                className="grid animate-fade-in grid-cols-2 gap-4"
-              >
-                {showEmpty ? (
+              <div key={`${colorCategoryFilter ?? ""}-${searchQuery}`} className="animate-fade-in">
+                {catalogError && (
+                  <p className="mb-4 text-center font-body text-sm text-destructive">{catalogError}</p>
+                )}
+                {showEmpty && !catalogLoading ? (
                   <div className="col-span-2 flex flex-col items-center justify-center rounded-2xl border border-[#E8DFD6] bg-[#FFFCFA] px-6 py-14 text-center shadow-[0_12px_40px_-16px_rgba(156,47,69,0.2)]">
                     <p className="font-display text-base font-semibold text-foreground">
                       Nenhum vestido encontrado para esta busca
@@ -283,55 +291,16 @@ const HomeScreen = () => {
                     </div>
                   </div>
                 ) : (
-                  filteredProducts.map((p) => (
-                    <div
-                      key={p.id}
-                      role="button"
-                      tabIndex={0}
-                      className="cursor-pointer overflow-hidden rounded-2xl bg-secondary shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-elevated"
-                      onClick={() => navigate(`/produto/${p.slug}`)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          navigate(`/produto/${p.slug}`);
-                        }
-                      }}
-                    >
-                      <div className="relative aspect-[3/4] overflow-hidden">
-                        <img
-                          src={p.imagem}
-                          alt={productDisplayName(p.nome)}
-                          className="h-full w-full object-cover"
-                          loading="lazy"
-                        />
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleFav(p.id);
-                          }}
-                          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-background/80 shadow-card backdrop-blur-sm"
-                        >
-                          <Heart
-                            className={`h-4 w-4 ${favorites.has(p.id) ? "fill-primary text-primary" : "text-foreground"}`}
-                          />
-                        </button>
-                      </div>
-                      <div className="flex flex-col gap-0.5 p-3">
-                        {!isGenericVestidosCategory(p.categoriaTipo) && (
-                          <p className="line-clamp-1 font-body text-xs text-muted-foreground">
-                            <HighlightedText text={p.categoriaTipo} query={searchQuery} />
-                          </p>
-                        )}
-                        <p className="line-clamp-2 font-body text-sm font-semibold text-foreground">
-                          <HighlightedText text={productDisplayName(p.nome)} query={searchQuery} />
-                        </p>
-                        <p className="mt-1 font-display text-base font-bold text-primary">
-                          R$ {p.preco.toLocaleString("pt-BR")}
-                        </p>
-                      </div>
-                    </div>
-                  ))
+                  <ProductGridVirtual
+                    products={filteredProducts}
+                    searchQuery={searchQuery}
+                    favorites={favorites}
+                    onToggleFav={toggleFav}
+                    visibleLimit={visibleLimit}
+                    onLoadMore={loadMoreProducts}
+                    hasMore={hasMoreProducts}
+                    catalogLoading={catalogLoading}
+                  />
                 )}
               </div>
             </div>

@@ -1,8 +1,10 @@
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronRight, Truck, CheckCircle2, Clock } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import ClosetSearchBar from "@/components/ClosetSearchBar";
-import { products } from "@/data/catalog";
+import { useCatalogProducts } from "@/hooks/useCatalogProducts";
+import { CatalogImage } from "@/components/CatalogImage";
 
 const orders = [
   {
@@ -46,6 +48,11 @@ const statusConfig = {
 
 const OrdersScreen = () => {
   const navigate = useNavigate();
+  const orderProductIds = useMemo(
+    () => [...new Set(orders.flatMap((o) => o.items.map((i) => i.productId)))],
+    [],
+  );
+  const { byId: orderById } = useCatalogProducts(orderProductIds);
 
   return (
     <div className="relative flex min-h-screen flex-col bg-background pb-24">
@@ -83,12 +90,16 @@ const OrdersScreen = () => {
               {/* Items */}
               <div className="px-4 py-2 space-y-2">
                 {order.items.map((item, idx) => {
-                  const product = products.find((p) => p.id === item.productId);
+                  const product = orderById.get(item.productId);
                   if (!product) return null;
                   return (
                     <div key={idx} className="flex items-center gap-3">
                       <div className="w-12 h-14 rounded-lg overflow-hidden shrink-0 shadow-sm">
-                        <img src={product.imagem} alt={product.nome} className="w-full h-full object-cover" />
+                        <CatalogImage
+                          src={product.imagem}
+                          alt={product.nome}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-body text-sm font-semibold text-foreground truncate">{product.nome}</p>

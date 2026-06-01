@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
-import { products } from "@/data/catalog";
 import { useCart } from "@/contexts/CartContext";
+import { useCatalogProducts } from "@/hooks/useCatalogProducts";
+import { CatalogImage } from "@/components/CatalogImage";
 import BottomNav from "@/components/BottomNav";
 import ClosetSearchBar from "@/components/ClosetSearchBar";
 import { getWhatsAppHref, getWhatsAppHrefWithText } from "@/components/WhatsAppFloat";
@@ -32,8 +33,12 @@ const CartScreen = () => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [eventDate, setEventDate] = useState("");
 
+  const cartProductIds = useMemo(() => items.map((i) => i.productId), [items]);
+  const { products: cartProducts, byId: cartById, loading: cartCatalogLoading } =
+    useCatalogProducts(cartProductIds);
+
   const subtotal = items.reduce((sum, item) => {
-    const p = products.find((pr) => pr.id === item.productId);
+    const p = cartById.get(item.productId);
     return sum + (p?.preco || 0) * item.qty;
   }, 0);
 
@@ -73,7 +78,7 @@ const CartScreen = () => {
 
   const finalizeToWhatsApp = () => {
     if (!eventDate.trim() || items.length === 0) return;
-    const text = buildReservationWhatsAppMessage(items, eventDate, products, {
+    const text = buildReservationWhatsAppMessage(items, eventDate, cartProducts, {
       couponApplied,
       discountAmount,
       totalWithShipping: total,
@@ -115,8 +120,24 @@ const CartScreen = () => {
             {/* Cart Items */}
             <div className="px-5 space-y-3 mt-2">
               {items.map((item, idx) => {
-                const product = products.find((p) => p.id === item.productId);
-                if (!product) return null;
+                const product = cartById.get(item.productId);
+                if (!product) {
+                  if (cartCatalogLoading) {
+                    return (
+                      <div
+                        key={`${item.productId}-${idx}-sk`}
+                        className="flex gap-3 p-3 rounded-2xl bg-secondary/60"
+                      >
+                        <div className="h-24 w-20 shrink-0 animate-pulse rounded-xl bg-secondary" />
+                        <div className="flex-1 space-y-2 py-1">
+                          <div className="h-4 w-3/4 animate-pulse rounded bg-secondary" />
+                          <div className="h-3 w-1/2 animate-pulse rounded bg-secondary" />
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                }
                 return (
                   <div
                     key={`${item.productId}-${idx}`}
@@ -124,7 +145,7 @@ const CartScreen = () => {
                   >
                     {/* Image */}
                     <div className="w-20 h-24 rounded-xl overflow-hidden shrink-0 shadow-sm">
-                      <img
+                      <CatalogImage
                         src={product.imagem}
                         alt={product.nome}
                         className="w-full h-full object-cover"

@@ -1,5 +1,5 @@
 import type { CartItem } from "@/contexts/CartContext";
-import type { Product } from "@/data/catalog.generated";
+import type { Product } from "@/data/catalog/product";
 
 function formatEventDateBr(iso: string): string {
   const t = iso.trim();

@@ -4,9 +4,27 @@ import path from "node:path";
 const REPO_ROOT = path.resolve(process.cwd());
 const INPUT_DIR = path.join(REPO_ROOT, "produtos");
 const OUTPUT_PUBLIC_DIR = path.join(REPO_ROOT, "public", "produtos");
-const OUTPUT_TS = path.join(REPO_ROOT, "src", "data", "catalog.generated.ts");
+const OUTPUT_CATALOG_DIR = path.join(REPO_ROOT, "src", "data", "catalog");
+const OUTPUT_CHUNKS_DIR = path.join(OUTPUT_CATALOG_DIR, "chunks");
+/** @deprecated Mantido só para compatibilidade de ferramentas; use catalog/search-index + chunks. */
+const OUTPUT_LEGACY_TS = path.join(REPO_ROOT, "src", "data", "catalog.generated.ts");
 
 const IMAGE_EXTS = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif"]);
+
+const PRODUCT_INTERFACE = `export interface Product {
+  id: number;
+  codigo: string;
+  nome: string;
+  preco: number;
+  imagem: string;
+  cor: string;
+  categoriaTipo: string;
+  slug: string;
+  coresDisponiveis: string[];
+  tamanhos: string[];
+  descricao: string;
+  tipos: string[];
+}`;
 
 function normalizeSlugPart(s) {
   return s
@@ -17,10 +35,11 @@ function normalizeSlugPart(s) {
     .replace(/^-|-$/g, "");
 }
 
+function normalizeChunkId(cor) {
+  return normalizeSlugPart(cor) || "outros";
+}
+
 function parseBRLFromFilename(name) {
-  // Expected patterns:
-  // "010002 - R$ 1.140,00"
-  // "010004 - R$ 960,00"
   const m = name.match(/R\$\s*([0-9.]+),([0-9]{2})/i);
   if (!m) return null;
   const intPart = m[1].replace(/\./g, "");
@@ -30,17 +49,12 @@ function parseBRLFromFilename(name) {
 }
 
 function parseCodeFromFilename(name) {
-  // "010002 - R$ 1.140,00" => 010002
   const m = name.match(/^\s*([0-9]+)\s*-/);
   if (!m) return null;
   return m[1];
 }
 
 function parseNameFromFilename(name, codigo) {
-  // Supports:
-  // "010002 - R$ 1.140,00"                 => null (falls back to "<tipo> <codigo>")
-  // "010002 - Petra - R$ 1.140,00"         => "Petra"
-  // "010002 - Petra Longo - R$ 1.140,00"   => "Petra Longo"
   const safe = name.replace(/\s+/g, " ").trim();
   const re = new RegExp(`^\\s*${codigo}\\s*-\\s*(.*?)\\s*-\\s*R\\$`, "i");
   const m = safe.match(re);
@@ -72,15 +86,62 @@ async function copyFileEnsuringDir(src, dst) {
   await fs.copyFile(src, dst);
 }
 
-function escapeTsString(s) {
-  return s.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$\{/g, "\\${");
+function writeChunkModule(filePath, products) {
+  return `// AUTO-GENERATED. DO NOT EDIT.
+import type { Product } from "../product";
+
+export const products: Product[] = ${JSON.stringify(products, null, 2)};
+`;
+}
+
+async function writeEmptyCatalog() {
+  const emptyChunk = writeChunkModule(path.join(OUTPUT_CHUNKS_DIR, "empty.generated.ts"), []);
+  await ensureDir(OUTPUT_CHUNKS_DIR);
+  await fs.writeFile(path.join(OUTPUT_CHUNKS_DIR, "empty.generated.ts"), emptyChunk, "utf8");
+
+  const searchIndex = `// AUTO-GENERATED. DO NOT EDIT.
+import type { Product } from "./product";
+
+export const searchIndex: Product[] = [];
+`;
+
+  const manifest = `// AUTO-GENERATED. DO NOT EDIT.
+export type CatalogChunkMeta = {
+  id: string;
+  cor: string;
+  productCount: number;
+};
+
+export const catalogChunks: CatalogChunkMeta[] = [];
+
+export const slugToChunkId: Record<string, string> = {};
+
+export const idToChunkId: Record<number, string> = {};
+`;
+
+  await ensureDir(OUTPUT_CATALOG_DIR);
+  await fs.writeFile(path.join(OUTPUT_CATALOG_DIR, "search-index.generated.ts"), searchIndex, "utf8");
+  await fs.writeFile(path.join(OUTPUT_CATALOG_DIR, "manifest.generated.ts"), manifest, "utf8");
+
+  const legacy = `// AUTO-GENERATED. DO NOT EDIT.
+${PRODUCT_INTERFACE}
+
+export const products: Product[] = [];
+
+export function findProductByRouteParam(_param: string | undefined): Product | undefined {
+  return undefined;
+}
+`;
+  await fs.writeFile(OUTPUT_LEGACY_TS, legacy, "utf8");
 }
 
 async function main() {
-  // Clean output public dir (keep it deterministic)
   await ensureDir(OUTPUT_PUBLIC_DIR);
   await fs.rm(OUTPUT_PUBLIC_DIR, { recursive: true, force: true });
   await ensureDir(OUTPUT_PUBLIC_DIR);
+  await ensureDir(OUTPUT_CATALOG_DIR);
+  await fs.rm(OUTPUT_CHUNKS_DIR, { recursive: true, force: true });
+  await ensureDir(OUTPUT_CHUNKS_DIR);
 
   let inputExists = true;
   try {
@@ -91,35 +152,7 @@ async function main() {
   }
 
   if (!inputExists) {
-    const empty = `// AUTO-GENERATED. DO NOT EDIT.
-export interface Product {
-  id: number;
-  codigo: string;
-  nome: string;
-  preco: number;
-  imagem: string;
-  cor: string;
-  categoriaTipo: string;
-  slug: string;
-  coresDisponiveis: string[];
-  tamanhos: string[];
-  descricao: string;
-  tipos: string[];
-}
-
-export const products: Product[] = [];
-
-export function findProductByRouteParam(param: string | undefined): Product | undefined {
-  if (!param) return undefined;
-  const bySlug = products.find((p) => p.slug === param);
-  if (bySlug) return bySlug;
-  const id = Number(param);
-  if (!Number.isNaN(id)) return products.find((p) => p.id === id);
-  return undefined;
-}
-`;
-    await ensureDir(path.dirname(OUTPUT_TS));
-    await fs.writeFile(OUTPUT_TS, empty, "utf8");
+    await writeEmptyCatalog();
     return;
   }
 
@@ -128,17 +161,15 @@ export function findProductByRouteParam(param: string | undefined): Product | un
 
   /** @type {Array<any>} */
   const products = [];
-  const colorsSet = new Set();
-  const typesSet = new Set();
 
   for (const abs of imageFiles) {
     const rel = path.relative(INPUT_DIR, abs);
     const parts = rel.split(path.sep);
-    if (parts.length < 3) continue; // must be <tipo>/<cor>/<file>
+    if (parts.length < 3) continue;
 
     const tipoFolder = parts[0];
     const corFolder = parts[1];
-    const fileName = parts.slice(2).join("/"); // keep any extra nesting inside color if ever used
+    const fileName = parts.slice(2).join("/");
 
     const ext = path.extname(fileName);
     const base = path.basename(fileName, ext);
@@ -154,13 +185,11 @@ export function findProductByRouteParam(param: string | undefined): Product | un
     const cor = corFolder.trim();
     const nomeExtra = parseNameFromFilename(base, codigo);
 
-    // Copy image preserving structure
     const publicRel = path.join(tipoFolder, corFolder, fileName);
     const publicAbs = path.join(OUTPUT_PUBLIC_DIR, publicRel);
     await copyFileEnsuringDir(abs, publicAbs);
 
     const imageUrl = `/produtos/${publicRel.split(path.sep).join("/")}`;
-
     const slug = [tipo, cor, codigo].map(normalizeSlugPart).filter(Boolean).join("-");
 
     products.push({
@@ -177,34 +206,65 @@ export function findProductByRouteParam(param: string | undefined): Product | un
       descricao: `Produto gerado automaticamente da pasta: ${tipo}/${cor}`,
       tipos: [tipo],
     });
-
-    colorsSet.add(cor);
-    typesSet.add(tipo);
   }
 
   products.sort((a, b) => a.id - b.id);
 
-  // Mantemos sets apenas para validação/inspeção futura; categorias oficiais ficam em `src/data/catalogMeta.ts`.
-  const _CORES_DETECTADAS = Array.from(colorsSet).sort((a, b) => a.localeCompare(b, "pt-BR"));
-  const _TIPOS_DETECTADOS = Array.from(typesSet).sort((a, b) => a.localeCompare(b, "pt-BR"));
+  /** @type {Map<string, any[]>} */
+  const byCor = new Map();
+  for (const p of products) {
+    if (!byCor.has(p.cor)) byCor.set(p.cor, []);
+    byCor.get(p.cor).push(p);
+  }
 
-  const out = `// AUTO-GENERATED. DO NOT EDIT.
-export interface Product {
-  id: number;
-  codigo: string;
-  nome: string;
-  preco: number;
-  imagem: string;
+  /** @type {import('./generate-catalog.mjs').CatalogChunkMeta[]} */
+  const catalogChunks = [];
+  const slugToChunkId = {};
+  const idToChunkId = {};
+
+  for (const [cor, list] of [...byCor.entries()].sort((a, b) => a[0].localeCompare(b[0], "pt-BR"))) {
+    const chunkId = normalizeChunkId(cor);
+    const chunkFile = `${chunkId}.generated.ts`;
+    const chunkPath = path.join(OUTPUT_CHUNKS_DIR, chunkFile);
+    await fs.writeFile(chunkPath, writeChunkModule(chunkPath, list), "utf8");
+
+    catalogChunks.push({ id: chunkId, cor, productCount: list.length });
+
+    for (const p of list) {
+      slugToChunkId[p.slug] = chunkId;
+      idToChunkId[p.id] = chunkId;
+    }
+  }
+
+  const searchIndex = `// AUTO-GENERATED. DO NOT EDIT.
+import type { Product } from "./product";
+
+/** Índice leve para busca, filtros e grade virtual (carregado sob demanda). */
+export const searchIndex: Product[] = ${JSON.stringify(products, null, 2)};
+`;
+
+  const manifest = `// AUTO-GENERATED. DO NOT EDIT.
+export type CatalogChunkMeta = {
+  id: string;
   cor: string;
-  categoriaTipo: string;
-  slug: string;
-  coresDisponiveis: string[];
-  tamanhos: string[];
-  descricao: string;
-  tipos: string[];
-}
+  productCount: number;
+};
 
-export const products: Product[] = ${JSON.stringify(products, null, 2).replaceAll('"', '"')};
+export const catalogChunks: CatalogChunkMeta[] = ${JSON.stringify(catalogChunks, null, 2)};
+
+export const slugToChunkId: Record<string, string> = ${JSON.stringify(slugToChunkId, null, 2)};
+
+export const idToChunkId: Record<number, string> = ${JSON.stringify(idToChunkId, null, 2)};
+`;
+
+  await fs.writeFile(path.join(OUTPUT_CATALOG_DIR, "search-index.generated.ts"), searchIndex, "utf8");
+  await fs.writeFile(path.join(OUTPUT_CATALOG_DIR, "manifest.generated.ts"), manifest, "utf8");
+
+  const legacy = `// AUTO-GENERATED. DO NOT EDIT.
+/** @deprecated Use \`@/data/catalog/loader\` e search-index com code splitting. */
+${PRODUCT_INTERFACE}
+
+export const products: Product[] = ${JSON.stringify(products, null, 2)};
 
 export function findProductByRouteParam(param: string | undefined): Product | undefined {
   if (!param) return undefined;
@@ -215,13 +275,10 @@ export function findProductByRouteParam(param: string | undefined): Product | un
   return undefined;
 }
 `;
-
-  await ensureDir(path.dirname(OUTPUT_TS));
-  await fs.writeFile(OUTPUT_TS, out, "utf8");
+  await fs.writeFile(OUTPUT_LEGACY_TS, legacy, "utf8");
 }
 
 main().catch((err) => {
   console.error(err);
   process.exitCode = 1;
 });
-

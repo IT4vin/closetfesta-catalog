@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Heart, ShoppingCart, Share2 } from "lucide-react";
-import { products } from "@/data/catalog";
 import { useCart } from "@/contexts/CartContext";
+import { useCatalogProducts } from "@/hooks/useCatalogProducts";
+import { CatalogImage } from "@/components/CatalogImage";
 import BottomNav from "@/components/BottomNav";
 import ClosetSearchBar from "@/components/ClosetSearchBar";
 import HighlightedText from "@/components/HighlightedText";
@@ -16,7 +17,10 @@ const FavoritesScreen = () => {
   const { addItem } = useCart();
   const { searchQuery, hasActiveSearch, clearSearch, filteredProducts, hasActiveCategoryFilter, clearAllFilters } =
     useSearch();
-  const [favIds, setFavIds] = useState<Set<number>>(new Set(products.slice(0, 4).map((p) => p.id)));
+  const [favIds, setFavIds] = useState<Set<number>>(new Set());
+
+  const favIdList = useMemo(() => [...favIds], [favIds]);
+  const { byId: favById, loading: favCatalogLoading } = useCatalogProducts(favIdList);
 
   const removeFav = (id: number) => {
     setFavIds((prev) => {
@@ -27,7 +31,10 @@ const FavoritesScreen = () => {
     toast("Removido dos favoritos");
   };
 
-  const favProducts = products.filter((p) => favIds.has(p.id));
+  const favProducts = useMemo(
+    () => favIdList.map((id) => favById.get(id)).filter((p): p is NonNullable<typeof p> => Boolean(p)),
+    [favIdList, favById],
+  );
 
   const allowedIds = useMemo(() => new Set(filteredProducts.map((p) => p.id)), [filteredProducts]);
 
@@ -137,6 +144,18 @@ const FavoritesScreen = () => {
             </button>
           </div>
         </div>
+      ) : favCatalogLoading && favProducts.length === 0 ? (
+        <div className="space-y-3 px-5 pb-8">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="flex gap-3 rounded-2xl bg-white p-3 shadow-card">
+              <div className="h-24 w-20 shrink-0 animate-pulse rounded-xl bg-secondary" />
+              <div className="flex-1 space-y-2 py-2">
+                <div className="h-4 w-2/3 animate-pulse rounded bg-secondary" />
+                <div className="h-5 w-1/3 animate-pulse rounded bg-secondary" />
+              </div>
+            </div>
+          ))}
+        </div>
       ) : (
         <div className="space-y-3 px-5 pb-8">
           {visibleFavorites.map((p) => (
@@ -156,7 +175,11 @@ const FavoritesScreen = () => {
                   }
                 }}
               >
-                <img src={p.imagem} alt={productDisplayName(p.nome)} className="h-full w-full object-cover" />
+                <CatalogImage
+                  src={p.imagem}
+                  alt={productDisplayName(p.nome)}
+                  className="h-full w-full object-cover"
+                />
               </div>
               <div className="flex min-w-0 flex-1 flex-col justify-between">
                 <div className="flex min-w-0 flex-col gap-0.5">

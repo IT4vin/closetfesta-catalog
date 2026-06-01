@@ -12,6 +12,17 @@ export default defineConfig({
     },
   },
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules/react-window")) return "react-window";
+          if (id.includes("search-index.generated")) return "catalog-search-index";
+          if (id.includes("/catalog/chunks/")) return "catalog-chunks";
+        },
+      },
+    },
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
