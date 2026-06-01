@@ -1,6 +1,13 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { useNavigate } from "react-router-dom";
-import { FixedSizeGrid as Grid, type GridChildComponentProps } from "react-window";
+import {
+  FixedSizeGrid as _FixedSizeGrid,
+  type GridChildComponentProps,
+  type GridProps,
+} from "react-window";
+
+/** Evita erro de tipos React 18 + @types/react-window no build (Vercel/TS). */
+const Grid = _FixedSizeGrid as unknown as ComponentType<GridProps>;
 import { Heart } from "lucide-react";
 import type { Product } from "@/data/catalog/product";
 import { CatalogImage } from "@/components/CatalogImage";

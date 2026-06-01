@@ -136,13 +136,6 @@ export function findProductByRouteParam(_param: string | undefined): Product | u
 }
 
 async function main() {
-  await ensureDir(OUTPUT_PUBLIC_DIR);
-  await fs.rm(OUTPUT_PUBLIC_DIR, { recursive: true, force: true });
-  await ensureDir(OUTPUT_PUBLIC_DIR);
-  await ensureDir(OUTPUT_CATALOG_DIR);
-  await fs.rm(OUTPUT_CHUNKS_DIR, { recursive: true, force: true });
-  await ensureDir(OUTPUT_CHUNKS_DIR);
-
   let inputExists = true;
   try {
     const st = await fs.stat(INPUT_DIR);
@@ -151,10 +144,21 @@ async function main() {
     inputExists = false;
   }
 
+  // Na Vercel costuma existir só public/produtos (sem pasta produtos/ no repo).
+  // Não apagar imagens já publicadas nem sobrescrever TS gerado commitado.
   if (!inputExists) {
-    await writeEmptyCatalog();
+    console.warn(
+      "[catalog:generate] Pasta produtos/ não encontrada — mantendo public/produtos e arquivos em src/data/catalog/*.generated.ts",
+    );
     return;
   }
+
+  await ensureDir(OUTPUT_PUBLIC_DIR);
+  await fs.rm(OUTPUT_PUBLIC_DIR, { recursive: true, force: true });
+  await ensureDir(OUTPUT_PUBLIC_DIR);
+  await ensureDir(OUTPUT_CATALOG_DIR);
+  await fs.rm(OUTPUT_CHUNKS_DIR, { recursive: true, force: true });
+  await ensureDir(OUTPUT_CHUNKS_DIR);
 
   const allFiles = await listFilesRecursive(INPUT_DIR);
   const imageFiles = allFiles.filter((f) => IMAGE_EXTS.has(path.extname(f).toLowerCase()));
