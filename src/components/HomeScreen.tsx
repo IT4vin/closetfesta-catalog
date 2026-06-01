@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, ShoppingBag, ArrowRight, Sparkles } from "lucide-react";
+import { Menu, ShoppingBag, ArrowRight } from "lucide-react";
 import { CORES_CATEGORIA, colorMap, type CorCategoria } from "@/data/catalog";
 import lojaBanner from "@loja-imagem/loja-imagem.svg";
 import logoUrl from "@/assets/logo.svg?url";
@@ -306,38 +306,6 @@ const HomeScreen = () => {
             </div>
           </div>
 
-          <section
-            className="relative mt-10 px-5 pb-8"
-            aria-labelledby="aluguel-destaques-heading"
-          >
-            <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-[#9C2F45] via-[#B84A62] to-[#7A2436] p-6 text-primary-foreground shadow-elevated">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-start gap-3">
-                  <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15">
-                    <Sparkles className="h-5 w-5" strokeWidth={2} />
-                  </span>
-                  <div>
-                    <p className="font-body text-[10px] font-bold uppercase tracking-[0.2em] text-white/80">
-                      Próxima parada
-                    </p>
-                    <h2 id="aluguel-destaques-heading" className="font-display text-xl font-bold leading-tight">
-                      Mais opções de aluguel
-                    </h2>
-                    <p className="mt-1 max-w-md font-body text-sm text-white/90">
-                      Novas peças e condições de aluguel em breve. Continue rolando para explorar o restante do site.
-                    </p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => navigate("/")}
-                  className="shrink-0 rounded-full bg-white px-6 py-3 font-body text-sm font-bold text-[#9C2F45] shadow-button transition-transform hover:scale-[1.02]"
-                >
-                  Explorar catálogo
-                </button>
-              </div>
-            </div>
-          </section>
         </div>
 
         <BottomNav />
