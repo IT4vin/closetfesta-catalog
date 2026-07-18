@@ -4,8 +4,6 @@ import { motion } from "motion/react";
 import {
   Heart,
   MessageCircle,
-  Menu,
-  X,
   Play,
   ArrowRight,
   Star,
@@ -19,8 +17,6 @@ import {
   Award,
   ShieldCheck,
   Instagram,
-  Facebook,
-  Music2,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -36,28 +32,16 @@ import feat1 from "@/assets/home/featured-1.jpg";
 import feat2 from "@/assets/home/featured-2.jpg";
 import feat4 from "@/assets/home/featured-4.jpg";
 import { getWhatsAppHref } from "@/components/WhatsAppFloat";
-import HomeHeaderSearch from "@/components/HomeHeaderSearch";
 import { CatalogImage } from "@/components/CatalogImage";
+import { LuxeSiteLayout } from "@/components/luxe/LuxeSiteLayout";
+import { formatSizeRange, pickFeaturedProducts, productColorHex } from "@/lib/featuredProducts";
+import { isGenericVestidosCategory, productDisplayName } from "@/lib/productDisplay";
 import { useSearch } from "@/contexts/SearchContext";
 import {
   buildCatalogUrl,
   HOME_CATEGORY_FILTERS,
   HOME_COLLECTION_FILTERS,
-  resolveHomeNavHref,
 } from "@/lib/catalogNavigation";
-import { formatSizeRange, pickFeaturedProducts, productColorHex } from "@/lib/featuredProducts";
-import { isGenericVestidosCategory, productDisplayName } from "@/lib/productDisplay";
-
-const NAV = [
-  "Início",
-  "Vestidos",
-  "Ternos",
-  "Noivas",
-  "Madrinhas",
-  "Debutantes",
-  "Acessórios",
-  "Contato",
-];
 
 const CATEGORIES = [
   { label: "Vestidos", img: colVestidos },
@@ -99,32 +83,6 @@ const INSTA = [colLongos, feat1, colNoivas, colCurtos, feat4, colTernos, feat2, 
 
 const whatsappHref = getWhatsAppHref();
 
-const navLinkClass =
-  "relative text-sm font-medium text-marsala/85 transition hover:text-marsala after:absolute after:-bottom-1 after:left-0 after:h-px after:w-0 after:bg-marsala after:transition-all after:duration-300 hover:after:w-full";
-
-function HomeNavLink({
-  item,
-  className,
-  onNavigate,
-}: {
-  item: string;
-  className?: string;
-  onNavigate?: () => void;
-}) {
-  const href = resolveHomeNavHref(item);
-  if (href.startsWith("/")) {
-    return (
-      <Link to={href} className={className} onClick={onNavigate}>
-        {item}
-      </Link>
-    );
-  }
-  return (
-    <a href={href} className={className} onClick={onNavigate}>
-      {item}
-    </a>
-  );
-}
 const TESTIMONIALS = [
   {
     name: "Marina Ribeiro",
@@ -148,8 +106,6 @@ const TESTIMONIALS = [
 
 const LuxeHomePage = () => {
   const { catalogProducts, catalogLoading } = useSearch();
-  const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [favs, setFavs] = useState<Record<number, boolean>>({});
   const [carousel, setCarousel] = useState(0);
 
@@ -159,13 +115,6 @@ const LuxeHomePage = () => {
   );
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
     setCarousel(0);
   }, [featuredProducts.length]);
 
@@ -173,75 +122,8 @@ const LuxeHomePage = () => {
   const maxCarousel = Math.max(0, featuredProducts.length - perView);
 
   return (
-    <div className="min-h-screen bg-background text-marsala">
-      <header
-        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-          scrolled
-            ? "bg-background/95 backdrop-blur-md border-b border-border shadow-[0_2px_20px_rgba(0,0,0,0.04)]"
-            : "bg-transparent"
-        }`}
-      >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-8 md:py-5">
-          <Link to="/" className="flex flex-col leading-none">
-            <span className="font-display text-2xl tracking-tight text-marsala md:text-[26px]">
-              Closet <span className="italic">Festa</span>
-            </span>
-            <span className="mt-0.5 text-[10px] uppercase tracking-[0.35em] text-warm-gray">
-              Aluguel de Trajes
-            </span>
-          </Link>
-
-          <nav className="hidden items-center gap-8 lg:flex">
-            {NAV.map((item) => (
-              <HomeNavLink key={item} item={item} className={navLinkClass} />
-            ))}
-          </nav>
-
-          <div className="flex items-center gap-2 md:gap-4">
-            <HomeHeaderSearch scrolled={scrolled} />
-            <Link
-              to="/favoritos"
-              aria-label="Favoritos"
-              className="rounded-full p-2 text-marsala transition hover:bg-marsala/5"
-            >
-              <Heart className="h-5 w-5" />
-            </Link>
-            <a
-              href={whatsappHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="WhatsApp"
-              className="rounded-full p-2 text-marsala transition hover:bg-marsala/5"
-            >
-              <MessageCircle className="h-5 w-5" />
-            </a>
-            <button
-              type="button"
-              onClick={() => setMenuOpen((v) => !v)}
-              className="rounded-full p-2 text-marsala transition hover:bg-marsala/5 lg:hidden"
-              aria-label="Menu"
-            >
-              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
-          </div>
-        </div>
-        {menuOpen && (
-          <div className="border-t border-border bg-background lg:hidden">
-            <nav className="mx-auto flex max-w-7xl flex-col px-4 py-4 md:px-8">
-              {NAV.map((item) => (
-                <HomeNavLink
-                  key={item}
-                  item={item}
-                  className="py-3 text-sm font-medium text-marsala"
-                  onNavigate={() => setMenuOpen(false)}
-                />
-              ))}
-            </nav>
-          </div>
-        )}
-      </header>
-
-      <section className="relative overflow-hidden pt-24 md:pt-28">
+    <LuxeSiteLayout>
+      <section className="relative overflow-hidden">
         <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 py-12 md:grid-cols-2 md:gap-16 md:px-8 md:py-20">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -319,7 +201,7 @@ const LuxeHomePage = () => {
                 <span className="text-xs font-medium">4.9</span>
               </div>
               <p className="mt-2 text-xs leading-snug text-warm-gray">
-                Mais de <span className="font-semibold text-marsala">2.400 clientes</span> vestidas com
+                Mais de <span className="font-semibold text-marsala">10.000 clientes</span> vestidas com
                 elegância.
               </p>
             </div>
@@ -741,70 +623,7 @@ const LuxeHomePage = () => {
           </div>
         </div>
       </section>
-
-      <footer id="contato" className="bg-marsala text-primary-foreground">
-        <div className="mx-auto max-w-7xl px-4 py-16 md:px-8 md:py-20">
-          <div className="grid grid-cols-1 gap-10 md:grid-cols-4">
-            <div>
-              <div className="font-display text-2xl">
-                Closet <span className="italic">Festa</span>
-              </div>
-              <p className="mt-4 max-w-xs text-sm text-primary-foreground/70">
-                Aluguel de trajes premium para casamentos, formaturas e momentos inesquecíveis.
-              </p>
-              <div className="mt-6 flex gap-3">
-                {[Instagram, Facebook, Music2, MessageCircle].map((Icon, i) => (
-                  <a
-                    key={i}
-                    href={i === 3 ? whatsappHref : "https://instagram.com/closetfesta"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="grid h-10 w-10 place-items-center rounded-full border border-primary-foreground/20 transition hover:bg-primary-foreground hover:text-marsala"
-                  >
-                    <Icon className="h-4 w-4" />
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            {[
-              { title: "Institucional", items: ["Sobre nós", "Nossa loja", "Trabalhe conosco", "Blog"] },
-              { title: "Coleções", items: ["Vestidos", "Noivas", "Ternos", "Acessórios"] },
-              { title: "Contato", items: ["WhatsApp", "Agendar prova", "Perguntas frequentes", "Trocas"] },
-            ].map((col) => (
-              <div key={col.title}>
-                <h4 className="font-display text-lg">{col.title}</h4>
-                <ul className="mt-4 space-y-2 text-sm text-primary-foreground/70">
-                  {col.items.map((it) => (
-                    <li key={it}>
-                      <a href="#" className="transition hover:text-primary-foreground">
-                        {it}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-primary-foreground/15 pt-8 text-xs text-primary-foreground/60 md:flex-row md:items-center">
-            <p>© {new Date().getFullYear()} Closet Festa. Todos os direitos reservados.</p>
-            <p>Elegância para momentos inesquecíveis.</p>
-          </div>
-        </div>
-      </footer>
-
-      <a
-        href={whatsappHref}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Fale no WhatsApp"
-        className="fixed bottom-6 right-6 z-40 grid h-14 w-14 place-items-center rounded-full bg-marsala text-primary-foreground shadow-[0_10px_30px_-8px_rgba(122,46,58,0.7)] transition hover:scale-110 hover:bg-marsala-dark md:h-16 md:w-16"
-      >
-        <MessageCircle className="h-6 w-6" />
-        <span className="absolute inset-0 animate-ping rounded-full bg-marsala/40" />
-      </a>
-    </div>
+    </LuxeSiteLayout>
   );
 };
 

@@ -1,4 +1,5 @@
 import { CORES_CATEGORIA, TIPOS_CATEGORIA, type CorCategoria, type TipoCategoria } from "@/data/catalogMeta";
+import type { CatalogSort } from "@/lib/catalogCategoryMeta";
 
 export type CatalogFilterParams = {
   q?: string;
@@ -6,6 +7,8 @@ export type CatalogFilterParams = {
   tipo?: TipoCategoria;
   /** Pasta de topo em produtos/ (ex.: vestidos, ternos). */
   categoria?: string;
+  ordenar?: CatalogSort;
+  pagina?: number;
 };
 
 export function buildCatalogUrl(params: CatalogFilterParams = {}): string {
@@ -14,6 +17,8 @@ export function buildCatalogUrl(params: CatalogFilterParams = {}): string {
   if (params.cor) sp.set("cor", params.cor);
   if (params.tipo) sp.set("tipo", params.tipo);
   if (params.categoria?.trim()) sp.set("categoria", params.categoria.trim());
+  if (params.ordenar && params.ordenar !== "recent") sp.set("ordenar", params.ordenar);
+  if (params.pagina && params.pagina > 1) sp.set("pagina", String(params.pagina));
   const qs = sp.toString();
   return qs ? `/catalogo?${qs}` : "/catalogo";
 }
@@ -23,6 +28,8 @@ export function parseCatalogSearchParams(searchParams: URLSearchParams): Catalog
   const corRaw = searchParams.get("cor");
   const tipoRaw = searchParams.get("tipo");
   const categoria = searchParams.get("categoria")?.trim() || undefined;
+  const ordenarRaw = searchParams.get("ordenar");
+  const paginaRaw = searchParams.get("pagina");
 
   const cor =
     corRaw && (CORES_CATEGORIA as readonly string[]).includes(corRaw)
@@ -33,7 +40,15 @@ export function parseCatalogSearchParams(searchParams: URLSearchParams): Catalog
       ? (tipoRaw as TipoCategoria)
       : undefined;
 
-  return { q, cor, tipo, categoria };
+  let ordenar: CatalogSort | undefined;
+  if (ordenarRaw === "popular" || ordenarRaw === "price-asc" || ordenarRaw === "price-desc" || ordenarRaw === "recent") {
+    ordenar = ordenarRaw;
+  }
+
+  const paginaNum = Number(paginaRaw);
+  const pagina = Number.isFinite(paginaNum) && paginaNum > 1 ? Math.floor(paginaNum) : undefined;
+
+  return { q, cor, tipo, categoria, ordenar, pagina };
 }
 
 /** Filtros das categorias circulares da home. */
