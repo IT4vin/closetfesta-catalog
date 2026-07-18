@@ -61,6 +61,11 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        marsala: {
+          DEFAULT: "hsl(var(--marsala))",
+          dark: "hsl(var(--marsala-dark))",
+        },
+        "warm-gray": "hsl(var(--warm-gray))",
       },
       borderRadius: {
         lg: "var(--radius)",

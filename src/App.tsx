@@ -8,6 +8,7 @@ import RouteFallback from "@/components/RouteFallback";
 import { CartProvider } from "@/contexts/CartContext";
 import { SearchProvider } from "@/contexts/SearchContext";
 
+const CatalogPage = lazy(() => import("./pages/CatalogPage.tsx"));
 const Index = lazy(() => import("./pages/Index.tsx"));
 const ProductPage = lazy(() => import("./pages/ProductPage.tsx"));
 const CartPage = lazy(() => import("./pages/CartPage.tsx"));
@@ -29,6 +30,7 @@ const App = () => (
             <Suspense fallback={<RouteFallback />}>
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/catalogo" element={<CatalogPage />} />
                 <Route path="/produto/:slug" element={<ProductPage />} />
                 <Route path="/carrinho" element={<CartPage />} />
                 <Route path="/favoritos" element={<FavoritesPage />} />

@@ -45,8 +45,13 @@ export function filterProductsByCategoryAndQuery(
   rawQuery: string,
   colorFilter: CorCategoria | null,
   typeFilter: TipoCategoria | null,
+  categoriaTipoFilter: string | null = null,
 ): Product[] {
   let next = list;
+  if (categoriaTipoFilter) {
+    const cat = normalizeSearch(categoriaTipoFilter);
+    next = next.filter((p) => normalizeSearch(p.categoriaTipo) === cat);
+  }
   if (colorFilter) {
     next = next.filter((p) => p.cor === colorFilter || p.coresDisponiveis.includes(colorFilter));
   }

@@ -1,5 +1,5 @@
-import HomeScreen from "@/components/HomeScreen";
+import LuxeHomePage from "@/components/LuxeHomePage";
 
-const Index = () => <HomeScreen />;
+const Index = () => <LuxeHomePage />;
 
 export default Index;

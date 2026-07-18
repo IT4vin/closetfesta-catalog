@@ -1,0 +1,811 @@
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { motion } from "motion/react";
+import {
+  Heart,
+  MessageCircle,
+  Menu,
+  X,
+  Play,
+  ArrowRight,
+  Star,
+  Sparkles,
+  Calendar,
+  Ruler,
+  PartyPopper,
+  Scissors,
+  WashingMachine,
+  CreditCard,
+  Award,
+  ShieldCheck,
+  Instagram,
+  Facebook,
+  Music2,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import heroImg from "@/assets/home/hero.jpg";
+import colVestidos from "@/assets/home/col-vestidos.jpg";
+import colTernos from "@/assets/home/col-ternos.jpg";
+import colNoivas from "@/assets/home/col-noivas.jpg";
+import colMadrinhas from "@/assets/home/col-madrinhas.jpg";
+import colCurtos from "@/assets/home/col-curtos.jpg";
+import colLongos from "@/assets/home/col-longos.jpg";
+import colSmoking from "@/assets/home/col-smoking.jpg";
+import feat1 from "@/assets/home/featured-1.jpg";
+import feat2 from "@/assets/home/featured-2.jpg";
+import feat4 from "@/assets/home/featured-4.jpg";
+import { getWhatsAppHref } from "@/components/WhatsAppFloat";
+import HomeHeaderSearch from "@/components/HomeHeaderSearch";
+import { CatalogImage } from "@/components/CatalogImage";
+import { useSearch } from "@/contexts/SearchContext";
+import {
+  buildCatalogUrl,
+  HOME_CATEGORY_FILTERS,
+  HOME_COLLECTION_FILTERS,
+  resolveHomeNavHref,
+} from "@/lib/catalogNavigation";
+import { formatSizeRange, pickFeaturedProducts, productColorHex } from "@/lib/featuredProducts";
+import { isGenericVestidosCategory, productDisplayName } from "@/lib/productDisplay";
+
+const NAV = [
+  "Início",
+  "Vestidos",
+  "Ternos",
+  "Noivas",
+  "Madrinhas",
+  "Debutantes",
+  "Acessórios",
+  "Contato",
+];
+
+const CATEGORIES = [
+  { label: "Vestidos", img: colVestidos },
+  { label: "Madrinhas", img: colMadrinhas },
+  { label: "Noivas", img: colNoivas },
+  { label: "Formandas", img: colLongos },
+  { label: "Ternos", img: colTernos },
+  { label: "Smoking", img: colSmoking },
+  { label: "Infantil", img: colCurtos },
+  { label: "Acessórios", img: feat2 },
+];
+
+const COLLECTIONS = [
+  { title: "Vestidos de Festa", desc: "Peças icônicas para brilhar", img: colVestidos },
+  { title: "Vestidos Longos", desc: "Elegância em movimento", img: colLongos },
+  { title: "Vestidos Curtos", desc: "Sofisticação descontraída", img: colCurtos },
+  { title: "Ternos", desc: "Alfaiataria refinada", img: colTernos },
+  { title: "Smokings", desc: "Ocasiões inesquecíveis", img: colSmoking },
+  { title: "Noivas", desc: "O dia mais especial", img: colNoivas },
+];
+
+const STEPS = [
+  { icon: Sparkles, title: "Escolha o traje", desc: "Navegue pela nossa curadoria exclusiva de peças premium." },
+  { icon: Calendar, title: "Agende sua prova", desc: "Reserve seu horário e receba atendimento personalizado." },
+  { icon: Ruler, title: "Faça os ajustes", desc: "Ajustes inclusos para um caimento impecável em você." },
+  { icon: PartyPopper, title: "Aproveite seu evento", desc: "Viva o momento com confiança e elegância." },
+];
+
+const FEATURES = [
+  { icon: Award, title: "Atendimento Exclusivo", desc: "Consultoria de estilo personalizada." },
+  { icon: Scissors, title: "Ajustes Inclusos", desc: "Caimento perfeito, sem custo extra." },
+  { icon: WashingMachine, title: "Higienização Profissional", desc: "Todas as peças impecáveis." },
+  { icon: CreditCard, title: "Parcelamento", desc: "Facilite em várias parcelas." },
+  { icon: MessageCircle, title: "WhatsApp", desc: "Atendimento rápido e humano." },
+  { icon: ShieldCheck, title: "Trajes Premium", desc: "Curadoria exclusiva de marcas." },
+];
+
+const INSTA = [colLongos, feat1, colNoivas, colCurtos, feat4, colTernos, feat2, colMadrinhas];
+
+const whatsappHref = getWhatsAppHref();
+
+const navLinkClass =
+  "relative text-sm font-medium text-marsala/85 transition hover:text-marsala after:absolute after:-bottom-1 after:left-0 after:h-px after:w-0 after:bg-marsala after:transition-all after:duration-300 hover:after:w-full";
+
+function HomeNavLink({
+  item,
+  className,
+  onNavigate,
+}: {
+  item: string;
+  className?: string;
+  onNavigate?: () => void;
+}) {
+  const href = resolveHomeNavHref(item);
+  if (href.startsWith("/")) {
+    return (
+      <Link to={href} className={className} onClick={onNavigate}>
+        {item}
+      </Link>
+    );
+  }
+  return (
+    <a href={href} className={className} onClick={onNavigate}>
+      {item}
+    </a>
+  );
+}
+const TESTIMONIALS = [
+  {
+    name: "Marina Ribeiro",
+    role: "Madrinha de casamento",
+    stars: 5,
+    text: "Atendimento impecável. O vestido caiu como uma segunda pele — recebi elogios a noite toda.",
+  },
+  {
+    name: "Ana Beatriz",
+    role: "Formanda 2025",
+    stars: 5,
+    text: "Escolhi meu vestido dos sonhos por uma fração do preço. Os ajustes ficaram perfeitos.",
+  },
+  {
+    name: "Rafael Menezes",
+    role: "Noivo",
+    stars: 5,
+    text: "O smoking transformou meu casamento. Elegância sem esforço, exatamente o que eu queria.",
+  },
+];
+
+const LuxeHomePage = () => {
+  const { catalogProducts, catalogLoading } = useSearch();
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [favs, setFavs] = useState<Record<number, boolean>>({});
+  const [carousel, setCarousel] = useState(0);
+
+  const featuredProducts = useMemo(
+    () => pickFeaturedProducts(catalogProducts, 6),
+    [catalogProducts],
+  );
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    setCarousel(0);
+  }, [featuredProducts.length]);
+
+  const perView = 3;
+  const maxCarousel = Math.max(0, featuredProducts.length - perView);
+
+  return (
+    <div className="min-h-screen bg-background text-marsala">
+      <header
+        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
+          scrolled
+            ? "bg-background/95 backdrop-blur-md border-b border-border shadow-[0_2px_20px_rgba(0,0,0,0.04)]"
+            : "bg-transparent"
+        }`}
+      >
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-8 md:py-5">
+          <Link to="/" className="flex flex-col leading-none">
+            <span className="font-display text-2xl tracking-tight text-marsala md:text-[26px]">
+              Closet <span className="italic">Festa</span>
+            </span>
+            <span className="mt-0.5 text-[10px] uppercase tracking-[0.35em] text-warm-gray">
+              Aluguel de Trajes
+            </span>
+          </Link>
+
+          <nav className="hidden items-center gap-8 lg:flex">
+            {NAV.map((item) => (
+              <HomeNavLink key={item} item={item} className={navLinkClass} />
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-2 md:gap-4">
+            <HomeHeaderSearch scrolled={scrolled} />
+            <Link
+              to="/favoritos"
+              aria-label="Favoritos"
+              className="rounded-full p-2 text-marsala transition hover:bg-marsala/5"
+            >
+              <Heart className="h-5 w-5" />
+            </Link>
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="WhatsApp"
+              className="rounded-full p-2 text-marsala transition hover:bg-marsala/5"
+            >
+              <MessageCircle className="h-5 w-5" />
+            </a>
+            <button
+              type="button"
+              onClick={() => setMenuOpen((v) => !v)}
+              className="rounded-full p-2 text-marsala transition hover:bg-marsala/5 lg:hidden"
+              aria-label="Menu"
+            >
+              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
+        </div>
+        {menuOpen && (
+          <div className="border-t border-border bg-background lg:hidden">
+            <nav className="mx-auto flex max-w-7xl flex-col px-4 py-4 md:px-8">
+              {NAV.map((item) => (
+                <HomeNavLink
+                  key={item}
+                  item={item}
+                  className="py-3 text-sm font-medium text-marsala"
+                  onNavigate={() => setMenuOpen(false)}
+                />
+              ))}
+            </nav>
+          </div>
+        )}
+      </header>
+
+      <section className="relative overflow-hidden pt-24 md:pt-28">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 py-12 md:grid-cols-2 md:gap-16 md:px-8 md:py-20">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+            className="order-2 md:order-1"
+          >
+            <span className="text-[11px] uppercase tracking-[0.4em] text-warm-gray">Nova Coleção</span>
+            <h1 className="mt-5 font-display text-[42px] leading-[1.02] tracking-tight text-marsala md:text-[64px]">
+              Elegância para <br />
+              <em className="font-normal italic">momentos</em> <br />
+              inesquecíveis.
+            </h1>
+            <p className="mt-6 max-w-md text-base leading-relaxed text-warm-gray">
+              Alugue vestidos, ternos e trajes exclusivos para casamentos, formaturas, festas e eventos
+              especiais.
+            </p>
+
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <a
+                href={whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-3 rounded-full bg-marsala px-7 py-4 text-sm font-medium text-primary-foreground shadow-[0_10px_30px_-10px_rgba(122,46,58,0.6)] transition hover:bg-marsala-dark hover:shadow-[0_18px_40px_-12px_rgba(122,46,58,0.7)]"
+              >
+                Agendar Prova
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </a>
+              <Link
+                to="/catalogo"
+                className="group inline-flex items-center gap-3 rounded-full border border-marsala/25 px-6 py-4 text-sm font-medium text-marsala transition hover:border-marsala hover:bg-marsala/5"
+              >
+                <span className="grid h-8 w-8 place-items-center rounded-full bg-marsala text-primary-foreground">
+                  <Play className="ml-0.5 h-3 w-3 fill-current" />
+                </span>
+                Ver Coleção
+              </Link>
+            </div>
+
+            <ul className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-sm text-marsala/85">
+              {["Atendimento Personalizado", "Ajustes Inclusos", "Peças Exclusivas"].map((f) => (
+                <li key={f} className="flex items-center gap-2">
+                  <span className="grid h-5 w-5 place-items-center rounded-full bg-marsala/10 text-marsala">
+                    ✓
+                  </span>
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 1.04 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+            className="relative order-1 md:order-2"
+          >
+            <div className="relative aspect-[3/4] overflow-hidden rounded-[28px] bg-accent shadow-[0_30px_80px_-30px_rgba(92,31,43,0.5)]">
+              <img
+                src={heroImg}
+                alt="Modelo com vestido marsala de luxo"
+                width={1200}
+                height={1600}
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute right-5 top-5 rounded-full bg-background/90 px-4 py-2 text-[10px] uppercase tracking-[0.3em] text-marsala backdrop-blur">
+                Coleção 2026
+              </div>
+            </div>
+            <div className="absolute -bottom-6 -left-6 hidden max-w-[220px] rounded-2xl border border-border bg-background/95 p-4 shadow-lg backdrop-blur md:block">
+              <div className="flex items-center gap-2">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="h-3.5 w-3.5 fill-marsala text-marsala" />
+                ))}
+                <span className="text-xs font-medium">4.9</span>
+              </div>
+              <p className="mt-2 text-xs leading-snug text-warm-gray">
+                Mais de <span className="font-semibold text-marsala">2.400 clientes</span> vestidas com
+                elegância.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="border-y border-border bg-card">
+        <div className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-14">
+          <div className="grid grid-cols-4 gap-6 md:grid-cols-8">
+            {CATEGORIES.map((c, i) => (
+              <motion.div
+                key={c.label}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.5, delay: i * 0.05 }}
+              >
+                <Link
+                  to={buildCatalogUrl(HOME_CATEGORY_FILTERS[c.label] ?? {})}
+                  className="group flex flex-col items-center gap-3 text-center"
+                >
+                  <div className="relative aspect-square w-full overflow-hidden rounded-full border border-border bg-secondary transition duration-500 group-hover:scale-105 group-hover:shadow-[0_16px_40px_-16px_rgba(122,46,58,0.35)]">
+                    <img
+                      src={c.img}
+                      alt={c.label}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
+                    />
+                  </div>
+                  <span className="text-[11px] font-medium uppercase tracking-[0.15em] text-marsala md:text-xs">
+                    {c.label}
+                  </span>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="colecoes" className="mx-auto max-w-7xl px-4 py-20 md:px-8 md:py-28">
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <span className="text-[11px] uppercase tracking-[0.4em] text-warm-gray">Coleções</span>
+            <h2 className="mt-4 max-w-xl font-display text-4xl leading-[1.05] text-marsala md:text-5xl">
+              Descubra a peça <em className="font-normal italic">perfeita</em> para o seu momento.
+            </h2>
+          </div>
+          <Link to="/catalogo" className="group inline-flex items-center gap-2 text-sm font-medium text-marsala">
+            Ver todas as coleções
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Link>
+        </div>
+
+        <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3">
+          {COLLECTIONS.map((c, i) => (
+            <motion.div
+              key={c.title}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.7, delay: (i % 3) * 0.1 }}
+              className={`group relative overflow-hidden rounded-3xl border border-border bg-card ${
+                i === 0 || i === 3 ? "md:col-span-2 md:row-span-1" : ""
+              }`}
+            >
+              <Link
+                to={buildCatalogUrl(HOME_COLLECTION_FILTERS[c.title] ?? {})}
+                className="block"
+              >
+                <div className={`relative overflow-hidden ${i === 0 || i === 3 ? "aspect-[16/10]" : "aspect-[4/5]"}`}>
+                  <img
+                    src={c.img}
+                    alt={c.title}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.06]"
+                  />
+                  <div className="marsala-gradient absolute inset-0" />
+                  <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
+                    <p className="text-[10px] uppercase tracking-[0.35em] text-primary-foreground/80">{c.desc}</p>
+                    <h3 className="mt-2 font-display text-2xl text-primary-foreground md:text-3xl">{c.title}</h3>
+                    <span className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary-foreground px-4 py-2 text-xs font-medium text-marsala shadow-md transition group-hover:gap-3">
+                      Explorar <ArrowRight className="h-3.5 w-3.5" />
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-y border-border bg-card">
+        <div className="mx-auto max-w-7xl px-4 py-20 md:px-8 md:py-28">
+          <div className="mx-auto max-w-2xl text-center">
+            <span className="text-[11px] uppercase tracking-[0.4em] text-warm-gray">Como Funciona</span>
+            <h2 className="mt-4 font-display text-4xl text-marsala md:text-5xl">
+              Uma experiência <em className="italic font-normal">sob medida</em>.
+            </h2>
+            <p className="mt-4 text-warm-gray">
+              Do primeiro clique ao brilho no evento — cuidamos de cada detalhe.
+            </p>
+          </div>
+
+          <div className="mt-16 grid grid-cols-1 gap-6 md:grid-cols-4">
+            {STEPS.map((s, i) => (
+              <motion.div
+                key={s.title}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.6, delay: i * 0.12 }}
+                className="group relative rounded-2xl border border-border bg-background p-8 transition duration-500 hover:-translate-y-1 hover:shadow-[0_20px_50px_-20px_rgba(122,46,58,0.35)]"
+              >
+                <div className="text-[10px] font-medium uppercase tracking-[0.3em] text-warm-gray">
+                  0{i + 1}
+                </div>
+                <div className="mt-6 grid h-14 w-14 place-items-center rounded-full bg-marsala/10 text-marsala transition group-hover:bg-marsala group-hover:text-primary-foreground">
+                  <s.icon className="h-6 w-6" />
+                </div>
+                <h3 className="mt-6 font-display text-2xl text-marsala">{s.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-warm-gray">{s.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-20 md:px-8 md:py-28">
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <span className="text-[11px] uppercase tracking-[0.4em] text-warm-gray">Destaques</span>
+            <h2 className="mt-4 font-display text-4xl text-marsala md:text-5xl">Os mais alugados</h2>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setCarousel((v) => Math.max(0, v - 1))}
+              className="grid h-11 w-11 place-items-center rounded-full border border-marsala/25 text-marsala transition hover:bg-marsala hover:text-primary-foreground disabled:opacity-40"
+              disabled={carousel === 0 || featuredProducts.length <= perView}
+              aria-label="Anterior"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setCarousel((v) => Math.min(maxCarousel, v + 1))}
+              className="grid h-11 w-11 place-items-center rounded-full border border-marsala/25 text-marsala transition hover:bg-marsala hover:text-primary-foreground disabled:opacity-40"
+              disabled={carousel >= maxCarousel || featuredProducts.length <= perView}
+              aria-label="Próximo"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-12 overflow-hidden">
+          {catalogLoading ? (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="animate-pulse overflow-hidden rounded-2xl border border-border bg-card">
+                  <div className="aspect-[4/5] bg-secondary" />
+                  <div className="space-y-3 p-6">
+                    <div className="h-3 w-1/3 rounded bg-secondary" />
+                    <div className="h-5 w-2/3 rounded bg-secondary" />
+                    <div className="h-10 rounded-full bg-secondary" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : featuredProducts.length === 0 ? (
+            <div className="rounded-2xl border border-border bg-card px-6 py-12 text-center">
+              <p className="font-display text-lg text-marsala">Catálogo em breve</p>
+              <p className="mt-2 text-sm text-warm-gray">Enquanto isso, fale conosco pelo WhatsApp.</p>
+              <Link
+                to="/catalogo"
+                className="mt-6 inline-flex items-center gap-2 rounded-full bg-marsala px-5 py-3 text-xs font-medium text-primary-foreground"
+              >
+                Ver catálogo <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+          ) : (
+            <motion.div
+              animate={{ x: `calc(-${carousel} * (100% / 3) - ${carousel * 1.5}rem)` }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="flex gap-6"
+            >
+              {featuredProducts.map((p) => {
+                const catLabel = isGenericVestidosCategory(p.categoriaTipo)
+                  ? p.tipos[0] ?? "Vestidos"
+                  : p.categoriaTipo;
+                return (
+                  <div
+                    key={p.slug}
+                    className="w-full shrink-0 sm:w-[calc((100%-1.5rem)/2)] md:w-[calc((100%-3rem)/3)]"
+                  >
+                    <div className="group relative overflow-hidden rounded-2xl border border-border bg-card">
+                      <Link to={`/produto/${p.slug}`} className="block">
+                        <div className="relative aspect-[4/5] overflow-hidden bg-secondary">
+                          <CatalogImage
+                            src={p.imagem}
+                            alt={productDisplayName(p.nome)}
+                            className="h-full w-full object-cover transition-transform duration-[900ms] group-hover:scale-[1.05]"
+                          />
+                        </div>
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => setFavs((f) => ({ ...f, [p.id]: !f[p.id] }))}
+                        aria-label="Favoritar"
+                        className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-background/90 text-marsala backdrop-blur transition hover:scale-110"
+                      >
+                        <Heart className={`h-4 w-4 ${favs[p.id] ? "fill-marsala" : ""}`} />
+                      </button>
+                      <div className="p-6">
+                        <p className="text-[10px] uppercase tracking-[0.3em] text-warm-gray">{catLabel}</p>
+                        <Link to={`/produto/${p.slug}`}>
+                          <h3 className="mt-2 font-display text-xl text-marsala transition hover:text-marsala-dark">
+                            {productDisplayName(p.nome)}
+                          </h3>
+                        </Link>
+                        <div className="mt-3 flex items-center gap-4 text-xs text-warm-gray">
+                          <span className="flex items-center gap-1.5">
+                            <span
+                              className="h-2.5 w-2.5 rounded-full border border-black/10"
+                              style={{ backgroundColor: productColorHex(p.cor) }}
+                            />{" "}
+                            {p.cor}
+                          </span>
+                          <span>Tam. {formatSizeRange(p.tamanhos)}</span>
+                        </div>
+                        <Link
+                          to={`/produto/${p.slug}`}
+                          className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-marsala px-5 py-3 text-xs font-medium tracking-wide text-primary-foreground transition hover:bg-marsala-dark"
+                        >
+                          Ver peça <ArrowRight className="h-3.5 w-3.5" />
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </motion.div>
+          )}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 pb-4 md:px-8">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="relative overflow-hidden rounded-3xl bg-marsala p-8 text-primary-foreground md:p-12">
+            <span className="text-[10px] uppercase tracking-[0.4em] text-primary-foreground/70">
+              Coleção Especial
+            </span>
+            <h3 className="mt-4 font-display text-3xl md:text-4xl">Casamentos 2026</h3>
+            <p className="mt-3 max-w-sm text-sm text-primary-foreground/80">
+              Curadoria exclusiva para noivas, madrinhas e padrinhos.
+            </p>
+            <Link
+              to={buildCatalogUrl({ q: "noiva" })}
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary-foreground px-5 py-3 text-xs font-medium text-marsala"
+            >
+              Explorar coleção <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+            <div className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full bg-primary-foreground/10 blur-3xl" />
+          </div>
+          <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-8 md:p-12">
+            <span className="text-[10px] uppercase tracking-[0.4em] text-warm-gray">Novidades</span>
+            <h3 className="mt-4 font-display text-3xl text-marsala md:text-4xl">Recém Chegados</h3>
+            <p className="mt-3 max-w-sm text-sm text-warm-gray">Peças exclusivas acabam de entrar no closet.</p>
+            <Link
+              to="/catalogo"
+              className="mt-6 inline-flex items-center gap-2 rounded-full border border-marsala/30 px-5 py-3 text-xs font-medium text-marsala hover:bg-marsala/5"
+            >
+              Ver novidades <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-20 md:px-8 md:py-28">
+        <div className="mx-auto max-w-2xl text-center">
+          <span className="text-[11px] uppercase tracking-[0.4em] text-warm-gray">Diferenciais</span>
+          <h2 className="mt-4 font-display text-4xl text-marsala md:text-5xl">
+            Feito para <em className="italic font-normal">encantar</em>.
+          </h2>
+        </div>
+
+        <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {FEATURES.map((f, i) => (
+            <motion.div
+              key={f.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.5, delay: i * 0.08 }}
+              className="group flex items-start gap-5 rounded-2xl border border-border bg-card p-6 transition hover:-translate-y-0.5 hover:shadow-[0_16px_40px_-16px_rgba(122,46,58,0.25)]"
+            >
+              <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-marsala/10 text-marsala transition group-hover:bg-marsala group-hover:text-primary-foreground">
+                <f.icon className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="font-display text-lg text-marsala">{f.title}</h3>
+                <p className="mt-1 text-sm text-warm-gray">{f.desc}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-y border-border bg-card">
+        <div className="mx-auto max-w-7xl px-4 py-20 md:px-8 md:py-28">
+          <div className="max-w-xl">
+            <span className="text-[11px] uppercase tracking-[0.4em] text-warm-gray">Depoimentos</span>
+            <h2 className="mt-4 font-display text-4xl text-marsala md:text-5xl">
+              Quem veste, <em className="italic font-normal">recomenda</em>.
+            </h2>
+          </div>
+
+          <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3">
+            {TESTIMONIALS.map((t, i) => (
+              <motion.div
+                key={t.name}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+                className="rounded-2xl border border-border bg-background p-8"
+              >
+                <div className="flex gap-1">
+                  {[...Array(t.stars)].map((_, k) => (
+                    <Star key={k} className="h-4 w-4 fill-marsala text-marsala" />
+                  ))}
+                </div>
+                <p className="mt-5 font-display text-lg italic leading-relaxed text-marsala">“{t.text}”</p>
+                <div className="mt-6 flex items-center gap-3 border-t border-border pt-5">
+                  <div className="grid h-11 w-11 place-items-center rounded-full bg-marsala/10 font-display text-marsala">
+                    {t.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-marsala">{t.name}</p>
+                    <p className="text-xs text-warm-gray">{t.role}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-20 md:px-8 md:py-28">
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <span className="text-[11px] uppercase tracking-[0.4em] text-warm-gray">@closetfesta</span>
+            <h2 className="mt-4 font-display text-4xl text-marsala md:text-5xl">
+              Inspiração no <em className="italic font-normal">Instagram</em>
+            </h2>
+          </div>
+          <a
+            href="https://instagram.com/closetfesta"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full border border-marsala/30 px-5 py-3 text-sm font-medium text-marsala transition hover:bg-marsala/5"
+          >
+            <Instagram className="h-4 w-4" /> Ver Instagram
+          </a>
+        </div>
+        <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {INSTA.map((img, i) => (
+            <a
+              href="https://instagram.com/closetfesta"
+              target="_blank"
+              rel="noopener noreferrer"
+              key={i}
+              className="group relative aspect-square overflow-hidden rounded-2xl bg-secondary"
+            >
+              <img
+                src={img}
+                alt=""
+                loading="lazy"
+                className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 grid place-items-center bg-marsala/0 opacity-0 transition group-hover:bg-marsala/50 group-hover:opacity-100">
+                <Instagram className="h-6 w-6 text-primary-foreground" />
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 pb-24 md:px-8">
+        <div className="relative overflow-hidden rounded-3xl bg-marsala px-6 py-14 text-primary-foreground md:px-16 md:py-20">
+          <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-primary-foreground/5 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-20 -right-10 h-64 w-64 rounded-full bg-primary-foreground/5 blur-3xl" />
+          <div className="relative mx-auto max-w-2xl text-center">
+            <span className="text-[11px] uppercase tracking-[0.4em] text-primary-foreground/70">Newsletter</span>
+            <h2 className="mt-4 font-display text-3xl md:text-5xl">
+              Receba novidades da <em className="italic font-normal">Closet Festa</em>
+            </h2>
+            <p className="mt-4 text-sm text-primary-foreground/80">
+              Cadastre-se e receba lançamentos, ofertas exclusivas e inspirações direto no seu e-mail.
+            </p>
+            <form
+              onSubmit={(e) => e.preventDefault()}
+              className="mt-8 flex flex-col gap-3 sm:mx-auto sm:max-w-md sm:flex-row"
+            >
+              <input
+                type="email"
+                required
+                placeholder="Digite seu e-mail"
+                className="flex-1 rounded-full bg-primary-foreground/95 px-5 py-3.5 text-sm text-marsala placeholder:text-marsala/50 outline-none focus:ring-2 focus:ring-primary-foreground/60"
+              />
+              <button
+                type="submit"
+                className="rounded-full bg-primary-foreground px-6 py-3.5 text-sm font-medium text-marsala transition hover:bg-primary-foreground/90"
+              >
+                Cadastrar
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <footer id="contato" className="bg-marsala text-primary-foreground">
+        <div className="mx-auto max-w-7xl px-4 py-16 md:px-8 md:py-20">
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-4">
+            <div>
+              <div className="font-display text-2xl">
+                Closet <span className="italic">Festa</span>
+              </div>
+              <p className="mt-4 max-w-xs text-sm text-primary-foreground/70">
+                Aluguel de trajes premium para casamentos, formaturas e momentos inesquecíveis.
+              </p>
+              <div className="mt-6 flex gap-3">
+                {[Instagram, Facebook, Music2, MessageCircle].map((Icon, i) => (
+                  <a
+                    key={i}
+                    href={i === 3 ? whatsappHref : "https://instagram.com/closetfesta"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="grid h-10 w-10 place-items-center rounded-full border border-primary-foreground/20 transition hover:bg-primary-foreground hover:text-marsala"
+                  >
+                    <Icon className="h-4 w-4" />
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {[
+              { title: "Institucional", items: ["Sobre nós", "Nossa loja", "Trabalhe conosco", "Blog"] },
+              { title: "Coleções", items: ["Vestidos", "Noivas", "Ternos", "Acessórios"] },
+              { title: "Contato", items: ["WhatsApp", "Agendar prova", "Perguntas frequentes", "Trocas"] },
+            ].map((col) => (
+              <div key={col.title}>
+                <h4 className="font-display text-lg">{col.title}</h4>
+                <ul className="mt-4 space-y-2 text-sm text-primary-foreground/70">
+                  {col.items.map((it) => (
+                    <li key={it}>
+                      <a href="#" className="transition hover:text-primary-foreground">
+                        {it}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-primary-foreground/15 pt-8 text-xs text-primary-foreground/60 md:flex-row md:items-center">
+            <p>© {new Date().getFullYear()} Closet Festa. Todos os direitos reservados.</p>
+            <p>Elegância para momentos inesquecíveis.</p>
+          </div>
+        </div>
+      </footer>
+
+      <a
+        href={whatsappHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Fale no WhatsApp"
+        className="fixed bottom-6 right-6 z-40 grid h-14 w-14 place-items-center rounded-full bg-marsala text-primary-foreground shadow-[0_10px_30px_-8px_rgba(122,46,58,0.7)] transition hover:scale-110 hover:bg-marsala-dark md:h-16 md:w-16"
+      >
+        <MessageCircle className="h-6 w-6" />
+        <span className="absolute inset-0 animate-ping rounded-full bg-marsala/40" />
+      </a>
+    </div>
+  );
+};
+
+export default LuxeHomePage;
