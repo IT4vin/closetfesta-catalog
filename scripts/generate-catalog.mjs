@@ -136,6 +136,15 @@ export function findProductByRouteParam(_param: string | undefined): Product | u
 }
 
 async function main() {
+  // Na Vercel, public/produtos e src/data/catalog/*.generated.ts já vêm do git.
+  // Regenerar copiaria ~1 GB de imagens a cada deploy (lento e sem saída no log).
+  if (process.env.VERCEL) {
+    console.log(
+      "[catalog:generate] Ambiente Vercel — usando catálogo e imagens já commitados, pulando regeneração.",
+    );
+    return;
+  }
+
   let inputExists = true;
   try {
     const st = await fs.stat(INPUT_DIR);
@@ -160,12 +169,15 @@ async function main() {
   await fs.rm(OUTPUT_CHUNKS_DIR, { recursive: true, force: true });
   await ensureDir(OUTPUT_CHUNKS_DIR);
 
+  console.log("[catalog:generate] Escaneando imagens em produtos/...");
   const allFiles = await listFilesRecursive(INPUT_DIR);
   const imageFiles = allFiles.filter((f) => IMAGE_EXTS.has(path.extname(f).toLowerCase()));
+  console.log(`[catalog:generate] ${imageFiles.length} imagens encontradas.`);
 
   /** @type {Array<any>} */
   const products = [];
 
+  let copied = 0;
   for (const abs of imageFiles) {
     const rel = path.relative(INPUT_DIR, abs);
     const parts = rel.split(path.sep);
@@ -192,6 +204,10 @@ async function main() {
     const publicRel = path.join(tipoFolder, corFolder, fileName);
     const publicAbs = path.join(OUTPUT_PUBLIC_DIR, publicRel);
     await copyFileEnsuringDir(abs, publicAbs);
+    copied++;
+    if (copied % 100 === 0) {
+      console.log(`[catalog:generate] Copiadas ${copied}/${imageFiles.length} imagens...`);
+    }
 
     const imageUrl = `/produtos/${publicRel.split(path.sep).join("/")}`;
     const slug = [tipo, cor, codigo].map(normalizeSlugPart).filter(Boolean).join("-");
@@ -280,6 +296,7 @@ export function findProductByRouteParam(param: string | undefined): Product | un
 }
 `;
   await fs.writeFile(OUTPUT_LEGACY_TS, legacy, "utf8");
+  console.log(`[catalog:generate] Concluído: ${products.length} produtos, ${catalogChunks.length} chunks.`);
 }
 
 main().catch((err) => {
