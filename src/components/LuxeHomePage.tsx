@@ -20,16 +20,16 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import heroImg from "@/assets/home/hero.jpg";
-import colVestidos from "@/assets/home/col-vestidos.jpg";
+import heroImg from "@/assets/home/hero.jpeg";
+import colVestidos from "@/assets/home/col-vestidos.jpeg";
 import colTernos from "@/assets/home/col-ternos.jpg";
-import colNoivas from "@/assets/home/col-noivas.jpg";
+import colNoivas from "@/assets/home/col-noivas.jpeg";
 import colMadrinhas from "@/assets/home/col-madrinhas.jpg";
-import colCurtos from "@/assets/home/col-curtos.jpg";
-import colLongos from "@/assets/home/col-longos.jpg";
-import colSmoking from "@/assets/home/col-smoking.jpg";
-import feat1 from "@/assets/home/featured-1.jpg";
-import feat2 from "@/assets/home/featured-2.jpg";
+import colCurtos from "@/assets/home/featured-3.jpg";
+import colLongos from "@/assets/home/col-longos.jpeg";
+import colSmoking from "@/assets/home/col-ternos.jpg";
+import feat1 from "@/assets/home/featured-1.jpeg";
+import feat2 from "@/assets/home/featured-2.jpeg";
 import feat4 from "@/assets/home/featured-4.jpg";
 import { getWhatsAppHref } from "@/components/WhatsAppFloat";
 import { CatalogImage } from "@/components/CatalogImage";

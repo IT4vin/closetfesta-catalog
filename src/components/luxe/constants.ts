@@ -1,12 +1,12 @@
-import colVestidos from "@/assets/home/col-vestidos.jpg";
+import colVestidos from "@/assets/home/col-vestidos.jpeg";
 import colTernos from "@/assets/home/col-ternos.jpg";
-import colNoivas from "@/assets/home/col-noivas.jpg";
+import colNoivas from "@/assets/home/col-noivas.jpeg";
 import colMadrinhas from "@/assets/home/col-madrinhas.jpg";
-import colCurtos from "@/assets/home/col-curtos.jpg";
-import colLongos from "@/assets/home/col-longos.jpg";
-import colSmoking from "@/assets/home/col-smoking.jpg";
-import feat2 from "@/assets/home/featured-2.jpg";
-import heroImg from "@/assets/home/hero.jpg";
+import colCurtos from "@/assets/home/featured-3.jpg";
+import colLongos from "@/assets/home/col-longos.jpeg";
+import colSmoking from "@/assets/home/col-ternos.jpg";
+import feat2 from "@/assets/home/featured-2.jpeg";
+import heroImg from "@/assets/home/hero.jpeg";
 
 export const LUXE_NAV = [
   "Início",

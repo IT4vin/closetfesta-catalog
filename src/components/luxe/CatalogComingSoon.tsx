@@ -4,7 +4,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { LuxeSiteLayout } from "@/components/luxe/LuxeSiteLayout";
 import { buildCatalogUrl } from "@/lib/catalogNavigation";
 import type { CatalogPageMeta } from "@/lib/catalogCategoryMeta";
-import heroImg from "@/assets/home/hero.jpg";
+import heroImg from "@/assets/home/hero.jpeg";
 
 type CatalogComingSoonProps = {
   meta: CatalogPageMeta;
