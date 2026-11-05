@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "motion/react";
 import { ChevronRight, Search, SlidersHorizontal, X } from "lucide-react";
 import { LuxeSiteLayout } from "@/components/luxe/LuxeSiteLayout";
+import { ProductImageNotice } from "@/components/ProductImageNotice";
 import { LuxeProductCard } from "@/components/luxe/LuxeProductCard";
 import { LuxeCatalogPagination } from "@/components/luxe/LuxeCatalogPagination";
 import { CatalogComingSoon } from "@/components/luxe/CatalogComingSoon";
@@ -175,6 +176,7 @@ const LuxeCatalogScreen = () => {
         </nav>
 
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-warm-gray">{meta.description}</p>
+        <ProductImageNotice className="mt-5" />
 
         {/* Search + Sort toolbar */}
         <div className="mt-10 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

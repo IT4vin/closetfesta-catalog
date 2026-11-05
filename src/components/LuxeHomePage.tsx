@@ -33,6 +33,7 @@ import feat2 from "@/assets/home/featured-2.jpeg";
 import feat4 from "@/assets/home/featured-4.jpg";
 import { getWhatsAppHref } from "@/components/WhatsAppFloat";
 import { CatalogImage } from "@/components/CatalogImage";
+import { ProductImageNotice } from "@/components/ProductImageNotice";
 import { LuxeSiteLayout } from "@/components/luxe/LuxeSiteLayout";
 import { formatSizeRange, pickFeaturedProducts, productColorHex } from "@/lib/featuredProducts";
 import { isGenericVestidosCategory, productDisplayName } from "@/lib/productDisplay";
@@ -357,6 +358,8 @@ const LuxeHomePage = () => {
             </button>
           </div>
         </div>
+
+        <ProductImageNotice className="mt-6" />
 
         <div className="mt-12 overflow-hidden">
           {catalogLoading ? (

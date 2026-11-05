@@ -4,6 +4,7 @@ import { ArrowLeft, Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useCatalogProducts } from "@/hooks/useCatalogProducts";
 import { CatalogImage } from "@/components/CatalogImage";
+import { ProductImageNotice } from "@/components/ProductImageNotice";
 import BottomNav from "@/components/BottomNav";
 import ClosetSearchBar from "@/components/ClosetSearchBar";
 import { getWhatsAppHref, getWhatsAppHrefWithText } from "@/components/WhatsAppFloat";
@@ -106,6 +107,12 @@ const CartScreen = () => {
         <div className="px-5 pb-2">
           <ClosetSearchBar />
         </div>
+
+        {items.length > 0 && (
+          <div className="px-5 pt-2 pb-3">
+            <ProductImageNotice />
+          </div>
+        )}
 
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 px-6">

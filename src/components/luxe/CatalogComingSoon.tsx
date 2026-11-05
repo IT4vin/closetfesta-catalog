@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { LuxeSiteLayout } from "@/components/luxe/LuxeSiteLayout";
+import { ProductImageNotice } from "@/components/ProductImageNotice";
 import { buildCatalogUrl } from "@/lib/catalogNavigation";
 import type { CatalogPageMeta } from "@/lib/catalogCategoryMeta";
 import heroImg from "@/assets/home/hero.jpeg";
@@ -13,6 +14,9 @@ type CatalogComingSoonProps = {
 export function CatalogComingSoon({ meta }: CatalogComingSoonProps) {
   return (
     <LuxeSiteLayout>
+      <div className="mx-auto max-w-3xl px-4 pt-6 md:px-8">
+        <ProductImageNotice />
+      </div>
       <section className="mx-auto max-w-3xl px-4 py-16 text-center md:px-8 md:py-28">
         <motion.div
           initial={{ opacity: 0, y: 24 }}

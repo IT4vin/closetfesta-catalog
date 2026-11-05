@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import BottomNav from "@/components/BottomNav";
 import ClosetSearchBar from "@/components/ClosetSearchBar";
 import { CatalogImage } from "@/components/CatalogImage";
+import { ProductImageNotice } from "@/components/ProductImageNotice";
 
 type FlyParticle = { id: number; sx: number; sy: number; ex: number; ey: number };
 
@@ -230,6 +231,10 @@ const ProductDetailScreen = () => {
               priority
             />
           </div>
+        </div>
+
+        <div className="mt-4 px-5">
+          <ProductImageNotice />
         </div>
 
         <div className="px-5 mt-5">

@@ -4,6 +4,7 @@ import { ArrowLeft, Heart, ShoppingCart, Share2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useCatalogProducts } from "@/hooks/useCatalogProducts";
 import { CatalogImage } from "@/components/CatalogImage";
+import { ProductImageNotice } from "@/components/ProductImageNotice";
 import BottomNav from "@/components/BottomNav";
 import ClosetSearchBar from "@/components/ClosetSearchBar";
 import HighlightedText from "@/components/HighlightedText";
@@ -108,6 +109,12 @@ const FavoritesScreen = () => {
       <div className="px-5 pb-3">
         <ClosetSearchBar />
       </div>
+
+      {favProducts.length > 0 && (
+        <div className="px-5 pb-4">
+          <ProductImageNotice />
+        </div>
+      )}
 
       {favProducts.length === 0 ? (
         <div className="flex flex-col items-center justify-center px-6 py-20">
