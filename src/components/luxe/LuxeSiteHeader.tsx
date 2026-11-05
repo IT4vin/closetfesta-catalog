@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Heart, MessageCircle, Menu, X } from "lucide-react";
+import { Heart, MessageCircle, Menu, ShoppingBag, X } from "lucide-react";
 import HomeHeaderSearch from "@/components/HomeHeaderSearch";
+import { useCart } from "@/contexts/CartContext";
 import { getWhatsAppHref } from "@/components/WhatsAppFloat";
 import { LUXE_NAV, LUXE_NAV_LINK_CLASS } from "@/components/luxe/constants";
 import { LuxeNavLink } from "@/components/luxe/LuxeNavLink";
@@ -9,6 +10,7 @@ import { LuxeNavLink } from "@/components/luxe/LuxeNavLink";
 const whatsappHref = getWhatsAppHref();
 
 export function LuxeSiteHeader() {
+  const { totalItems } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -28,11 +30,11 @@ export function LuxeSiteHeader() {
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-8 md:py-5">
-        <Link to="/" className="flex flex-col leading-none">
-          <span className="font-display text-2xl tracking-tight text-marsala md:text-[26px]">
+        <Link to="/" className="flex min-w-0 flex-1 flex-col leading-none lg:flex-none">
+          <span className="font-display whitespace-nowrap text-xl tracking-tight text-marsala sm:text-2xl md:text-[26px]">
             Closet <span className="italic">Festa</span>
           </span>
-          <span className="mt-0.5 text-[10px] uppercase tracking-[0.35em] text-warm-gray">
+          <span className="mt-0.5 whitespace-nowrap text-[8px] uppercase tracking-[0.2em] text-warm-gray sm:text-[10px] sm:tracking-[0.35em]">
             Aluguel de Trajes
           </span>
         </Link>
@@ -43,8 +45,20 @@ export function LuxeSiteHeader() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2 md:gap-4">
+        <div className="flex shrink-0 items-center gap-0.5 sm:gap-2 md:gap-4">
           <HomeHeaderSearch scrolled={scrolled} />
+          <Link
+            to="/carrinho"
+            aria-label={totalItems > 0 ? `Abrir minha reserva (${totalItems} trajes)` : "Abrir minha reserva"}
+            className="relative rounded-full p-2 text-marsala transition hover:bg-marsala/5"
+          >
+            <ShoppingBag className="h-5 w-5" aria-hidden />
+            {totalItems > 0 && (
+              <span className="pointer-events-none absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-marsala px-1 text-[10px] font-bold text-white">
+                {totalItems > 99 ? "99+" : totalItems}
+              </span>
+            )}
+          </Link>
           <Link
             to="/favoritos"
             aria-label="Favoritos"

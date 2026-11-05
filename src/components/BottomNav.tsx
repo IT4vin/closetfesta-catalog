@@ -8,7 +8,7 @@ import { useCart } from "@/contexts/CartContext";
 const MARSALA = "#9C2F45";
 
 const TABS: readonly { path: string; label: string; Icon: LucideIcon }[] = [
-  { path: "/", label: "Home", Icon: Home },
+  { path: "/", label: "Início", Icon: Home },
   { path: "/carrinho", label: "Reserva", Icon: ShoppingBag },
   { path: "/favoritos", label: "Favoritos", Icon: Heart },
   { path: "/perfil", label: "Perfil", Icon: User },
