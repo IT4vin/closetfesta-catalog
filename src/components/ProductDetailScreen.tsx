@@ -60,8 +60,8 @@ function ReservationFlyDot({
 
 function ProductDetailSkeleton() {
   return (
-    <div className="px-5 mt-2 space-y-5 animate-pulse">
-      <div className="aspect-[3/4] w-full rounded-2xl bg-secondary" />
+    <div className="mx-auto mt-4 w-full max-w-6xl space-y-5 px-5 lg:px-8">
+      <div className="aspect-[3/4] w-full max-w-[480px] rounded-2xl bg-secondary lg:aspect-[4/5]" />
       <div className="h-6 w-2/3 rounded-lg bg-secondary" />
       <div className="h-4 w-1/2 rounded-lg bg-secondary" />
     </div>
@@ -186,7 +186,7 @@ const ProductDetailScreen = () => {
 
   return (
     <div className="relative flex min-h-screen flex-col bg-background">
-      <div className="flex-1 pb-48">
+      <div className="mx-auto w-full max-w-6xl flex-1 pb-48 lg:pb-28">
         <div className="flex items-center justify-between px-5 pt-5 pb-3">
           <button
             type="button"
@@ -218,26 +218,29 @@ const ProductDetailScreen = () => {
           </button>
         </div>
 
-        <div className="px-5 pb-2">
+        <div className="px-5 pb-2 lg:max-w-3xl lg:px-8">
           <ClosetSearchBar />
         </div>
 
-        <div className="px-5 mt-2">
-          <div className="rounded-2xl overflow-hidden shadow-elevated bg-secondary transition-shadow duration-300">
-            <CatalogImage
-              src={product.imagem}
-              alt={productDisplayName(product.nome)}
-              className="w-full aspect-[3/4] object-cover"
-              priority
-            />
+        <div className="mt-2 lg:mt-6 lg:grid lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start lg:gap-10 lg:px-8">
+          <div className="lg:sticky lg:top-8">
+            <div className="px-5 lg:px-0">
+              <div className="mx-auto max-w-[480px] overflow-hidden rounded-2xl bg-secondary shadow-elevated transition-shadow duration-300">
+                <CatalogImage
+                  src={product.imagem}
+                  alt={productDisplayName(product.nome)}
+                  className="block aspect-[3/4] w-full object-cover lg:h-[min(70vh,600px)] lg:aspect-auto lg:object-contain"
+                  priority
+                />
+              </div>
+            </div>
+
+            <div className="mx-auto mt-4 max-w-[480px] px-5 lg:px-0">
+              <ProductImageNotice />
+            </div>
           </div>
-        </div>
 
-        <div className="mt-4 px-5">
-          <ProductImageNotice />
-        </div>
-
-        <div className="px-5 mt-5">
+          <div className="mx-auto mt-5 w-full min-w-0 max-w-2xl px-5 lg:mt-0 lg:max-w-none lg:px-0">
           <div className="flex items-start justify-between gap-3">
             <div>
               {!isGenericVestidosCategory(product.categoriaTipo) && (
@@ -353,11 +356,8 @@ const ProductDetailScreen = () => {
             <p className="font-body text-sm font-semibold text-foreground mb-2">Descrição</p>
             <p className="font-body text-sm text-muted-foreground leading-relaxed">{product.descricao}</p>
           </div>
-        </div>
-      </div>
-
-      <div className="fixed bottom-24 left-0 right-0 z-40 px-5 py-4">
-        <div className="mx-auto flex max-w-lg items-center justify-between rounded-2xl bg-white/10 backdrop-blur-lg px-4 py-3">
+          <div className="fixed bottom-24 left-0 right-0 z-40 px-5 py-4 lg:static lg:mt-7 lg:px-0 lg:py-0">
+        <div className="mx-auto flex max-w-lg items-center justify-between gap-3 rounded-2xl bg-white/90 px-4 py-3 shadow-card backdrop-blur-lg lg:max-w-none lg:border lg:border-border lg:bg-secondary/60 lg:px-5 lg:py-5">
           <div>
             <p className="font-body text-xs text-muted-foreground">Total do aluguel</p>
             <p className="font-display text-2xl font-bold text-foreground">
@@ -375,6 +375,9 @@ const ProductDetailScreen = () => {
           </button>
         </div>
       </div>
+        </div>
+      </div>
+    </div>
 
       {flyParticle && (
         <ReservationFlyDot

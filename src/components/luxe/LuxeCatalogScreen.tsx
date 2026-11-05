@@ -284,7 +284,7 @@ const LuxeCatalogScreen = () => {
 
         {/* Grid */}
         {catalogLoading ? (
-          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="mx-auto mt-10 grid w-full grid-cols-1 gap-5 sm:grid-cols-2 lg:max-w-5xl lg:grid-cols-4 lg:gap-6">
             {[...Array(8)].map((_, i) => (
               <div key={i} className="animate-pulse overflow-hidden rounded-2xl border border-border bg-card">
                 <div className="aspect-[4/5] bg-secondary" />
@@ -328,7 +328,7 @@ const LuxeCatalogScreen = () => {
           </motion.div>
         ) : (
           <>
-            <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="mx-auto mt-10 grid w-full grid-cols-1 gap-5 sm:grid-cols-2 lg:max-w-5xl lg:grid-cols-4 lg:gap-6">
               {pageProducts.map((product, i) => (
                 <LuxeProductCard
                   key={product.slug}

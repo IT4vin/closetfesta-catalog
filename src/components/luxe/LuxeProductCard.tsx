@@ -36,7 +36,7 @@ export function LuxeProductCard({
           <CatalogImage
             src={product.imagem}
             alt={productDisplayName(product.nome)}
-            className="h-full w-full object-cover transition-transform duration-[900ms] group-hover:scale-[1.05]"
+            className="h-full w-full object-cover transition-transform duration-[900ms] lg:object-contain group-hover:scale-[1.05]"
           />
         </div>
       </Link>
@@ -52,7 +52,7 @@ export function LuxeProductCard({
         </button>
       )}
 
-      <div className="p-5 md:p-6">
+      <div className="p-5 lg:p-4 xl:p-5">
         <p className="text-[10px] uppercase tracking-[0.3em] text-warm-gray">{catLabel}</p>
         <Link to={`/produto/${product.slug}`}>
           <h3 className="mt-2 font-display text-lg text-marsala transition hover:text-marsala-dark md:text-xl">
