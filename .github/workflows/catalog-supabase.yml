@@ -33,15 +33,20 @@ jobs:
       - name: Confirmar consulta real de produtos ao Supabase (somente dados públicos)
         run: |
           node --input-type=module <<'NODE'
-          const endpoint = 'https://roqcwdlsuawrdbmnwbvv.supabase.co/functions/v1/closet-public-catalog?limit=2';
+          const endpoint = 'https://roqcwdlsuawrdbmnwbvv.supabase.co/functions/v1/closet-public-catalog';
           const abort = AbortSignal.timeout(60000);
           const response = await fetch(endpoint, { signal: abort, headers:{Accept:'application/json'} });
           if (!response.ok) throw new Error('Endpoint público do catálogo falhou: HTTP ' + response.status);
           const data = await response.json();
-          if (!Array.isArray(data.products) || data.products.length !== 2 || data.total < 500) {
+          if (!Array.isArray(data.products) || data.products.length < 500 || data.products.length !== data.total) {
             throw new Error('Catálogo não retornou os produtos reais importados no Supabase');
           }
+          const codes = new Set();
+          const ids = new Set();
           for(const p of data.products){
+            if(codes.has(p.codigo) || ids.has(p.id)) throw new Error('ID ou SKU duplicado na vitrine');
+            codes.add(p.codigo);
+            ids.add(p.id);
             if (!p.supabaseId || !p.codigo || !p.nome || !p.imagem || !p.slug) {
               throw new Error('Produto de teste incompleto: sem foto ou código');
             }
