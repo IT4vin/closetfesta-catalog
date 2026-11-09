@@ -20,7 +20,7 @@ const product = (over: Partial<Product>): Product => ({
 
 describe("filterProductsByCategoryAndQuery", () => {
   const list = [
-    product({ id: 1, categoriaTipo: "vestidos", nome: "vestidos longo 1" }),
+    product({ id: 1, categoriaTipo: "vestidos", nome: "vestidos madrinha longo 1" }),
     product({ id: 2, categoriaTipo: "ternos", nome: "terno azul" }),
   ];
 
