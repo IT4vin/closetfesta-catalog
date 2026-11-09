@@ -3,11 +3,10 @@ import { useNavigate } from "react-router-dom";
 import {
   FixedSizeGrid as _FixedSizeGrid,
   type GridChildComponentProps,
-  type GridProps,
 } from "react-window";
 
-/** Evita erro de tipos React 18 + @types/react-window no build (Vercel/TS). */
-const Grid = _FixedSizeGrid as unknown as ComponentType<GridProps>;
+/** Conserva o tipo correto de FixedSizeGrid (inclui columnWidth e rowHeight). */
+const Grid = _FixedSizeGrid as unknown as ComponentType<React.ComponentProps<typeof _FixedSizeGrid>>;
 import { Heart } from "lucide-react";
 import type { Product } from "@/data/catalog/product";
 import { CatalogImage } from "@/components/CatalogImage";
