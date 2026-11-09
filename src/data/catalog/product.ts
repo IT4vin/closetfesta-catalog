@@ -12,4 +12,10 @@ export interface Product {
   tamanhos: string[];
   descricao: string;
   tipos: string[];
+  /** Dados do Supabase administrativo; nunca contém custos internos. */
+  supabaseId?: string;
+  /** Galeria publicada pelo sistema de gestão. */
+  imagens?: string[];
+  atualizadoEm?: string;
+  criadoEm?: string;
 }
