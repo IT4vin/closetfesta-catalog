@@ -7,7 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { loadSearchIndex, preloadChunkByCor } from "@/data/catalog/loader";
+import { loadSearchIndex, preloadChunkByCor, refreshCatalog } from "@/data/catalog/loader";
 import type { CorCategoria, TipoCategoria } from "@/data/catalogMeta";
 import type { Product } from "@/data/catalog/product";
 import { filterProductsByCategoryAndQuery } from "@/lib/searchUtils";
@@ -71,6 +71,29 @@ export function SearchProvider({ children }: { children: ReactNode }) {
       });
     return () => {
       cancelled = true;
+    };
+  }, []);
+
+  // Atualiza periodicamente os dados alterados pelo sistema de gestão e
+  // também quando a cliente retorna à aba. Não mantém catálogo antigo como fallback.
+  useEffect(() => {
+    let active = true;
+    const refresh = () => {
+      void refreshCatalog().then(next => {
+        if (!active) return;
+        setSearchIndex(next);
+        setCatalogError(null);
+      }).catch(() => {
+        if (active) setCatalogError("Não foi possível atualizar os produtos agora.");
+      });
+    };
+    const onFocus = () => refresh();
+    const interval = window.setInterval(refresh, 2 * 60 * 1000);
+    window.addEventListener("focus", onFocus);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+      window.removeEventListener("focus", onFocus);
     };
   }, []);
 
