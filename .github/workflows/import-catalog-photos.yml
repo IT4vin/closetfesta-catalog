@@ -1,0 +1,158 @@
+name: Importar fotos do catálogo para o Supabase
+on:
+  push:
+    paths:
+      - '.github/workflows/import-catalog-photos.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  import_images:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            produtos
+          persist-credentials: false
+      - name: Instalar dependencias de conversao
+        run: python3 -m pip install --disable-pip-version-check --user Pillow==11.3.0 requests==2.32.5
+      - name: Otimizar e transferir imagens
+        env:
+          SUPABASE_UPLOAD_URL: https://roqcwdlsuawrdbmnwbvv.supabase.co/functions/v1/closet-catalog-photo-sync
+          OIDC_AUDIENCE: closet-festa-catalog-photo-sync-v1
+        run: |
+          python3 - <<'PY'
+          import collections
+          import concurrent.futures
+          import io
+          import os
+          import pathlib
+          import re
+          import sys
+          import threading
+          import time
+          
+          import requests
+          from PIL import Image, ImageOps, UnidentifiedImageError
+          
+          ROOT = pathlib.Path("produtos")
+          ENDPOINT = os.environ["SUPABASE_UPLOAD_URL"]
+          AUDIENCE = os.environ["OIDC_AUDIENCE"]
+          ALLOWED = {".jpg", ".jpeg", ".png", ".jfif"}
+          token_cache = {"value": None, "fetched": 0.0}
+          token_lock = threading.Lock()
+          progress_lock = threading.Lock()
+          counts = {"completed": 0, "failed": 0}
+          failures = []
+          
+          def get_oidc_token():
+              with token_lock:
+                  if token_cache["value"] and time.monotonic() - token_cache["fetched"] < 120:
+                      return token_cache["value"]
+                  token_url = os.environ["ACTIONS_ID_TOKEN_REQUEST_URL"]
+                  request_token = os.environ["ACTIONS_ID_TOKEN_REQUEST_TOKEN"]
+                  r = requests.get(
+                      token_url,
+                      headers={"Authorization": "Bearer " + request_token},
+                      params={"audience": AUDIENCE},
+                      timeout=40,
+                  )
+                  r.raise_for_status()
+                  token_cache["value"] = r.json()["value"]
+                  token_cache["fetched"] = time.monotonic()
+                  return token_cache["value"]
+          
+          def photo_number(path):
+              match = re.search(r"\((\d+)\)\.[^.]+$", path.name)
+              return int(match.group(1)) if match else 1
+          
+          def as_webp(path):
+              with Image.open(path) as raw:
+                  im = ImageOps.exif_transpose(raw)
+                  im.thumbnail((1800, 1800), Image.Resampling.LANCZOS)
+                  im = im.convert("RGBA" if im.mode in ("RGBA", "LA", "P") and "transparency" in im.info else "RGB")
+                  max_dim = 1800
+                  quality = 85
+                  while True:
+                      buf = io.BytesIO()
+                      im.save(buf, format="WEBP", quality=quality, method=5)
+                      data = buf.getvalue()
+                      if len(data) <= 7_000_000:
+                          return data
+                      if max_dim <= 900:
+                          raise RuntimeError("WebP still exceeds 7 MB: " + str(path))
+                      max_dim = int(max_dim * 0.8)
+                      quality = max(65, quality - 5)
+                      im.thumbnail((max_dim, max_dim), Image.Resampling.LANCZOS)
+          
+          def upload(sku, index, path):
+              payload = as_webp(path)
+              last_error = None
+              for attempt in range(4):
+                  try:
+                      token = get_oidc_token()
+                      response = requests.post(
+                          ENDPOINT,
+                          params={"sku": sku, "index": index},
+                          data=payload,
+                          headers={"Content-Type": "image/webp", "X-GitHub-OIDC": token},
+                          timeout=120,
+                      )
+                      if response.status_code == 200 and response.json().get("ok"):
+                          return
+                      last_error = f"HTTP {response.status_code}: {response.text[:400]}"
+                      if response.status_code in (400, 401, 403, 404, 413, 415):
+                          raise RuntimeError(last_error)
+                  except Exception as exc:
+                      last_error = str(exc)
+                  time.sleep(min(3 * (attempt + 1), 12))
+              raise RuntimeError(f"{sku}/{index} {path}: {last_error}")
+          
+          def transfer_group(group):
+              sku, paths = group
+              local_failures = []
+              for i, path in enumerate(paths):
+                  try:
+                      upload(sku, i, path)
+                      with progress_lock:
+                          counts["completed"] += 1
+                          if counts["completed"] % 25 == 0:
+                              print("Uploaded", counts["completed"], "photos", flush=True)
+                  except Exception as exc:
+                      with progress_lock:
+                          counts["failed"] += 1
+                      local_failures.append(str(exc))
+              return local_failures
+          
+          if not ROOT.is_dir():
+              raise RuntimeError("Products folder missing")
+          groups = collections.defaultdict(list)
+          for image in ROOT.rglob("*"):
+              if not image.is_file() or image.suffix.lower() not in ALLOWED:
+                  continue
+              m = re.match(r"^\s*(\d{5,6})\s*-", image.name)
+              if not m:
+                  raise RuntimeError("Unrecognized product filename: " + str(image))
+              groups[m.group(1)].append(image)
+          
+          for paths in groups.values():
+              paths.sort(key=lambda p: (photo_number(p), str(p)))
+          
+          total = sum(len(p) for p in groups.values())
+          print(f"Photo files: {total}; unique product codes: {len(groups)}", flush=True)
+          if total != 595 or len(groups) != 518:
+              raise RuntimeError("Catalog has changed; verify counts before importing")
+          with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+              futures = [pool.submit(transfer_group, group) for group in sorted(groups.items())]
+              for fut in concurrent.futures.as_completed(futures):
+                  failures.extend(fut.result())
+          print(f"Transferred {counts['completed']} of {total}; failures={len(failures)}", flush=True)
+          for failure in failures[:60]:
+              print("FAILED:", failure, file=sys.stderr)
+          if failures:
+              raise SystemExit(1)
+          
+          PY
