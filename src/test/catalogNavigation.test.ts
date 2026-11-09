@@ -3,9 +3,10 @@ import { buildCatalogUrl, parseCatalogSearchParams } from "@/lib/catalogNavigati
 
 describe("catalogNavigation", () => {
   it("buildCatalogUrl monta query string", () => {
-    expect(buildCatalogUrl({ categoria: "vestidos", q: "noiva" })).toBe(
-      "/catalogo?categoria=vestidos&q=noiva",
-    );
+    const url = new URL(buildCatalogUrl({ categoria: "vestidos", q: "noiva" }), "https://closet.test");
+    expect(url.pathname).toBe("/catalogo");
+    expect(url.searchParams.get("categoria")).toBe("vestidos");
+    expect(url.searchParams.get("q")).toBe("noiva");
   });
 
   it("parseCatalogSearchParams valida cor e tipo", () => {
