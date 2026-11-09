@@ -1,0 +1,53 @@
+name: Catálogo - integração com Supabase administrativo
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'supabase/functions/closet-public-catalog/**'
+      - '.github/workflows/catalog-supabase.yml'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.ts'
+  workflow_dispatch:
+
+jobs:
+  build-and-live-api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Instalar dependências
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Verificar tipos da aplicação
+        run: npx tsc -p tsconfig.app.json --noEmit
+      - name: Testar catálogo
+        run: npm test
+      - name: Compilar para produção
+        run: npx vite build
+      - name: Confirmar consulta real de produtos ao Supabase (somente dados públicos)
+        run: |
+          node --input-type=module <<'NODE'
+          const endpoint = 'https://roqcwdlsuawrdbmnwbvv.supabase.co/functions/v1/closet-public-catalog?limit=2';
+          const abort = AbortSignal.timeout(60000);
+          const response = await fetch(endpoint, { signal: abort, headers:{Accept:'application/json'} });
+          if (!response.ok) throw new Error('Endpoint público do catálogo falhou: HTTP ' + response.status);
+          const data = await response.json();
+          if (!Array.isArray(data.products) || data.products.length !== 2 || data.total < 500) {
+            throw new Error('Catálogo não retornou os produtos reais importados no Supabase');
+          }
+          for(const p of data.products){
+            if (!p.supabaseId || !p.codigo || !p.nome || !p.imagem || !p.slug) {
+              throw new Error('Produto de teste incompleto: sem foto ou código');
+            }
+            for(const field of ['metadata','stock_quantity','cost','created_by','customer','client_id']) {
+              if (field in p) throw new Error('Resposta pública revelou campo administrativo: ' + field);
+            }
+          }
+          console.log('API pública aprovada: ' + data.total + ' produtos do mesmo Supabase administrativo');
+          NODE
