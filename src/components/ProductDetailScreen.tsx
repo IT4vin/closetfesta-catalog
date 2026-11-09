@@ -76,7 +76,8 @@ const ProductDetailScreen = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedColor, setSelectedColor] = useState<CorCategoria>("Branco");
-  const [selectedSize, setSelectedSize] = useState("M");
+  const [selectedSize, setSelectedSize] = useState("A consultar");
+  const [selectedImage, setSelectedImage] = useState("");
   const [qty, setQty] = useState(1);
   const [fav, setFav] = useState(false);
   const addReservationBtnRef = useRef<HTMLButtonElement>(null);
@@ -91,9 +92,14 @@ const ProductDetailScreen = () => {
       .then((p) => {
         if (!cancelled) {
           setProduct(p ?? null);
-          if (p) setSelectedColor(p.cor as CorCategoria);
+          if (p) {
+            setSelectedColor(p.cor as CorCategoria);
+            setSelectedSize(p.tamanhos[0] || "A consultar");
+            setSelectedImage(p.imagem);
+          }
         }
       })
+      .catch(() => { if (!cancelled) setProduct(null); })
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
@@ -105,6 +111,8 @@ const ProductDetailScreen = () => {
   useEffect(() => {
     if (!product) return;
     setSelectedColor(product.cor as CorCategoria);
+    setSelectedSize(product.tamanhos[0] || "A consultar");
+    setSelectedImage(product.imagem);
     setQty(1);
   }, [product?.id, product?.cor, product]);
 
@@ -227,13 +235,28 @@ const ProductDetailScreen = () => {
             <div className="px-5 lg:px-0">
               <div className="mx-auto max-w-[480px] overflow-hidden rounded-2xl bg-secondary shadow-elevated transition-shadow duration-300">
                 <CatalogImage
-                  src={product.imagem}
+                  src={selectedImage || product.imagem}
                   alt={productDisplayName(product.nome)}
-                  className="block aspect-[3/4] w-full object-cover lg:h-[min(70vh,600px)] lg:aspect-auto lg:object-contain"
+                  className="block aspect-[3/4] w-full object-contain lg:h-[min(70vh,600px)] lg:aspect-auto"
                   priority
                 />
               </div>
             </div>
+
+            {(product.imagens?.length ?? 0) > 1 && (
+              <div className="mx-auto mt-3 flex max-w-[480px] gap-2 overflow-x-auto px-5 pb-2 lg:px-0">
+                {product.imagens!.map((imagem, index) => (
+                  <button key={imagem} type="button"
+                    aria-label={"Ver foto " + (index+1) + " do traje"}
+                    aria-pressed={selectedImage===imagem}
+                    onClick={() => setSelectedImage(imagem)}
+                    className={"h-20 w-16 shrink-0 overflow-hidden rounded-lg border-2 bg-secondary " +
+                      (selectedImage===imagem ? "border-marsala" : "border-transparent")}>
+                    <CatalogImage src={imagem} alt={"Detalhe " + (index+1)} className="h-full w-full object-contain"/>
+                  </button>
+                ))}
+              </div>
+            )}
 
             <div className="mx-auto mt-4 max-w-[480px] px-5 lg:px-0">
               <ProductImageNotice />
@@ -313,6 +336,9 @@ const ProductDetailScreen = () => {
 
           <div className="mt-5">
             <p className="font-body text-sm font-semibold text-foreground mb-2">Selecione o tamanho</p>
+            {product.tamanhos.length===0 && (
+              <p className="text-sm text-muted-foreground">Tamanhos sob consulta com a loja.</p>
+            )}
             <div className="flex flex-wrap gap-3">
               {product.tamanhos.map((s) => (
                 <button
