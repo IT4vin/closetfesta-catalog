@@ -20,7 +20,7 @@ O catálogo lê os **mesmos produtos** do Supabase do sistema [Closet Festa Admi
 - A API pública devolve exclusivamente atributos da vitrine. **Clientes, contratos, credenciais, custos de compra e detalhes internos do estoque não são divulgados.** A chave service_role é usada apenas na função do servidor e nunca no navegador.
 - O catálogo é uma vitrine de **aluguel**, não de venda. Estar publicado não garante disponibilidade na data de um evento; a reserva é confirmada pela equipe.
 - Preservamos os IDs numéricos dos SKUs já existentes (`010001` equivale ao ID `10001`) e, quando SKU/cor/categoria não mudam, as rotas antigas, como `/produto/vestidos-branco-010001`.
-- Imagens estáticas em `produtos/` e os arquivos `*.generated.ts` foram mantidos apenas como histórico: a aplicação publicada não os utiliza para decidir quais produtos exibir.
+- As imagens duplicadas de `produtos/` e `public/produtos/`, os arquivos `*.generated.ts` e o gerador antigo foram **excluídos da versão atual**. As fotos usadas no catálogo permanecem no Supabase. As referências antigas ainda podem existir no histórico Git até uma limpeza separada do histórico.
 
 ### Publicação
 
@@ -35,3 +35,11 @@ A rotina `.github/workflows/catalog-supabase.yml` valida a compilação, os test
 3. Abra/recarregue o catálogo público; o conteúdo será atualizado sem precisar de novo build.
 4. Se o produto não aparecer, confira o estado da função `closet-public-catalog` no Supabase e a rotina de verificação do GitHub Actions.
 
+
+### Limpeza do catálogo antigo (novembro de 2026)
+
+- Excluídas as 1.189 cópias JPEG/PNG/WebP versionadas, antes distribuídas entre `produtos/` e `public/produtos/` (aproximadamente 2.40 GB somados).
+- Removido `scripts/generate-catalog.mjs`, que recriava as pastas de imagens e o catálogo estático; desativados `predev`, `prebuild` e `catalog:generate` do `package.json`.
+- Excluídos os índices e chunks gerados que duplicavam nomes, fotos e preços antigos.
+- Preservados `src/assets/` (imagens de ambientação/banner), favicon, logos, páginas, rotas, carrinho, filtros, favoritos e o endpoint no Supabase.
+- **Atenção:** exclusão de arquivos na branch atual reduz o checkout e o contexto do build, mas NÃO apaga automaticamente os blobs dos commits antigos. Reescrever o histórico demandaria ação específica com cuidado para não invalidar clones e deploys existentes.

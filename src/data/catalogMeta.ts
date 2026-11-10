@@ -1,9 +1,10 @@
 /**
- * Metadados fixos do catálogo (cores, tipos e mapa de cores).
- * Produtos vêm de `catalog/search-index` e chunks por cor (gerados a partir da pasta `produtos/`).
+ * Metadados de cores e categorias utilizados pela interface do catálogo.
+ * Os produtos e suas fotos são consultados em tempo real no Supabase do
+ * sistema administrativo; as antigas pastas de imagens do GitHub foram removidas.
  *
- * CORES_CATEGORIA deve coincidir com os nomes das pastas em `produtos/vestidos/<cor>/`
- * (cada subpasta é uma cor). Ao adicionar pastas novas, inclua o nome e um hex em colorMap.
+ * Se forem adicionadas novas cores no administrativo, revise os filtros e
+ * o mapa de cores nesta interface (a listagem dos produtos já é dinâmica).
  *
  * Ordem: tonalidade do mais claro ao mais escuro (luminância relativa WCAG do hex em colorMap).
  */

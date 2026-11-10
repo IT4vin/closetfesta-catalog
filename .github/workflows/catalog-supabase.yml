@@ -17,6 +17,14 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - name: Garantir que fotos e catálogo estáticos não voltaram ao GitHub
+        run: |
+          test ! -d produtos
+          test ! -d public/produtos
+          test ! -f scripts/generate-catalog.mjs
+          test ! -f src/data/catalog.generated.ts
+          test ! -f src/data/catalog/search-index.generated.ts
+          test ! -f src/data/catalog/manifest.generated.ts
       - name: Node.js 24
         uses: actions/setup-node@v4
         with:

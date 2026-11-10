@@ -1,4 +1,4 @@
-/** Modelo de produto do catálogo (gerado em chunks e search-index). */
+/** Modelo de produto recebido do Supabase administrativo pela API pública. */
 export interface Product {
   id: number;
   codigo: string;

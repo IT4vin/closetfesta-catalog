@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Catálogo oficial é carregado do Supabase; imagens locais não devem voltar.
+# Preserve apenas src/assets/ (banners) e os elementos visuais do site.
+/produtos/
+/public/produtos/
+/src/data/catalog.generated.ts
+/src/data/catalog/chunks/*.generated.ts
+/src/data/catalog/manifest.generated.ts
+/src/data/catalog/search-index.generated.ts
