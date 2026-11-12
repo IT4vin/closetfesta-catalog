@@ -383,7 +383,7 @@ const ProductDetailScreen = () => {
             <p className="font-body text-sm text-muted-foreground leading-relaxed">{product.descricao}</p>
           </div>
           <div className="fixed bottom-24 left-0 right-0 z-40 px-5 py-4 lg:static lg:mt-7 lg:px-0 lg:py-0">
-        <div className="mx-auto flex max-w-lg items-center justify-between gap-3 rounded-2xl bg-white/90 px-4 py-3 shadow-card backdrop-blur-lg lg:max-w-none lg:border lg:border-border lg:bg-secondary/60 lg:px-5 lg:py-5">
+        <div className="mx-auto flex max-w-lg items-center justify-between gap-3 rounded-2xl bg-white/10 px-4 py-3 shadow-card backdrop-blur-lg lg:max-w-none lg:border lg:border-white/20 lg:px-5 lg:py-5">
           <div>
             <p className="font-body text-xs text-muted-foreground">Total do aluguel</p>
             <p className="font-display text-2xl font-bold text-foreground">
