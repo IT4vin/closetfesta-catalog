@@ -4,7 +4,6 @@ import { motion } from "motion/react";
 import {
   Heart,
   MessageCircle,
-  Play,
   ArrowRight,
   Star,
   Sparkles,
@@ -146,69 +145,45 @@ const LuxeHomePage = () => {
 
   return (
     <LuxeSiteLayout>
-      <section className="relative overflow-hidden">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 py-12 md:grid-cols-2 md:gap-16 md:px-8 md:py-20">
+      <section className="relative overflow-hidden" aria-label="Coleções e acesso ao catálogo">
+        <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)] items-start gap-x-3 gap-y-4 px-4 pb-8 pt-6 sm:gap-x-5 sm:px-6 md:grid-cols-2 md:items-center md:gap-x-16 md:gap-y-0 md:px-8 md:py-20">
+          {/* No celular: texto à esquerda, banner à direita e ações embaixo dos dois. */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className="order-2 md:order-1"
+            transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+            className="col-start-1 row-start-1 min-w-0 self-center md:self-end"
           >
-            <span className="text-[11px] uppercase tracking-[0.4em] text-warm-gray">Nova Coleção</span>
-            <h1 className="mt-5 font-display text-[42px] leading-[1.02] tracking-tight text-marsala md:text-[64px]">
-              Elegância para <br />
-              <em className="font-normal italic">momentos</em> <br />
+            <span className="block text-[9px] uppercase tracking-[0.15em] text-warm-gray sm:text-[10px] md:text-[11px] md:tracking-[0.4em]">
+              Nova Coleção
+            </span>
+            <h1 className="mt-3 font-display text-[clamp(1.45rem,6vw,2.1rem)] leading-[1.07] tracking-tight text-marsala sm:text-[2.2rem] md:mt-5 md:text-[64px] md:leading-[1.02]">
+              Elegância para <br className="hidden md:block" />
+              <em className="font-normal italic">momentos</em>{" "}
+              <br className="hidden md:block" />
               inesquecíveis.
             </h1>
-            <p className="mt-6 max-w-md text-base leading-relaxed text-warm-gray">
-              Alugue vestidos, ternos e trajes exclusivos para casamentos, formaturas, festas e eventos
-              especiais.
+            <p className="mt-3 max-w-md text-[11px] leading-relaxed text-warm-gray sm:text-xs md:mt-6 md:text-base">
+              <span className="md:hidden">
+                Vestidos, ternos e trajes especiais para celebrar cada momento.
+              </span>
+              <span className="hidden md:inline">
+                Alugue vestidos, ternos e trajes exclusivos para casamentos, formaturas, festas e eventos especiais.
+              </span>
             </p>
-
-            <div className="mt-8 flex flex-wrap items-center gap-4">
-              <a
-                href={whatsappHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center gap-3 rounded-full bg-marsala px-7 py-4 text-sm font-medium text-primary-foreground shadow-[0_10px_30px_-10px_rgba(122,46,58,0.6)] transition hover:bg-marsala-dark hover:shadow-[0_18px_40px_-12px_rgba(122,46,58,0.7)]"
-              >
-                Agendar Prova
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </a>
-              <Link
-                to="/catalogo"
-                className="group inline-flex items-center gap-3 rounded-full border border-marsala/25 px-6 py-4 text-sm font-medium text-marsala transition hover:border-marsala hover:bg-marsala/5"
-              >
-                <span className="grid h-8 w-8 place-items-center rounded-full bg-marsala text-primary-foreground">
-                  <Play className="ml-0.5 h-3 w-3 fill-current" />
-                </span>
-                Ver Coleção
-              </Link>
-            </div>
-
-            <ul className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-sm text-marsala/85">
-              {["Atendimento Personalizado", "Ajustes Inclusos", "Peças Exclusivas"].map((f) => (
-                <li key={f} className="flex items-center gap-2">
-                  <span className="grid h-5 w-5 place-items-center rounded-full bg-marsala/10 text-marsala">
-                    ✓
-                  </span>
-                  <span>{f}</span>
-                </li>
-              ))}
-            </ul>
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0, scale: 1.04 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-            className="relative order-1 mx-auto w-full max-w-[290px] sm:max-w-[335px] md:order-2 md:max-w-[360px] lg:max-w-[380px]"
+            transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
+            className="relative col-start-2 row-start-1 w-full max-w-[185px] justify-self-end sm:max-w-[245px] md:col-start-2 md:row-span-2 md:row-start-1 md:mx-auto md:max-w-[360px] md:justify-self-center lg:max-w-[380px]"
           >
             <div
               role="region"
               aria-label="Destaques do catálogo Closet Festa"
               aria-roledescription="carrossel"
-              className="relative overflow-hidden rounded-[24px] border border-marsala/20 bg-[#510C17] shadow-[0_18px_36px_-7px_rgba(71,19,33,0.48),0_7px_14px_-5px_rgba(71,19,33,0.34)] ring-1 ring-white/40 md:rounded-[28px]"
+              className="relative overflow-hidden rounded-[18px] border border-marsala/20 bg-[#510C17] shadow-[0_18px_36px_-7px_rgba(71,19,33,0.48),0_7px_14px_-5px_rgba(71,19,33,0.34)] ring-1 ring-white/40 sm:rounded-[24px] md:rounded-[28px]"
             >
               <div className="relative aspect-[9/16]">
                 {HERO_SLIDES.map((slide, index) => (
@@ -218,7 +193,7 @@ const LuxeHomePage = () => {
                     alt={slide.alt}
                     width={861}
                     height={1536}
-                    loading="eager"
+                    loading={index === 0 ? "eager" : "lazy"}
                     decoding="async"
                     aria-hidden={heroIndex !== index}
                     className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ease-in-out ${heroIndex === index ? "z-10 opacity-100" : "z-0 opacity-0"}`}
@@ -226,7 +201,7 @@ const LuxeHomePage = () => {
                 ))}
               </div>
             </div>
-            <div className="mt-3 flex justify-center gap-2" role="group" aria-label="Selecionar imagem do banner">
+            <div className="mt-2 flex justify-center gap-2 md:mt-3" role="group" aria-label="Selecionar imagem do banner">
               {HERO_SLIDES.map((slide, index) => (
                 <button
                   key={slide.label}
@@ -238,6 +213,42 @@ const LuxeHomePage = () => {
                 />
               ))}
             </div>
+          </motion.div>
+
+          {/* Botões aparecem na primeira dobra no celular, sem precisar passar pelo banner. */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.1 }}
+            className="col-span-2 row-start-2 min-w-0 md:col-span-1 md:col-start-1 md:mt-8"
+          >
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 md:flex md:flex-wrap md:items-center md:gap-4">
+              <Link
+                to="/catalogo"
+                className="group inline-flex min-h-12 items-center justify-center gap-1.5 rounded-full bg-marsala px-3 py-3 text-center text-xs font-semibold text-primary-foreground shadow-[0_10px_30px_-10px_rgba(122,46,58,0.6)] transition hover:bg-marsala-dark hover:shadow-[0_18px_40px_-12px_rgba(122,46,58,0.7)] sm:text-sm md:px-7 md:py-4"
+              >
+                Ver catálogo
+                <ArrowRight className="h-4 w-4 shrink-0 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+              </Link>
+              <a
+                href={whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex min-h-12 items-center justify-center rounded-full border border-marsala/30 px-3 py-3 text-center text-xs font-medium text-marsala transition hover:border-marsala hover:bg-marsala/5 sm:text-sm md:px-6 md:py-4"
+              >
+                Agendar prova
+              </a>
+            </div>
+            <ul className="mt-9 hidden flex-wrap gap-x-8 gap-y-3 text-sm text-marsala/85 md:flex">
+              {["Atendimento Personalizado", "Ajustes Inclusos", "Peças Exclusivas"].map(f => (
+                <li key={f} className="flex items-center gap-2">
+                  <span className="grid h-5 w-5 place-items-center rounded-full bg-marsala/10 text-marsala" aria-hidden="true">
+                    ✓
+                  </span>
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
           </motion.div>
         </div>
       </section>
