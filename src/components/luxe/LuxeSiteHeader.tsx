@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Heart, MessageCircle, Menu, ShoppingBag, X } from "lucide-react";
 import HomeHeaderSearch from "@/components/HomeHeaderSearch";
-import closetLogoUrl from "@/assets/logo.svg?url";
+import closetHeaderLogoUrl from "@/assets/logo-header.svg?url";
 import { useCart } from "@/contexts/CartContext";
 import { getWhatsAppHref } from "@/components/WhatsAppFloat";
 import { LUXE_NAV, LUXE_NAV_LINK_CLASS } from "@/components/luxe/constants";
@@ -31,11 +31,17 @@ export function LuxeSiteHeader() {
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-3 sm:px-4 md:px-8 md:py-4">
-        <Link to="/" className="flex min-w-0 flex-1 flex-col items-center justify-center leading-none lg:flex-none" aria-label="Closet Festa — início">
-          <img src={closetLogoUrl} alt="" aria-hidden="true"
-            className="h-12 w-12 shrink-0 object-contain sm:h-14 sm:w-14 md:h-16 md:w-16"
-            width={64} height={64} loading="eager" />
-          <span className="mt-1 block text-center text-[8px] uppercase leading-tight tracking-[0.08em] text-warm-gray sm:text-[9px] sm:tracking-[0.12em]">
+        <Link to="/" className="flex w-[136px] shrink-0 flex-col items-center justify-center leading-none sm:w-[158px]" aria-label="Closet Festa — início">
+          <img
+            src={closetHeaderLogoUrl}
+            alt=""
+            aria-hidden="true"
+            className="block h-auto w-full object-contain"
+            width={1442}
+            height={580}
+            loading="eager"
+          />
+          <span className="mt-0.5 block text-center text-[9px] font-medium uppercase leading-snug tracking-[0.09em] text-marsala/75 sm:text-[10px]">
             Aluguel de Trajes
           </span>
         </Link>
