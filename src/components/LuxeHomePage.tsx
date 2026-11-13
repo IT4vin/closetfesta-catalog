@@ -202,26 +202,26 @@ const LuxeHomePage = () => {
             initial={{ opacity: 0, scale: 1.04 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-            className="relative order-1 md:order-2"
+            className="relative order-1 mx-auto w-full max-w-[290px] sm:max-w-[335px] md:order-2 md:max-w-[360px] lg:max-w-[380px]"
           >
             <div
               role="region"
               aria-label="Destaques do catálogo Closet Festa"
               aria-roledescription="carrossel"
-              className="relative overflow-hidden rounded-[28px] bg-[#510C17] shadow-[0_30px_80px_-30px_rgba(92,31,43,0.5)]"
+              className="relative overflow-hidden rounded-[24px] border border-marsala/20 bg-[#510C17] shadow-[0_18px_36px_-7px_rgba(71,19,33,0.48),0_7px_14px_-5px_rgba(71,19,33,0.34)] ring-1 ring-white/40 md:rounded-[28px]"
             >
-              <div className="relative aspect-[9/16] md:aspect-[3/4]">
+              <div className="relative aspect-[9/16]">
                 {HERO_SLIDES.map((slide, index) => (
                   <img
                     key={slide.label}
                     src={slide.src}
                     alt={slide.alt}
-                    width={480}
-                    height={856}
+                    width={861}
+                    height={1536}
                     loading="eager"
                     decoding="async"
                     aria-hidden={heroIndex !== index}
-                    className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-700 ease-in-out ${heroIndex === index ? "z-10 opacity-100" : "z-0 opacity-0"}`}
+                    className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ease-in-out ${heroIndex === index ? "z-10 opacity-100" : "z-0 opacity-0"}`}
                   />
                 ))}
               </div>
