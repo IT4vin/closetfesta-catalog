@@ -116,7 +116,7 @@ const HomeScreen = () => {
                 alt="Closet Festa"
                 width={1792}
                 height={1792}
-                className="h-24 w-auto max-w-[calc(100vw-7rem)] object-contain object-center drop-shadow-sm sm:h-28 lg:h-24 xl:h-28"
+                className="h-20 w-auto max-w-[calc(100vw-7.5rem)] object-contain object-center drop-shadow-sm sm:h-24 lg:h-24 xl:h-28"
                 decoding="async"
                 fetchPriority="high"
               />
@@ -136,7 +136,7 @@ const HomeScreen = () => {
             </button>
           </div>
 
-          <div className="mx-auto w-full max-w-7xl px-4 -mt-4 sm:px-5 sm:-mt-6 lg:px-8">
+          <div className="mx-auto mt-0.5 w-full max-w-7xl px-4 sm:mt-0 sm:px-5 lg:px-8">
             <div className="mx-auto w-full max-w-3xl lg:max-w-4xl">
               <ClosetSearchBar compact />
             </div>

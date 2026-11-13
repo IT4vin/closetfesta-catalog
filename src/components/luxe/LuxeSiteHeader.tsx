@@ -30,12 +30,12 @@ export function LuxeSiteHeader() {
           : "bg-background/80 backdrop-blur-sm"
       }`}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-8 md:py-5">
-        <Link to="/" className="flex min-w-0 flex-1 items-center gap-2 leading-none lg:flex-none" aria-label="Closet Festa — início">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-3 sm:px-4 md:px-8 md:py-4">
+        <Link to="/" className="flex min-w-0 flex-1 flex-col items-center justify-center leading-none lg:flex-none" aria-label="Closet Festa — início">
           <img src={closetLogoUrl} alt="" aria-hidden="true"
-            className="h-16 w-16 shrink-0 object-contain sm:h-[72px] sm:w-[72px]"
-            width={72} height={72} loading="eager" />
-          <span className="whitespace-nowrap text-[9px] uppercase tracking-[0.14em] text-warm-gray sm:text-[10px]">
+            className="h-12 w-12 shrink-0 object-contain sm:h-14 sm:w-14 md:h-16 md:w-16"
+            width={64} height={64} loading="eager" />
+          <span className="mt-1 block text-center text-[8px] uppercase leading-tight tracking-[0.08em] text-warm-gray sm:text-[9px] sm:tracking-[0.12em]">
             Aluguel de Trajes
           </span>
         </Link>
@@ -46,7 +46,7 @@ export function LuxeSiteHeader() {
           ))}
         </nav>
 
-        <div className="flex shrink-0 items-center gap-0.5 sm:gap-2 md:gap-4">
+        <div className="flex shrink-0 items-center gap-0 sm:gap-1 md:gap-3">
           <HomeHeaderSearch scrolled={scrolled} />
           <Link
             to="/carrinho"

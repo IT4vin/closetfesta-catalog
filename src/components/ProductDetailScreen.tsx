@@ -194,7 +194,7 @@ const ProductDetailScreen = () => {
 
   return (
     <div className="relative flex min-h-screen flex-col bg-background">
-      <div className="mx-auto w-full max-w-6xl flex-1 pb-48 lg:pb-28">
+      <div className="mx-auto w-full max-w-6xl flex-1 pb-60 lg:pb-28">
         <div className="flex items-center justify-between px-5 pt-5 pb-3">
           <button
             type="button"
@@ -383,7 +383,7 @@ const ProductDetailScreen = () => {
             <p className="font-body text-sm text-muted-foreground leading-relaxed">{product.descricao}</p>
           </div>
           <div className="fixed bottom-24 left-0 right-0 z-40 px-5 py-4 lg:static lg:mt-7 lg:px-0 lg:py-0">
-        <div className="mx-auto flex max-w-lg items-center justify-between gap-3 rounded-2xl bg-white/10 px-4 py-3 shadow-card backdrop-blur-lg lg:max-w-none lg:border lg:border-white/20 lg:px-5 lg:py-5">
+        <div className="mx-auto flex max-w-lg flex-col items-stretch gap-2 rounded-2xl bg-white/10 px-4 py-3 shadow-card backdrop-blur-lg sm:flex-row sm:items-center sm:justify-between sm:gap-3 lg:max-w-none lg:border lg:border-white/20 lg:px-5 lg:py-5">
           <div>
             <p className="font-body text-xs text-muted-foreground">Total do aluguel</p>
             <p className="font-display text-2xl font-bold text-foreground">
@@ -394,7 +394,7 @@ const ProductDetailScreen = () => {
             ref={addReservationBtnRef}
             type="button"
             onClick={handleAddToCart}
-            className="flex items-center gap-2 rounded-2xl bg-primary px-6 py-3.5 font-body text-sm font-bold text-primary-foreground shadow-button transition-transform hover:scale-105 active:scale-95"
+            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-3 font-body text-sm font-bold text-primary-foreground shadow-button transition-transform hover:scale-[1.02] active:scale-95 sm:w-auto sm:shrink-0 sm:px-6 sm:py-3.5"
           >
             <ShoppingCart className="h-5 w-5" />
             Adicionar à reserva

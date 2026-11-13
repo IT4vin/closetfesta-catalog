@@ -17,14 +17,12 @@ export function LuxeSiteFooter() {
   return (
     <footer id="contato" className="bg-marsala text-primary-foreground">
       <div className="mx-auto max-w-7xl px-4 py-16 md:px-8 md:py-20">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-4">
-          <div>
-            <div className="flex items-center">
-              <img src={closetLogoUrl} alt="Logo Closet Festa"
-                width={112} height={112} loading="lazy"
-                className="h-28 w-28 shrink-0 object-contain" />
-            </div>
-            <p className="mt-4 max-w-xs text-sm text-primary-foreground/70">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4 md:gap-10">
+          <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
+            <img src={closetLogoUrl} alt="Logo Closet Festa"
+              width={128} height={128} loading="lazy"
+              className="h-28 w-28 shrink-0 object-contain sm:h-32 sm:w-32" />
+            <p className="mt-3 max-w-xs text-sm leading-relaxed text-primary-foreground/70">
               Aluguel de trajes premium para casamentos, formaturas e momentos inesquecíveis.
             </p>
             <div className="mt-6 flex gap-3">
