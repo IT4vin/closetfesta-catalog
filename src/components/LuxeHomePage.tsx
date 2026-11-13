@@ -146,7 +146,7 @@ const LuxeHomePage = () => {
   return (
     <LuxeSiteLayout>
       <section className="relative overflow-hidden" aria-label="Coleções e acesso ao catálogo">
-        <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)] items-start gap-x-3 gap-y-4 px-4 pb-8 pt-6 sm:gap-x-5 sm:px-6 md:grid-cols-2 md:items-center md:gap-x-16 md:gap-y-0 md:px-8 md:py-20">
+        <div className="mx-auto grid min-h-[calc(100svh-6rem)] max-w-7xl content-center grid-cols-[minmax(0,0.46fr)_minmax(0,0.54fr)] items-center gap-x-2 gap-y-6 px-3 pb-9 pt-5 sm:gap-x-4 sm:px-6 md:min-h-0 md:grid-cols-2 md:content-normal md:gap-x-16 md:gap-y-0 md:px-8 md:py-20">
           {/* No celular: texto à esquerda, banner à direita e ações embaixo dos dois. */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -154,16 +154,16 @@ const LuxeHomePage = () => {
             transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
             className="col-start-1 row-start-1 min-w-0 self-center md:self-end"
           >
-            <span className="block text-[9px] uppercase tracking-[0.15em] text-warm-gray sm:text-[10px] md:text-[11px] md:tracking-[0.4em]">
+            <span className="block text-[10px] font-medium uppercase tracking-[0.12em] text-warm-gray sm:text-[11px] md:tracking-[0.4em]">
               Nova Coleção
             </span>
-            <h1 className="mt-3 font-display text-[clamp(1.45rem,6vw,2.1rem)] leading-[1.07] tracking-tight text-marsala sm:text-[2.2rem] md:mt-5 md:text-[64px] md:leading-[1.02]">
+            <h1 className="mt-4 font-display text-[clamp(1.5rem,6.8vw,2.3rem)] leading-[1.06] tracking-tight text-marsala sm:text-[2.45rem] md:mt-5 md:text-[64px] md:leading-[1.02]">
               Elegância para <br className="hidden md:block" />
               <em className="font-normal italic">momentos</em>{" "}
               <br className="hidden md:block" />
               inesquecíveis.
             </h1>
-            <p className="mt-3 max-w-md text-[11px] leading-relaxed text-warm-gray sm:text-xs md:mt-6 md:text-base">
+            <p className="mt-4 max-w-md text-xs leading-relaxed text-warm-gray sm:text-sm md:mt-6 md:text-base">
               <span className="md:hidden">
                 Vestidos, ternos e trajes especiais para celebrar cada momento.
               </span>
@@ -177,7 +177,7 @@ const LuxeHomePage = () => {
             initial={{ opacity: 0, scale: 1.04 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
-            className="relative col-start-2 row-start-1 w-full max-w-[185px] justify-self-end sm:max-w-[245px] md:col-start-2 md:row-span-2 md:row-start-1 md:mx-auto md:max-w-[360px] md:justify-self-center lg:max-w-[380px]"
+            className="relative col-start-2 row-start-1 w-full max-w-[215px] justify-self-end sm:max-w-[275px] md:col-start-2 md:row-span-2 md:row-start-1 md:mx-auto md:max-w-[360px] md:justify-self-center lg:max-w-[380px]"
           >
             <div
               role="region"
