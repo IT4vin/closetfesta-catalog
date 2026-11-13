@@ -20,7 +20,8 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import heroImg from "@/assets/home/hero.jpeg";
+import heroCivil from "@/assets/home/banner-casamento-civil.webp";
+import heroVestidos from "@/assets/home/banner-vestidos-festa.webp";
 import colVestidos from "@/assets/home/col-vestidos.jpeg";
 import colTernos from "@/assets/home/col-ternos.jpg";
 import colNoivas from "@/assets/home/col-noivas.jpeg";
@@ -84,6 +85,19 @@ const INSTA = [colLongos, feat1, colNoivas, colCurtos, feat4, colTernos, feat2, 
 
 const whatsappHref = getWhatsAppHref();
 
+const HERO_SLIDES = [
+  {
+    src: heroCivil,
+    alt: "Casamento civil: casal com trajes claros. Pacotes a partir de R$ 299,99.",
+    label: "Casamento civil",
+  },
+  {
+    src: heroVestidos,
+    alt: "Vestidos de festa em tons rosé e dourado. Pacotes a partir de R$ 190,00.",
+    label: "Vestidos de festa",
+  },
+] as const;
+
 const TESTIMONIALS = [
   {
     name: "Marina Ribeiro",
@@ -109,6 +123,14 @@ const LuxeHomePage = () => {
   const { catalogProducts, catalogLoading } = useSearch();
   const [favs, setFavs] = useState<Record<number, boolean>>({});
   const [carousel, setCarousel] = useState(0);
+  const [heroIndex, setHeroIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setHeroIndex(current => (current + 1) % HERO_SLIDES.length);
+    }, 3000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   const featuredProducts = useMemo(
     () => pickFeaturedProducts(catalogProducts, 6),
@@ -182,29 +204,39 @@ const LuxeHomePage = () => {
             transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
             className="relative order-1 md:order-2"
           >
-            <div className="relative aspect-[3/4] overflow-hidden rounded-[28px] bg-accent shadow-[0_30px_80px_-30px_rgba(92,31,43,0.5)]">
-              <img
-                src={heroImg}
-                alt="Modelo com vestido marsala de luxo"
-                width={1200}
-                height={1600}
-                className="h-full w-full object-cover"
-              />
-              <div className="absolute right-5 top-5 rounded-full bg-background/90 px-4 py-2 text-[10px] uppercase tracking-[0.3em] text-marsala backdrop-blur">
-                Coleção 2026
+            <div
+              role="region"
+              aria-label="Destaques do catálogo Closet Festa"
+              aria-roledescription="carrossel"
+              className="relative overflow-hidden rounded-[28px] bg-[#510C17] shadow-[0_30px_80px_-30px_rgba(92,31,43,0.5)]"
+            >
+              <div className="relative aspect-[9/16] md:aspect-[3/4]">
+                {HERO_SLIDES.map((slide, index) => (
+                  <img
+                    key={slide.label}
+                    src={slide.src}
+                    alt={slide.alt}
+                    width={480}
+                    height={856}
+                    loading="eager"
+                    decoding="async"
+                    aria-hidden={heroIndex !== index}
+                    className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-700 ease-in-out ${heroIndex === index ? "z-10 opacity-100" : "z-0 opacity-0"}`}
+                  />
+                ))}
               </div>
             </div>
-            <div className="absolute -bottom-6 -left-6 hidden max-w-[220px] rounded-2xl border border-border bg-background/95 p-4 shadow-lg backdrop-blur md:block">
-              <div className="flex items-center gap-2">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-3.5 w-3.5 fill-marsala text-marsala" />
-                ))}
-                <span className="text-xs font-medium">4.9</span>
-              </div>
-              <p className="mt-2 text-xs leading-snug text-warm-gray">
-                Mais de <span className="font-semibold text-marsala">10.000 clientes</span> vestidas com
-                elegância.
-              </p>
+            <div className="mt-3 flex justify-center gap-2" role="group" aria-label="Selecionar imagem do banner">
+              {HERO_SLIDES.map((slide, index) => (
+                <button
+                  key={slide.label}
+                  type="button"
+                  aria-label={`Exibir banner ${slide.label}`}
+                  aria-pressed={heroIndex === index}
+                  onClick={() => setHeroIndex(index)}
+                  className={`h-2.5 rounded-full transition-all duration-300 ${heroIndex === index ? "w-7 bg-marsala" : "w-2.5 bg-marsala/25 hover:bg-marsala/60"}`}
+                />
+              ))}
             </div>
           </motion.div>
         </div>
