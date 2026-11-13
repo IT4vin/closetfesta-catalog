@@ -146,24 +146,26 @@ const LuxeHomePage = () => {
   return (
     <LuxeSiteLayout>
       <section className="relative overflow-hidden" aria-label="Coleções e acesso ao catálogo">
-        <div className="mx-auto grid min-h-[calc(100svh-6rem)] max-w-7xl content-center grid-cols-[minmax(0,0.46fr)_minmax(0,0.54fr)] items-center gap-x-2 gap-y-6 px-3 pb-9 pt-5 sm:gap-x-4 sm:px-6 md:min-h-0 md:grid-cols-2 md:content-normal md:gap-x-16 md:gap-y-0 md:px-8 md:py-20">
+        <div className="mx-auto grid min-h-[calc(100svh-6rem)] max-w-7xl content-start grid-cols-[minmax(0,0.48fr)_minmax(0,0.52fr)] items-stretch gap-x-2 gap-y-7 px-3 pb-9 pt-12 sm:gap-x-4 sm:px-6 sm:pt-14 md:min-h-0 md:grid-cols-2 md:content-normal md:items-center md:gap-x-16 md:gap-y-0 md:px-8 md:py-20">
           {/* No celular: texto à esquerda, banner à direita e ações embaixo dos dois. */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-            className="col-start-1 row-start-1 min-w-0 self-center md:self-end"
+            className="col-start-1 row-start-1 flex h-full min-w-0 flex-col items-start gap-3 py-2 md:block md:h-auto md:self-end md:py-0"
           >
-            <span className="block text-[10px] font-medium uppercase tracking-[0.12em] text-warm-gray sm:text-[11px] md:tracking-[0.4em]">
-              Nova Coleção
-            </span>
-            <h1 className="mt-4 font-display text-[clamp(1.5rem,6.8vw,2.3rem)] leading-[1.06] tracking-tight text-marsala sm:text-[2.45rem] md:mt-5 md:text-[64px] md:leading-[1.02]">
+            <div className="min-w-0 w-full">
+              <span className="block text-[11px] font-medium uppercase tracking-[0.1em] text-warm-gray sm:text-xs md:text-[11px] md:tracking-[0.4em]">
+                Nova Coleção
+              </span>
+              <h1 className="mt-3 break-words font-display text-[clamp(1.65rem,7.8vw,2.3rem)] leading-[1.06] tracking-tight text-marsala sm:text-[2.5rem] md:mt-5 md:text-[64px] md:leading-[1.02]">
               Elegância para <br className="hidden md:block" />
               <em className="font-normal italic">momentos</em>{" "}
               <br className="hidden md:block" />
-              inesquecíveis.
-            </h1>
-            <p className="mt-4 max-w-md text-xs leading-relaxed text-warm-gray sm:text-sm md:mt-6 md:text-base">
+                inesquecíveis.
+              </h1>
+            </div>
+            <p className="mt-auto max-w-md pt-4 text-[13px] leading-relaxed text-warm-gray sm:text-sm md:mt-6 md:pt-0 md:text-base">
               <span className="md:hidden">
                 Vestidos, ternos e trajes especiais para celebrar cada momento.
               </span>
