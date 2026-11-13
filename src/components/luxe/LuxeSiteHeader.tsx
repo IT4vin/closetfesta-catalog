@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Heart, MessageCircle, Menu, ShoppingBag, X } from "lucide-react";
 import HomeHeaderSearch from "@/components/HomeHeaderSearch";
+import closetLogoUrl from "@/assets/logo.svg?url";
 import { useCart } from "@/contexts/CartContext";
 import { getWhatsAppHref } from "@/components/WhatsAppFloat";
 import { LUXE_NAV, LUXE_NAV_LINK_CLASS } from "@/components/luxe/constants";
@@ -30,12 +31,17 @@ export function LuxeSiteHeader() {
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-8 md:py-5">
-        <Link to="/" className="flex min-w-0 flex-1 flex-col leading-none lg:flex-none">
-          <span className="font-display whitespace-nowrap text-xl tracking-tight text-marsala sm:text-2xl md:text-[26px]">
-            Closet <span className="italic">Festa</span>
-          </span>
-          <span className="mt-0.5 whitespace-nowrap text-[8px] uppercase tracking-[0.2em] text-warm-gray sm:text-[10px] sm:tracking-[0.35em]">
-            Aluguel de Trajes
+        <Link to="/" className="flex min-w-0 flex-1 items-center gap-2 leading-none lg:flex-none" aria-label="Closet Festa — início">
+          <img src={closetLogoUrl} alt="" aria-hidden="true"
+            className="h-12 w-12 shrink-0 object-contain sm:h-14 sm:w-14"
+            width={56} height={56} loading="eager" />
+          <span className="flex min-w-0 flex-col">
+            <span className="font-display whitespace-nowrap text-xl tracking-tight text-marsala sm:text-2xl md:text-[26px]">
+              Closet <span className="italic">Festa</span>
+            </span>
+            <span className="mt-0.5 whitespace-nowrap text-[8px] uppercase tracking-[0.2em] text-warm-gray sm:text-[10px] sm:tracking-[0.35em]">
+              Aluguel de Trajes
+            </span>
           </span>
         </Link>
 

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Instagram, Facebook, Music2, MessageCircle } from "lucide-react";
 import { getWhatsAppHref } from "@/components/WhatsAppFloat";
 import { buildCatalogUrl } from "@/lib/catalogNavigation";
+import closetLogoUrl from "@/assets/logo.svg?url";
 
 const whatsappHref = getWhatsAppHref();
 
@@ -18,8 +19,13 @@ export function LuxeSiteFooter() {
       <div className="mx-auto max-w-7xl px-4 py-16 md:px-8 md:py-20">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-4">
           <div>
-            <div className="font-display text-2xl">
-              Closet <span className="italic">Festa</span>
+            <div className="flex items-center gap-3">
+              <img src={closetLogoUrl} alt="Logo Closet Festa"
+                width={88} height={88} loading="lazy"
+                className="h-20 w-20 shrink-0 object-contain" />
+              <div className="font-display text-2xl">
+                Closet <span className="italic">Festa</span>
+              </div>
             </div>
             <p className="mt-4 max-w-xs text-sm text-primary-foreground/70">
               Aluguel de trajes premium para casamentos, formaturas e momentos inesquecíveis.
