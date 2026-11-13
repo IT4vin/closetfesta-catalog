@@ -88,12 +88,20 @@ export function SearchProvider({ children }: { children: ReactNode }) {
       });
     };
     const onFocus = () => refresh();
+    // No Safari mobile a troca de aba nem sempre emite focus; revalida ao voltar.
+    const onVisible = () => {
+      if (document.visibilityState === "visible") refresh();
+    };
     const interval = window.setInterval(refresh, 2 * 60 * 1000);
     window.addEventListener("focus", onFocus);
+    window.addEventListener("pageshow", onFocus);
+    document.addEventListener("visibilitychange", onVisible);
     return () => {
       active = false;
       window.clearInterval(interval);
       window.removeEventListener("focus", onFocus);
+      window.removeEventListener("pageshow", onFocus);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, []);
 
